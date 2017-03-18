@@ -1,0 +1,27 @@
+﻿<div class="text">
+    <h2>Case</h2>
+    <p>
+        You have some data in your database, but you need to display it in some projection (e.g. "not all fields"), probably using aggregate functions,
+        and at the same time you want to avoid <a href="http://stackoverflow.com/questions/97197/what-is-the-n1-selects-issue" target="_blank">Select N+1 issue</a>
+        in your table.
+    </p>
+    <h2>Solution</h2>
+    <p>There are 3 possible ways to map TSource to TRow in Reinforced.Lattice</p>
+    <h3>Automatic mapping</h3>
+    <p>
+        In simple cases Reinforced.Lattice is able to map your data automatically. As you have seen at "Getting it Working" tutorial, Reinforced.Lattice has automatically determined which data to show,
+        but you have not specified any additional settings to do that.
+        That is because Reinforced.Lattice mapping at work. If you know project <a href="http://automapper.org" target="_blank">Automapper</a> then you are familiar with mapping process
+        - it is almost similar in Reinforced.Lattice. Obviously, for some cases it is not applicable.
+    </p>
+    <h3>Manual mapping with <code>.MappedFrom</code></h3>
+    <p>
+        
+    </p>
+</div>
+<div class="text">
+    <h3>Manual mapping using <code>.ProjectDataWith</code></h3>
+    <p>
+        
+    </p>
+</div>

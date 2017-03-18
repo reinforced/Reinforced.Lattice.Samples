@@ -1,0 +1,86 @@
+{
+  "Id": "Projections",
+  "Title": "Data mapping and Projections",
+  "Subtitle": "When data in database differs from data in table",
+  "Link": "https://github.com/reinforced/Reinforced.Lattice/tree/master/Samples/Reinforced.Lattice.CaseStudies.Projections",
+  "Keywords": [],
+  "Downloads": [
+    {
+      "Url": "/App_Data/data.json",
+      "Title": "Source data",
+      "Description": "Source data file that is used in this sample",
+      "IsRelative": true
+    }
+  ],
+  "LiveDemos": [
+    {
+      "Id": "Projection",
+      "Title": "Projection",
+      "Description": "Demo of using projections",
+      "Controller": "HomeController",
+      "Action": "Index",
+      "View": "Index",
+      "Data": "data.json"
+    }
+  ],
+  "CodePieces": [
+    {
+      "Id": "DataClasses",
+      "Title": "Problematic data classes",
+      "Description": "Definitions of source and row where data differs",
+      "Files": [
+        {
+          "Path": "/Models/User.cs",
+          "Language": "csharp",
+          "Comment": "Data from data source",
+          "Title": "User.cs"
+        },
+        {
+          "Path": "/Models/UserRow.cs",
+          "Language": "csharp",
+          "Comment": "ViewModel of table's row",
+          "Title": "UserRow.cs"
+        }
+      ]
+    },
+    {
+      "Id": "MappedFromTable.cs",
+      "Title": "Configuration with .MappedFrom",
+      "Description": "Class holding our configuration extension method for .MappedFrom",
+      "Files": [
+        {
+          "Path": "/Models/MappedFromTable.cs",
+          "Language": "csharp",
+          "Comment": null,
+          "Title": "MappedFromTable.cs"
+        }
+      ]
+    },
+    {
+      "Id": "ProjectionTable.cs",
+      "Title": "Configuration with .MappedFrom",
+      "Description": "Class holding our configuration extension method for .ProjectDataWith",
+      "Files": [
+        {
+          "Path": "/Models/ProjectionTable.cs",
+          "Language": "csharp",
+          "Comment": null,
+          "Title": "ProjectionTable.cs"
+        }
+      ]
+    },
+    {
+      "Id": "HomeController.cs",
+      "Title": "Controller",
+      "Description": "Implementation of MVC controller handling table on server side",
+      "Files": [
+        {
+          "Path": "/Controllers/HomeController.cs",
+          "Language": "csharp",
+          "Comment": null,
+          "Title": "HomeController.cs"
+        }
+      ]
+    }
+  ]
+}
