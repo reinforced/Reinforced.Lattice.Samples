@@ -16,13 +16,52 @@
     </p>
     <h3>Manual mapping with <code>.MappedFrom</code></h3>
     <p>
-        <code>.MappedFrom</code> extension allows you to point a delegate that must be used to obtain specific column's value 
-        from source data instance. 
+        <code>.MappedFrom</code> extension allows you to point a delegate that must be used to obtain specific <code>TRow</code>'s column value 
+        from <code>TSource</code> instance:
     </p>
+</div>
+<pre class="language-csharp wrap-code" data-src="#doc#/mapped-from.cs">
+
+</pre>
+<div class="text">    
+    <p>
+        Noticable moments are:
+    </p>
+    <ul class="blogger-sans">
+        <li><code>.MappedFrom</code> delegate is executed <b>after</b> fetching <code>TSource</code>'s set from data source</li>
+        <li>If you use database and ORM with lazy loading enabled then it is bad idea to use <code>.MappedFrom</code> on joined aggregates - it will throw you into Select N+1 issue</li>        
+        <li><code>.MappedFrom</code> works perfectly in conjunction with automatical mapping. If <code>.MappedFrom</code> delegate presents for particular <code>TRow</code>'s column then it will be used for mapping. 
+        Otherwise - automaticall mapping wil be applied.
+         </li>  
+    </ul>
+    <p>So you can use <code>.MappedFrom</code> for post-query model transformations. It is pretty flexible on simple models to be used with automatical mapping. Unfortunately, it is not usable with complext models because of Select N+1 issue. 
+
+      </p>
 </div>
 <div class="text">
     <h3>Manual mapping using <code>.ProjectDataWith</code></h3>
     <p>
-        
+        For complex models you can use projection method. <code>.ProjectDataWith</code> is used to specify method that takes your <code>IQueryable&lt;TSource&gt;</code> and turns it to <code>IQueryable&lt;TRow&gt;</code>. 
+        The trick is pretty simple: in case if you use ORM that translates LINQ to store internal query language (e.g. EF translates LINQ to SQL) then your projection method will be also processed by query translator and all the fields of projection will be calculated on store side. It solves Select N+1 issue but requires little bit more boilerplate code:
+    </p>
+</div>
+<pre class="language-csharp wrap-code" data-src="#doc#/project-with.cs">
+
+</pre>
+<div class="text">
+    <p>
+        Noticable moments are:
+    </p>
+    <ul class="blogger-sans">
+        <li><code>.ProjectDataWith</code> can be specified only once for table. All further calls to <code>.ProjectDataWith</code> will override projection.</li>
+        <li>Automatic mapping does not work when projection specified</li>        
+        <li>An attempt to use <code>.MappedFrom</code> in conjunction with <code>.ProjectDataWith</code> will lead to excetion - technically it is not possible to use <code>.ProjectDataWith</code> and <code>.MappedFrom</code> at the same time (since <code>.MappedFrom</code> consumes delegate, not expression)</li>  
+        <li>You have to specify mapping for all properties. So if field <code>Id</code> presents both in <code>TSource</code> and <code>TRow</code> - you anyway will have to mention it in projection</li>        
+    </ul>
+</div>
+<div class="text">
+    <h3>If nothing helped</h3>
+    <p>
+        If your model and projection query is too complex even for <code>.ProjectDataWith</code> then consider re-organizing your table e.g. by changing of your <code>IQueryable&lt;TSource&gt;</code> to other type (probably even <code>IQueryable&lt;TRow&gt;</code>) query. 
     </p>
 </div>

@@ -1,0 +1,1 @@
+conf.Column(c => c.FullName).MappedFrom(x => string.Format("{0} {1}",x.FirstName, x.LastName));
