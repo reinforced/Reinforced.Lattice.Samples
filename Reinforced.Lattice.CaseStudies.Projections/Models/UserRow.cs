@@ -11,7 +11,7 @@ namespace Reinforced.Lattice.CaseStudies.Projections.Models
         public string Email { get; set; }
         public DateTime RegistrationDate { get; set; }
         public bool IsActive { get; set; }
-        public int ManagerId { get; set; }
+        public int? ManagerId { get; set; }
         public string ManagerName { get; set; }
         public double TotalOrder { get; set; }
     }

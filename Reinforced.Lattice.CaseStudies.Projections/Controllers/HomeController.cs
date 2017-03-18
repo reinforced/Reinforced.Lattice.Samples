@@ -17,17 +17,28 @@ namespace Reinforced.Lattice.CaseStudies.Projections.Controllers
         {
             return new HomeIndexViewModel()
             {
-                Table = new Configurator<User, UserRow>()   // create our configurator instance 
-                            .ConfigureProjection()                    // configure it with extension method from UsersTable.cs
-                            .Url(Url.Action("HandleTable")) // Set handle method URL. We use Url.Action to be more consistent
+                ProjectionTable = new Configurator<User, UserRow>()
+                            .ConfigureProjection().Url(Url.Action("HandleProjectionTable")),
+                MappedFromTable = new Configurator<User, UserRow>()
+                            .ConfigureMappedFrom().Url(Url.Action("HandleMappedFromTable"))
             };
         }
 
-        public ActionResult HandleTable()
+        public ActionResult HandleProjectionTable()
         {
-            return null;
+            var conf = new Configurator<User, UserRow>().ConfigureProjection();
+            var handler = conf.CreateMvcHandler(ControllerContext);
+            var q = DataService.GetAllData();
+            return handler.Handle(q);
         }
 
+        public ActionResult HandleMappedFromTable()
+        {
+            var conf = new Configurator<User, UserRow>().ConfigureMappedFrom();
+            var handler = conf.CreateMvcHandler(ControllerContext);
+            var q = DataService.GetAllData();
+            return handler.Handle(q);
+        }
 
         public DataService<User> DataService { get; private set; }
         public HomeController()

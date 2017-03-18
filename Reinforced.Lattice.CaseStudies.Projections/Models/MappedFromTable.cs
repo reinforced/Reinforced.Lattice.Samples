@@ -19,16 +19,18 @@ namespace Reinforced.Lattice.CaseStudies.Projections.Models
             conf.Column(c => c.FullName).MappedFrom(x => string.Format("{0} {1}",x.FirstName, x.LastName));
 
             // but here Managed will be fetched from DB !!FOR EACH!! table row
-            conf.Column(c => c.ManagerId).MappedFrom(c => c.Manager.Id);
-            conf.Column(c => c.ManagerName).MappedFrom(c => c.Manager.FullName); // twice! (if not cached)
+            conf.Column(c => c.ManagerId).MappedFrom(c => c.Manager == null ? (int?)null : c.Manager.Id);
+            conf.Column(c => c.ManagerName).MappedFrom(c => c.Manager == null ? null : c.Manager.FullName); // twice! (if not cached)
 
             // do not ask me what will happen here
             conf.Column(c => c.TotalOrder).MappedFrom(x => x.Orders.Sum(d => d.Quantity*d.Price));
 
             // in conclusion - in really simple cases, .MappedFrom can
             // save space and improve readability
-            
+
             // in complex cases it will lead to massive slowdowns
+
+            conf.Column(c => c.RegistrationDate).DataOnly(); //let's hide date column for convinience
             return conf;
         }
     }

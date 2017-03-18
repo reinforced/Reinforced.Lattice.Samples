@@ -4,26 +4,21 @@
 @using Reinforced.Lattice.Templates
 @model Reinforced.Lattice.CaseStudies.Projections.Models.HomeIndexViewModel
 
-@* Our table will be rendered to this div *@
-<div id="table"></div>
+<div class="row">
+    <div class="col-sm-6">
+        <h3 class="text-center">Table with <code>.ProjectDataWith</code></h3>
+        <div id="projectionTable"></div>
+    </div>
+    <div class="col-sm-6">
+        <h3 class="text-center">Table with <code>.MappedFrom</code></h3>
+        <div id="mappedFromTable"></div>
+    </div>
+</div>
 
 @section scripts {
 
-    @* Render our templates *@
-
     @{ Html.RenderTemplates("lt", "Lattice_Templates_Bootstrap"); }
 
-    @* Instantiate our table and put it to JS window.$$table variable *@
-
-    @Model.Table.InitializationScript("table", "window.$$table")
-    
-    @* 
-        Warning!
-        Do not put that code into jQuery's $(document).ready()!
-        
-        Reinforced.Lattice has its own mechanism for rendering when 
-        DOM completed loading.
-
-        Just do not do that. Seriously, you do not have to do anything else
-    *@
+    @Model.ProjectionTable.InitializationScript("projectionTable", "window.$$projectionTable")
+    @Model.MappedFromTable.InitializationScript("mappedFromTable", "window.$$mappedFromTable")
 }

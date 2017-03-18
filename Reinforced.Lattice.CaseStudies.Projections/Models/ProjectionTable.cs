@@ -16,16 +16,18 @@ namespace Reinforced.Lattice.CaseStudies.Projections.Models
                     FullName = c.FirstName + " " + c.LastName,
                     Email = c.Email,
                     IsActive = c.IsActive,
-                    ManagerId = c.Manager.Id,
+                    ManagerId = c.Manager == null ? (int?)null : c.Manager.Id,
 
                     // EF will convert that to left join
-                    ManagerName = c.Manager.FullName, 
+                    ManagerName = c.Manager == null ? null : c.Manager.FullName,
                     RegistrationDate = c.RegistrationDate,
 
                     // and this EF will convert to CROSS APPLY
                     TotalOrder = c.Orders.Sum(d => d.Quantity * d.Price)
                 }
             ));
+
+            conf.Column(c => c.RegistrationDate).DataOnly(); //let's hide date column for convinience
 
             return conf;
         }
