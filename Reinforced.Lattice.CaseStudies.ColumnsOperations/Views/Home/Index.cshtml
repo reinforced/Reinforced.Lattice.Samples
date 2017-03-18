@@ -1,4 +1,4 @@
-﻿@{ ViewBag.Title = "Getting It Working"; }
+﻿@{ ViewBag.Title = "Columns Operations"; }
 
 @using Reinforced.Lattice.Configuration
 @using Reinforced.Lattice.Mvc
@@ -6,7 +6,7 @@
 @model Reinforced.Lattice.CaseStudies.ColumnsOperations.Models.HomeIndexViewModel
 @{
     var conf = Model.Table;
-    
+
     conf.PrettifyTitles(firstCapitals: true);
     conf.Column(c => c.Id).DataOnly();
     conf.Column(c => c.RegistrationDate).DataOnly();
@@ -21,8 +21,15 @@
 <div id="table"></div>
 
 @section scripts {
-
+    <style type="text/css">
+        [data-track="h-IsActive"] {
+            width: 3%;
+        }
+    </style>
 
     @{ Html.RenderTemplates("lt", "Lattice_Templates_Bootstrap"); }
     @Model.Table.InitializationScript("table", "window.$$table")
+
+
+
 }
