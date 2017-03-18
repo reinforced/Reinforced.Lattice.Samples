@@ -1,0 +1,30 @@
+﻿<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>@ViewBag.Title - Reinforced.Lattice Case Study</title>
+    @Styles.Render("~/Content/css")
+    @Scripts.Render("~/bundles/modernizr")
+    
+    @* This is where we include Reinforced.Lattice Script *@
+    <script type="text/javascript" src="~/Scripts/Reinforced.Lattice/reinforced.lattice.js"></script>
+
+    @* And also to this section will have to include our templates *@
+    @RenderSection("scripts", required: false)
+</head>
+<body>
+<div class="container-fluid body-content">
+    <div class="row">
+        <div class="col-sm-12">
+            @RenderBody()
+        </div>
+    </div>
+    
+</div>
+
+    @Scripts.Render("~/bundles/jquery")
+    @Scripts.Render("~/bundles/bootstrap")
+    
+</body>
+</html>

@@ -11,12 +11,11 @@
     <p>
         In simple cases Reinforced.Lattice is able to map your data automatically. As you have seen at "Getting it Working" tutorial, Reinforced.Lattice has automatically determined which data to show,
         but you have not specified any additional settings to do that.
-        That is because Reinforced.Lattice mapping at work. If you know project <a href="http://automapper.org" target="_blank">Automapper</a> then you are familiar with mapping process
-        - it is almost similar in Reinforced.Lattice. Obviously, for some cases it is not applicable.
+        That is because Reinforced.Lattice mapping at work: <i>Reinforced.Lattice automatically copies properties with matching names from <code>TSource</code> to <code>TRow</code>.</i> <a href="http://automapper.org" target="_blank">Automapper</a> behaves almost in the same way. Obviously, for some cases this approach is not applicable.
     </p>
     <h3>Manual mapping with <code>.MappedFrom</code></h3>
     <p>
-        <code>.MappedFrom</code> extension allows you to point a delegate that must be used to obtain specific <code>TRow</code>'s column value 
+        <code>.MappedFrom</code> extension allows you to point a <span class="tip" data-tip="delegate">delegate</span> that must be used to obtain specific <code>TRow</code>'s column value 
         from <code>TSource</code> instance:
     </p>
 </div>
@@ -63,5 +62,12 @@
     <h3>If nothing helped</h3>
     <p>
         If your model and projection query is too complex even for <code>.ProjectDataWith</code> then consider re-organizing your table e.g. by changing of your <code>IQueryable&lt;TSource&gt;</code> to other type (probably even <code>IQueryable&lt;TRow&gt;</code>) query. 
+    </p>
+</div>
+
+<div class="text tiptext" data-tiptext="delegate" data-caption=".MappedFrom consumes delegate">
+    <p>
+        Here I want to point that <code>.MappedFrom</code> method consumes <b>delegate</b> that takes <code>TSource</code> as input and produces result of matching column's type. Since it is <b>delegate</b>, not 
+        <b>expression</b> - you easily can use any custom method to perform mapping for specified field. Therefore you are not limited to single expression.
     </p>
 </div>

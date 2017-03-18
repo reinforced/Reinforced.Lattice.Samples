@@ -1,0 +1,28 @@
+﻿@{ ViewBag.Title = "Getting It Working"; }
+
+@using Reinforced.Lattice.Configuration
+@using Reinforced.Lattice.Mvc
+@using Reinforced.Lattice.Templates
+@model Reinforced.Lattice.CaseStudies.ColumnsOperations.Models.HomeIndexViewModel
+@{
+    var conf = Model.Table;
+    
+    conf.PrettifyTitles(firstCapitals: true);
+    conf.Column(c => c.Id).DataOnly();
+    conf.Column(c => c.RegistrationDate).DataOnly();
+
+    conf.Column(c => c.IsActive).DisplayOrder(99); // will be displayed last
+    conf.Column(c => c.IsActive).Title("Active?");
+    conf.Column(c => c.Email)
+        .Title("<span style='color:red;text-decoration:underline;'>E-mail</span>") // HTML supported
+        .Description("User's email") // provides optional column description
+    ;
+}
+<div id="table"></div>
+
+@section scripts {
+
+
+    @{ Html.RenderTemplates("lt", "Lattice_Templates_Bootstrap"); }
+    @Model.Table.InitializationScript("table", "window.$$table")
+}

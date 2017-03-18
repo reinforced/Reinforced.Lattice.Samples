@@ -1,0 +1,95 @@
+﻿<div class="text">
+    <h2>Case</h2>
+    <p>
+        You have set up basic table and now you want to customize it: hide some columns, change cells templates, change columns titles etc. 
+    </p>
+    <h2>Necessary knowledge</h2>
+    <h3>Column selector</h3>
+    <p>
+        In this example we will select lots of columns. We do that by invoking <code>.Column</code> method of our table configurator. Column selector retrieves <span class="tip" data-tip="column_configurator">fluent column configurator</span> that exposes access to fluent methods for configuring column. As 1st parameter for <code>.Column</code> method you must supply property lambda expression that selects one of properties of <code>TRow</code> class. As you could see before, table columns correspond to <code>TRow</code> properties:
+    </p>
+</div>
+<pre class="language-csharp wrap-code" data-src="#doc#/column-selector.cs"></pre>
+<div class="text">
+    <h3>Configuration location</h3>
+    <p>
+        Actually you can configure your table not only in configuration method itself, but in your <code>.cshtml</code> file also. Moreover, <i>I hardly recommend to do so</i> just to keep UI-specific configuration along with other UI. Of course, technically there is no difference where to call all configuration methods mentioned below, but you will:
+    </p>    
+    <ul class="blogger-sans">
+        <li>save couple of CPU ticks/few bytes of RAM</li>
+        <li>improve code readability</li>
+        <li>not have to stop your debugger to change table design</li>
+    </ul>
+    <p>
+        if you will store your UI-related configuration within <code>.cshtml</code>:
+    </p>
+</div>
+<pre class="language-cshtml wrap-code" data-src="#doc#/cshtml-config.cshtml"></pre>
+<div class="text">    
+    <p>
+        Some of methods like <code>.Razor</code> are available only on <code>.cshtml</code>. But the more important thing is that <b>features affecting server behavior <i>must</i> be configured in configuration method</b> in order to be saved for <code>.Handle</code> methods. Find out what can be used in <code>.cshtml</code> and what can not in correspondign cheatsheet <b>(link???)</b>. You even can create configurator instance in <code>.cshtml</code>, but I prefer to put it to ViewModel.
+    </p>    
+    <h2>Solution</h2>
+    <h3>How to change column title</h3>
+    <p>
+        If column title is not provided then corresponding <code>TRow</code>'s property name will be used as column title. 
+        Use <code>.Title</code> method of column configurator to change column title (HTML is supporeted there):
+    </p>
+</div>
+<pre class="language-csharp wrap-code" data-src="#doc#/column-title.cs"></pre>
+<div class="text">  
+    <p>
+        Also <code>[Display]</code> attribute on <code>TRow</code>'s properties is supported specify column title. <br/>
+    </p>
+    <h3>How to set columns titles automatically</h3>
+    <p>
+        If you are using standard C# code conventions and <i>PascalCase</i> for properties names, and of course if you give your properties sensitive names then Reinforced.Lattice can prettify these names and use as column titles.
+        To do that use <code>.PrettifyTitles</code> method of configurator. Make sure to call it <b>prior</b> to invoking <code>.Title</code>. 
+    </p>
+</div>
+<pre class="language-csharp wrap-code" data-src="#doc#/column-prettify.cs"></pre>
+<div class="text">  
+    <h3>How to hide column</h3>
+    <p>
+        Use <span class="tip" data-tip="dataonly"><code>.DataOnly</code> method</span> of column configurator. Column will not be displayed in UI, but column data will present on client side:
+    </p>
+</div>
+<pre class="language-csharp wrap-code" data-src="#doc#/column-dataonly.cs"></pre>
+<div class="text">  
+    <h3>How to change column display order</h3>
+    <p>
+        By default column display order corresponds to order it has been declared in <code>TRow</code> class. So if it will be enough - you can reorder <code>TRow</code> class properties. 
+        Otherwise you can use <code>.DisplayOrder</code> method. It consumes double value, so you can easily insert another column between two existing columns:
+    </p>
+</div>
+<pre class="language-csharp wrap-code" data-src="#doc#/column-order.cs"></pre>
+<div class="text">  
+    <h3>How to ignore column</h3>
+    <p>
+        If you want to make Reinforced.Lattice to do not treat some property of <code>TRow</code> as column - you can express it by using <code>.NotAColumn</code> method of <i>configurator itself</i>:
+    </p>
+</div>
+<pre class="language-csharp wrap-code" data-src="#doc#/column-notcolumn.cs"></pre>
+<div class="text">  
+    <p>
+        <b>Important!</b> <code>.NotAColumn</code> must be called within configuration method - not <code>.cshtml</code> page as request handler must know to do not handle this column. Also, <code>.NotAColumn</code> can be called once for particular column. Second call to <code>.NotAColumn</code> method for column that already was ignored will throw exception because Reinforced.Lattice has already forgot about this column.
+    </p>
+</div>
+
+<div class="text tiptext" data-tiptext="column_configurator" data-caption="Column configurator type note">
+    <p>
+        Of couse you can create your mixins (static methods) to column configurator to persist some configuration pieces. So you can find useful column configurator types. All these types are located in 
+        <code>Reinforced.Lattice.Configuration</code> namespace:
+    </p>
+    <ul class="blogger-sans">
+        <li><code>ColumnUsage&lt;TSource, TRow, TColumn&gt;</code> - fully parametrized column configurator that is returned as result of <code>.Column</code> call. <code>TSource</code> corresponds to table source set type, <code>TRow</code> corresponds to table row type, <code>TColumn</code> is type of column.</li>
+        <li><code>IColumnTargetProperty&lt;T&gt;</code> - base interface for <code>ColumnUsage&lt;,,&gt;</code> with reduced parametrization. <code>T</code> is type of column</li>
+        <li><code>IColumnConfigurator</code> - base interface for <code>IColumnTargetProperty&lt;,&gt;</code>. Non-generic interface</li>
+    </ul>
+</div>
+
+<div class="text tiptext" data-tiptext="dataonly" data-caption=".DataOnly and .Hide difference">
+    <p>
+        Do not use <code>.Hide</code> method for column if you are not going to make user show this column again. <code>.Hide</code> method belongs to Hideout (link???) plugin and used for hiding and showing columns dynamically, along with <code>.Hideout</code> method of configurator.
+    </p>    
+</div>

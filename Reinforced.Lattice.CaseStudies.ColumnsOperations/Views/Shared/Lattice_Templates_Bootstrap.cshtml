@@ -1,0 +1,870 @@
+﻿@using Reinforced.Lattice
+@using Reinforced.Lattice.Configuration.Json
+@using Reinforced.Lattice.Templates
+@using Reinforced.Lattice.Templates.BuiltIn
+@using Reinforced.Lattice.Templates.Editing
+@using Reinforced.Lattice.Templates.Editing.Editors.Check
+@using Reinforced.Lattice.Templates.Editing.Editors.Display
+@using Reinforced.Lattice.Templates.Editing.Editors.Memo
+@using Reinforced.Lattice.Templates.Editing.Editors.PlainText
+@using Reinforced.Lattice.Templates.Editing.Editors.SelectList
+@using Reinforced.Lattice.Templates.Expressions
+@using Reinforced.Lattice.Templates.Filters.Range
+@using Reinforced.Lattice.Templates.Filters.Select
+@using Reinforced.Lattice.Templates.Filters.Value
+@using Reinforced.Lattice.Templates.Plugins.Checkboxify
+@using Reinforced.Lattice.Templates.Plugins.Hideout
+@using Reinforced.Lattice.Templates.Plugins.Limit
+@using Reinforced.Lattice.Templates.Plugins.Loading
+@using Reinforced.Lattice.Templates.Plugins.LoadingOverlap
+@using Reinforced.Lattice.Templates.Plugins.MouseSelect
+@using Reinforced.Lattice.Templates.Plugins.Ordering
+@using Reinforced.Lattice.Templates.Plugins.Paging
+@using Reinforced.Lattice.Templates.Plugins.Reload
+@using Reinforced.Lattice.Templates.Plugins.ResponseInfo
+@using Reinforced.Lattice.Templates.Plugins.Scrollbar
+@using Reinforced.Lattice.Templates.Plugins.Toolbar
+
+
+@inherits Reinforced.Lattice.Templates.TemplatesPageBase
+
+@*
+    Lattice common layout template
+    See available helpers in scope variable "t"
+*@
+
+@using (var t = this.Layout())
+{
+    <div class="container-fluid">
+        <div class="row">
+            <div class="col-md-6 col-sm-6 col-xs-6 col-lg-6">
+                @t.Plugins("lt")
+                <div class="btn-group" style="margin-bottom: 10px">@t.Plugins("toolbar-lt")</div>
+                <br />
+            </div>
+            <div class="col-md-6 col-sm-6 col-xs-6 col-lg-6 text-right">
+                @t.Plugins("rt")
+                <div class="btn-group" style="padding-bottom: 10px">@t.Plugins("toolbar-rt")</div>
+            </div>
+        </div>
+        <div class="row">
+            <div class="col-md-12 col-sm-12 col-xs-12 col-lg-12">
+                <hr />
+            </div>
+            <div class="col-xs-12 col-sm-12 col-md-12 col-lg-12">
+                <table class="table table-striped table-condensed table-bordered">
+                    <thead style="display: table-header-group;">
+                        <tr>@t.Headers()</tr>
+                        <tr>@t.Filters()</tr>
+                    </thead>
+                    <tbody>@t.Body()</tbody>
+                </table>
+            </div>
+        </div>
+        <div class="row">
+            <div class="col-xs-6 col-sm-6 col-md-6 col-lg-6">
+                @t.Plugins("lb")
+                <div class="btn-group">@t.Plugins("toolbar-lb")</div>
+            </div>
+            <div class="col-xs-6 col-sm-6 col-md-6 col-lg-6 text-right" style="float: right;">
+                @t.Plugins("rb")
+                <div class="btn-group">@t.Plugins("toolbar-rb")</div>
+            </div>
+        </div>
+    </div>
+}
+
+@*
+    Plugin wrapper template. This template is being wrapped around each plugin
+*@
+@using (var t = this.PluginWrapper())
+{
+    <text>
+        @using (t.IfPlacement("lt", "lb", "toolbar-lt", "toolbar-lb"))
+        { <div style="display: inline-block"> @t.Content() </div> }
+        @using (t.IfPlacement("rt", "rb", "toolbar-rt", "toolbar-rb"))
+        { <div style="float: right;"> @t.Content() </div> }
+        @using (t.IfPlacement("filter"))
+        { <th>@t.Content()</th> }
+    </text>
+}
+
+@*
+    Column header wrapper template.
+*@
+@using (var t = this.HeaderWrapper())
+{ <th>@t.Content()</th> }
+
+@*
+    Row wrapper template.
+    Following HTML is being wrapped around each data row
+*@
+@using (var t = this.RowWrapper())
+{ <tr class="@t.If(c => c.IsSelected, "success") @t.If(c=>c.IsUpdated,"touched") @t.If(c=>c.IsAdded,"touched")">@t.Content()</tr> }
+
+
+@using (var t = this.RowWrapper("alternateRow"))
+{ <tr class="@t.If(c => c.IsSelected, "success") @t.If(c=>c.IsUpdated,"touched") @t.If(c=>c.IsAdded,"touched")">@t.Content()</tr> }
+
+@*
+    Cell wrapper template.
+    Following HTML is being wrapped around each data cell
+*@
+@using (var t = this.CellWrapper())
+{ <td class="@t.If(c=>c.IsSelected,"success") @t.If(c=>c.IsUpdated,"touched") @t.If(c=>c.IsAdded,"touched")">@t.Content()</td> }
+
+
+@using (var t = this.Message("error"))
+{ 
+    <tr class="danger" style="padding: 30px">
+        <td colspan="@t.Value(c => c.TDO.UiColumnsCount)">
+            <h4 class="text-center"><span class="glyphicon glyphicon-remove-sign" aria-hidden="true"></span>  Error occured</h4>
+            <p style="margin-left:25px;margin-right:25px">
+                @t.Value(c => c.TDO.Title) 
+                <hr />
+                @t.Value(c => c.TDO.Details)
+            </p>
+        </td>
+    </tr>
+}
+
+@using (var t = this.PartitionIndication())
+{
+    <tr style="padding: 30px">
+        <td colspan="@t.Value(c => c.DO.UiColumnsCount)">
+            @using (t.If(x => x.DO.IsLoading))
+            {
+                <h4 class="text-center"><span class="glyphicon glyphicon-refresh" aria-hidden="true"></span>  Loading</h4>
+            }
+            @using (t.If(x => x.DO.IsClientSearchPending && !x.DO.IsLoading))
+            {
+                <div class="text-center">
+                    <span>Shown search results among <b>@t.Value(x => x.DO.Stats.Stored)</b> loaded records. </span>
+                    @using (t.If(x => x.DO.CanLoadMore))
+                    {
+                        <div>
+                            Load <input @t.ThisIsAdditionalPagesInput() type="text" value="@t.Value(c=>c.DO.LoadAhead)" class="form-control input-sm" style="display:inline-block;width:40px;text-align:center;" /> pages more and
+                            <button type="button" class="btn btn-default btn-sm" @t.BindLoadMore("click")>find more records</button>.
+                        </div>
+                    }
+                </div>
+
+            }
+            @using (t.If(x => !x.DO.IsClientSearchPending && x.DO.CanLoadMore && !x.DO.IsLoading))
+            {
+                <div class="text-center">
+                    <button type="button" class="btn btn-default btn-sm" @t.BindLoadMore("click")>Load more</button>
+                </div>
+            }
+        </td>
+    </tr>
+}
+
+@using (var t = this.Message("noresults"))
+{
+    <tr class="info">
+        <td colspan="@t.Value(c => c.TDO.UiColumnsCount)">
+            <h4 class="text-center text-info bg-info">
+                <span class="glyphicon glyphicon-eye-close"></span>  No data found
+            </h4>
+        </td>
+    </tr>
+}
+
+@using (var t = this.Message("initial"))
+{
+    <tr class="warning">
+        <td colspan="@t.Value(c => c.TDO.UiColumnsCount)">
+            <h4 class="text-center text-info bg-info">
+                <span class="glyphicon glyphicon-search"></span>  Please change filter settings to get search results
+            </h4>
+        </td>
+    </tr>
+}
+
+@using (var t = Plugin.Loading())
+{
+    <div style="display:block;height:10px;margin:10px;margin-top:5px;" @t.ThisElementWillBlink()>
+        <div class="badge">
+            <span class="glyphicon glyphicon-refresh"></span> Loading
+        </div>
+    </div>
+}
+
+@using (var t = Plugin.Ordering())
+{
+    <th @t.BindSwitchOrdering("click") style="cursor: pointer">
+        <span><strong>@t.HtmlValue(c => c.Column.Configuration.Title)</strong></span>
+        @using (t.If(c => c.IsNeutral))
+        { <span class="glyphicon glyphicon-sort" style="color: #bac5d3; float: right;"></span> }
+        @using (t.If(c => c.IsAscending))
+        { <span class="glyphicon glyphicon-arrow-down" style="color: #bac5d3; float: right;"></span> }
+        @using (t.If(c => c.IsDescending))
+        { <span class="glyphicon glyphicon-arrow-up" style="color: #bac5d3; float: right;"></span> }
+    </th>
+}
+
+@using (var t = Plugin.Limit())
+{
+    <div class="btn-group">
+        <button type="button" class="btn btn-default dropdown-toggle" data-toggle="dropdown">
+            Results: <strong>@t.Value(c => c.SelectedValue == null ? "null" : c.SelectedValue.Label)</strong> <span class="caret"></span>
+        </button>
+        <ul class="dropdown-menu" role="menu">
+            @using (var sz = t.Each(c => c.Sizes))
+            {
+                using (sz.If(c => c.IsSeparator))
+                {
+                    <li class="divider"></li>
+                    @sz.Else()
+                    <li><a href="#" @sz.BindLimitChangeEvent("click")>@sz.Value(c => c.Label)</a></li>
+                }
+            }
+        </ul>
+    </div>
+}
+
+@using (var t = Plugin.Scroll())
+{
+    using (t.If(c => c.IsVertical))
+    {
+        <div style="opacity:.7;background:grey;border-radius:5px;width:24px; position: absolute;" @t.ThisIsScrollerActiveArea()>
+            <button @t.ThisIsUpArrow() type="button" class="btn btn-default btn-xs" style="display:block; width: 100%;">
+                <span class="glyphicon glyphicon-chevron-up"></span>
+            </button>
+            <button @t.ThisIsScroller() type="button" class="btn btn-default btn-xs"
+                    style="position: relative; display: block; height: 20px; width: 100%; top: 0px"></button>
+
+            <button @t.ThisIsDownArrow() type="button" class="btn btn-default btn-xs"
+                    style="bottom:0;position:absolute; top:auto;width: 100%;">
+                <span class="glyphicon glyphicon-chevron-down"></span>
+            </button>
+        </div>
+    }
+    using (t.If(c => !c.IsVertical))
+    {
+        <div style="opacity:.7;background:grey;border-radius:5px;height: 24px; position: absolute;" @t.ThisIsScrollerActiveArea()>
+            <button @t.ThisIsUpArrow() type="button" class="btn btn-default btn-xs" style="display:block; height: 100%; float: left;">
+                <span class="glyphicon glyphicon-chevron-left"></span>
+            </button>
+            <button @t.ThisIsScroller() type="button" class="btn btn-default btn-xs"
+                    style="position: relative;height: 24px; top: 0px"></button>
+
+            <button @t.ThisIsDownArrow() type="button" class="btn btn-default btn-xs"
+                    style="right:0; float: right;height:24px">
+                <span class="glyphicon glyphicon-chevron-right"></span>
+            </button>
+        </div>
+    }
+}
+
+@using (var t = Plugin.MouseSelect())
+{
+    <div style="width: 100%; height: 100%; display: block; position: relative; border: 1px solid #2b597f; background: #428BCA; opacity: 0.5">
+
+    </div>
+}
+
+@using (var t = Plugin.Paging())
+{
+    using (t.If(c => c.Shown))
+    {
+        <div class="col-md-10">
+            @using (var m = t.ArrowsMode())
+            {
+                <nav style="margin: 0; width: 250px; margin-left: auto;">
+                    <ul class="pager">
+                        @using (m.If(c => c.PrevArrow))
+                        {
+                            <li><a @t.BindPreviousPage("click") style="cursor: pointer"><span class="glyphicon glyphicon-chevron-left"></span></a></li>
+                        }
+                        <li><span>Page @m.Value(c => c.CurrentPage) of @m.Value(c => c.TotalPages)</span></li>
+                        @using (m.If(c => c.NextArrow))
+                        {
+                            <li><a @t.BindNextPage("click") style="cursor: pointer"><span class="glyphicon glyphicon-chevron-right"></span></a></li>
+                        }
+                    </ul>
+                </nav>
+            }
+
+            @using (var m = t.PeriodsMode())
+            {
+                <ul class="pagination" style="margin: 0;">
+                    @using (var pg = m.Each(c => c.Pages))
+                    {
+                        using (pg.If(c => c.First))
+                        {
+                            <li class="first"><a style="cursor: pointer" @pg.BindNavigateToPage("click")><span class="glyphicon glyphicon-fast-backward"></span></a></li>
+                        }
+                        using (pg.If(c => c.Prev))
+                        {
+                            <li class="prev"><a style="cursor: pointer" @t.BindPreviousPage("click")><span class="glyphicon glyphicon-chevron-left"></span></a></li>
+                        }
+                        using (pg.If(c => c.Period))
+                        {
+                            <li><span>. . .</span></li>
+                        }
+                        using (pg.If(c => c.ActivePage))
+                        {
+                            <li class="active"><span>@pg.Value(c => c.DisPage)</span></li>
+                        }
+                        using (pg.If(c => c.InActivePage))
+                        {
+                            <li><a @pg.BindNavigateToPage("click") style="cursor: pointer">@pg.Value(c => c.DisPage)</a></li>
+                        }
+                        using (pg.If(c => c.Next))
+                        {
+                            <li class="next"><a style="cursor: pointer" @t.BindNextPage("click")><span class="glyphicon glyphicon-chevron-right"></span></a></li>
+                        }
+                        using (pg.If(c => c.Last))
+                        {
+                            <li class="last"><a style="cursor: pointer" @pg.BindNavigateToPage("click")><span class="glyphicon glyphicon-fast-forward"></span></a></li>
+                        }
+                    }
+                </ul>
+            }
+        </div>
+        <div class="col-md-2">
+            @using (var m = t.GotoPage())
+            {
+                <div class="input-group" @m.WhenEnteredPageInvalid(c => c.AddClass("has-error"))>
+                    <input @m.ThisIsGotopageInput() type="text" @m.WhenEnteredPageInvalid(c => c.Color("red")) class="form-control" @m.BindValidateGotoPage("keyup") style="width: 60px;" placeholder="Page">
+                    <span class="input-group-btn">
+                        <button class="btn btn-default" @m.WhenEnteredPageInvalid(c => c.Disabled()) type="button" @m.BindGotoPage("click")><span class="glyphicon glyphicon-circle-arrow-right"></span></button>
+                    </span>
+                </div>
+            }
+        </div>
+        <div class="clearfix"></div>
+    }
+}
+
+@using (var t = Plugin.ValueFilter())
+{
+    <input type="text"  @t.DatepickerCanBeHere() @t.BindValueChanged("keyup,input,change,paste") @t.ThisIsFilterValueProvider() style="margin: 0; width: 100%; max-width: 100%;" class="form-control input-md" value="@t.Value(c=>c.Configuration.DefaultValue)" placeholder="@t.Value(c=>c.Configuration.Placeholder)" />
+}
+
+@using (var t = Plugin.RangeFilter())
+{
+    <input type="text" @t.DatepickerCanBeHere() @t.ThisIsFromField() @t.BindValueChanged("keyup,input,change,paste") class="form-control input-md" value="@t.Value(c=>c.Configuration.FromValue)" style="margin:0;width:100%;max-width:100%;" placeholder="@t.Value(c=>c.Configuration.FromPlaceholder)">
+    <br />
+    <input type="text" @t.DatepickerCanBeHere() @t.ThisIsToField() @t.BindValueChanged("keyup,input,change,paste") class="form-control input-md" value="@t.Value(c=>c.Configuration.ToValue)" style="margin:0;width:100%;max-width:100%;" placeholder="@t.Value(c=>c.Configuration.ToPlaceholder)">
+}
+
+@using (var t = Plugin.SelectFilter())
+{
+    <select class="form-control input-md" style="margin:0;width:100%;max-width:100%;" @t.ThisIsFilterValueProvider() @t.BindValueChanged("change") @t.If(c => c.Configuration.IsMultiple, "multiple=\"multiple\"")>
+        @using (var item = t.Each(c => c.Configuration.Items))
+        {
+            <option @item.If(c => c.Disabled, "disabled=\"disabled\"") value="@item.Value(c => c.Value)" @item.If(c => c.Selected, "selected")>@item.Value(c => c.Text)</option>
+        }
+    </select>
+}
+
+@using (var t = Plugin.HideoutMenu())
+{
+    <div class="btn-group" role="group">
+        <button type="button" class="btn btn-default dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+            Show/Hide Columns
+            <span class="caret"></span>
+        </button>
+        <ul class="dropdown-menu">
+            @using (var itm = t.Each(c => c.ColumnStates))
+            {
+                using (itm.If(c => c.Visible))
+                {
+                    <li @itm.BindHide("click")>
+                        <a style="cursor: pointer;">
+                            <span class="glyphicon glyphicon-eye-open" style="float: left"></span> <span style="margin-left: 10px">@itm.Value(c => c.Name)</span>
+                        </a>
+                    </li>
+                }
+                using (itm.If(c => !c.Visible))
+                {
+                    <li @itm.BindShow("click")>
+                        <a style="cursor: pointer;">
+                            <span class="glyphicon glyphicon-eye-close" style="float: left"></span> <span style="margin-left: 10px;">@itm.Value(c => c.Name)</span>
+                        </a>
+                    </li>
+                }
+            }
+        </ul>
+
+    </div>
+}
+
+@using (var t = Plugin.ResponseInfo())
+{
+    <p>
+        @using (t.If(c => c.Mode == PartitionType.Client))
+        {
+            <br />
+        <p>Data fetched locally.</p>
+        }
+        Currently shown <strong>@t.Value(c => c.Displayed)</strong> of <strong>@t.Value(c => c.ServerCount)</strong> records
+        <br />
+        @using (t.If(c => c.Take > 0))
+        {
+            <p>
+                Page <strong>@t.Value(c => c.CurrentPage)</strong> of @t.Value(c => c.Pages)
+            </p>
+        }
+        </p>
+}
+
+@using (var t = Plugin.CheckboxifySelectAll())
+{
+    <th>
+        @using (t.If(c => c.CanSelectAll))
+        {
+            using (t.If(c => c.IsAllSelected))
+            {
+                <button class="btn btn-xs btn-danger" @t.BindSelectAll("click")><span class="glyphicon glyphicon-check"></span></button>
+                @t.Else()
+                <button class="btn btn-xs btn-primary" @t.BindSelectAll("click")><span class="glyphicon glyphicon-unchecked"></span></button>
+            }
+        }
+    </th>
+}
+
+@using (var t = Plugin.CheckboxifyCell())
+{
+    using (t.If(c => c.Row.CanBeSelected))
+    {
+        <div @t.ThisWillTriggerSelection()>
+            @using (t.If(c => c.Row.IsSelected))
+            {
+                <input type="checkbox" checked="checked" />
+                @t.Else()
+                <input type="checkbox" />
+            }
+        </div>
+    }
+}
+
+
+@using (var t = Plugin.Toolbar())
+{
+    <div class="btn-group">
+        @using (var btn = t.Buttons())
+        {
+            using (btn.If(c => !c.HasSubmenu))
+            {
+                using (btn.If(c => c.IsDisabled))
+                {
+                    <button disabled="disabled" type="button" data-role="toolbar-btn" class="btn btn-default @btn.Value(c => c.Css) disabled" title="@btn.Value(c => c.Title)" id="@btn.Value(c => c.Id)">@btn.HtmlValue(c => c.HtmlContent)</button>
+                    @btn.Else()
+                    <button @btn.BindButton("click") type="button" data-role="toolbar-btn" class="btn btn-default @btn.Value(c => c.Css)" title="@btn.Value(c => c.Title)" id="@btn.Value(c => c.Id)">@btn.HtmlValue(c => c.HtmlContent)</button>
+                }
+
+                @btn.Else()
+                <div class="btn-group">
+                    @btn.If(c => c.IsMenu, "<div class=\"btn-group\" role=\"group\">")
+                    @using (btn.If(c => c.IsMenu))
+                    {
+                        <button type="button" id="@btn.Value(c => c.Id)" class="btn @btn.Value(c => c.Css) dropdown-toggle" title="@btn.Value(c => c.Title)" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                            @btn.HtmlValue(c => c.HtmlContent)
+                            <span class="caret"></span>
+                        </button>
+                        @btn.Else()
+                        using (btn.If(c => c.IsDisabled))
+                        {
+                            <button disabled="disabled" type="button" id="@btn.Value(c => c.Id)" class="btn @btn.Value(c => c.Css) disabled" title="@btn.Value(c => c.Title)">@btn.HtmlValue(c => c.HtmlContent)</button>
+                            @btn.Else()
+                            <button @btn.BindButton("click") type="button" id="@btn.Value(c => c.Id)" class="btn @btn.Value(c => c.Css)" title="@btn.Value(c => c.Title)">@btn.HtmlValue(c => c.HtmlContent)</button>
+                        }
+                        <button type="button" class="btn @btn.Value(c=>c.Css) dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                            <span class="caret"></span>
+                            <span class="sr-only">Toggle Dropdown</span>
+                        </button>
+                    }
+                    <ul class="dropdown-menu">
+                        @using (var sm = btn.Each(c => c.Submenu))
+                        {
+                            using (sm.If(c => c.Separator))
+                            {
+                                <li role="separator" class="divider"></li>
+                                @sm.Else()
+                                using (btn.If(c => c.IsDisabled))
+                                {
+                                    <li aria-disabled="true" style="cursor: pointer" class="@sm.Value(c => c.Css) disabled" id="@sm.Value(c => c.Id)"><a title="@sm.Value(c => c.Title)">@sm.HtmlValue(c => c.HtmlContent)</a></li>
+                                    @btn.Else()
+                                    <li @btn.BindButton("click") style="cursor: pointer" class="@sm.Value(c => c.Css)" id="@sm.Value(c => c.Id)"><a title="@sm.Value(c => c.Title)">@sm.HtmlValue(c => c.HtmlContent)</a></li>
+                                }
+                            }
+                        }
+                    </ul>
+                    @btn.If(c => c.IsMenu, "</div>")
+                </div>
+            }
+        }
+    </div>
+}
+
+@using (var t = Plugin.LoadingOverlap())
+{
+    <div style="background-color: white;opacity: 0.5">
+        <div style="top: 45%; position: relative;" class="text-center">
+            <h1>Loading</h1>
+        </div>
+    </div>
+}
+
+@using (var t = Plugin.Reload())
+{
+    <button class="btn btn-primary" @t.WhenLoading(c => c.Disabled()) @t.BindTriggerReload("click")>Refresh</button>
+}
+
+@using (var t = Plugin.Editor_PlainText())
+{
+    using (t.If(c => c.IsCellEdit))
+    {
+        <div style="position: relative" @t.BindReject("out-click")>
+            <div>
+                @t.OriginalContent()
+            </div>
+            <div class="popover fade top in" role="tooltip" style="top: -88px; left: -50px; display: block; position: absolute;">
+                <div class="arrow" style="top: 100%;"></div>
+                <h3 class="popover-title">
+                    @t.Value(c => c.Column.Configuration.Title)
+                    <button type="button" class="close" @t.BindReject("click")><span aria-hidden="true">×</span></button>
+                </h3>
+                <div class="popover-content">
+                    <input type="text"
+                           class="form-control input-md"
+                           style="min-width: 200px;" aria-label="..."
+                           @t.WhenSaving(c => c.Hide())
+                           @t.ThisIsInput()
+                           @t.BindChanged("keyup")
+                           @t.BindCommit(DOMEvent.Filter("keyup").Prop(13, "keyCode", "which"))
+                           @t.WhenInvalid(c => c.State.Color("red").Style("border-color", "red")) />
+                    <span class="text-center" style="display: none; min-width: 200px; min-height: 28px; margin-top: 5px;" @t.WhenSaving(c => c.Show())>
+                        <span class="badge"><span class="glyphicon glyphicon-refresh loader"></span> Saving...</span>
+                    </span>
+                </div>
+            </div>
+        </div>
+    }
+    using (t.If(c => c.IsRowEdit))
+    {
+        <div>
+            <div @t.WhenInvalid(c => c.State.AddClass("has-error"))>
+                <input type="text" class="form-control input-sm"
+                       @t.WhenSaving(c => c.Attr("disabled", "disabled"))
+                       @t.ThisIsInput()
+                       @t.BindChanged("keyup")
+                       @t.BindCommit(DOMEvent.Filter("keyup").Prop(13, "keyCode", "which"))
+                       @t.WhenInvalid(c => c.State.Color("red")) />
+                <div class="tooltip bottom" role="tooltip" style="opacity: 1; top: 21px; display: none;"
+                     @t.WhenInvalid(c => c.State.Show())>
+                    <div class="tooltip-arrow" style="border-bottom-color: #E15C5C; left: 15%"></div>
+                    <div class="tooltip-inner" style="max-width: 400px; background-color: #E15C5C;" @t.WhenInvalid(c => c.Content(v => v.ValidationMessages))></div>
+                </div>
+            </div>
+        </div>
+    }
+
+    using (t.If(c => c.IsFormEdit))
+    {
+        <div class="form-group">
+            <label for="edit-@t.Value(c=>c.Column.RawName)" class="col-sm-2 control-label">@t.Value(c => c.Column.Configuration.Title)</label>
+            <div class="col-sm-10">
+                <input type="text" class="form-control" style="max-width: 100%" id="edit-@t.Value(c=>c.Column.RawName)" placeholder="@t.Value(c => c.Column.Configuration.Title)"
+                       @t.ThisIsInput()
+                       @t.BindChanged("keyup")
+                       @t.BindCommit(DOMEvent.Filter("keyup").Prop(13, "keyCode", "which"))
+                       @t.WhenInvalid(c => c.State.Color("red").Style("border-color", "red")) />
+                <div class="help-block" @t.WhenInvalid(c => { c.State.Show(); c.Content(d => d.ValidationMessages); }) style="display: none; color: #E15C5C;">
+                </div>
+            </div>
+        </div>
+    }
+}
+
+@using (var t = Plugin.Editor_ValidationMessages())
+{
+    <p style="margin-bottom: 0">
+        @using (var m = t.Each(c => c.Messages))
+        {
+            <span>@m.Value(c => c.Message)</span>
+        }
+    </p>
+}
+
+@using (var t = Plugin.Editor_PlainText("plainTextEditorAlternate"))
+{
+    using (t.If(c => c.IsCellEdit))
+    {
+        <div @t.BindReject(DOMEvent.Filter("click").Out().Prop(true, "ctrlKey"))>
+            <div class="input-group" @t.WhenInvalid(c => c.State.AddClass("has-error")) style="max-width: 200px;" @t.WhenSaving(c => c.Hide())>
+                <input @t.ThisIsInput() @t.BindChanged("keyup") @t.BindCommit(DOMEvent.Filter("keyup").Prop(13, "keyCode", "which")) type="text" @t.WhenInvalid(c => c.State.Color("red")) class="form-control input-sm" aria-label="..." style="height: 28px; margin-top: -10px; margin-bottom: -10px" />
+                <div class="tooltip bottom" role="tooltip" style="opacity: 1; top: 21px; display: none;"
+                     @t.WhenInvalid(c => c.State.Show())>
+                    <div class="tooltip-arrow" style="border-bottom-color: #E15C5C; left: 15%"></div>
+
+                    <div class="tooltip-inner" style="max-width: 400px; background-color: #E15C5C;" @t.WhenInvalid(c => c.Content(v => v.ValidationMessages))></div>
+                </div>
+                <div class="input-group-btn">
+                    <button style="margin: -4px 0px; padding: 4px 10px;" type="button" class="btn btn-default btn-sm dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                        <span class="caret"></span>
+                    </button>
+                    <ul class="dropdown-menu dropdown-menu-right">
+                        <li @t.WhenInvalid(c => c.State.Disabled().AddClass("disabled"))><a style="cursor: pointer;" @t.BindCommit("click")><span class="glyphicon glyphicon-floppy-disk"></span> Save</a></li>
+                        <li role="separator" class="divider"></li>
+                        <li><a style="cursor: pointer;" @t.BindReject("click")><span class="glyphicon glyphicon-remove"></span> Cancel</a></li>
+                    </ul>
+                </div>
+            </div>
+
+            <span class="text-center" style="display: none" @t.WhenSaving(c => c.Show())>
+                <span class="badge"><span class="glyphicon glyphicon-refresh"></span> Saving...</span>
+            </span>
+        </div>
+    }
+
+
+}
+
+@using (var t = Plugin.Editor_SelectList())
+{
+    using (t.If(c => c.IsCellEdit))
+    {
+        <div style="position: relative" @t.BindReject("out-click")>
+            <div>
+                @t.OriginalContent()
+            </div>
+            <div class="popover fade top in" role="tooltip" style="top: -88px; left: -50px; display: block; position: absolute;">
+                <div class="arrow" style="top: 100%;"></div>
+                <h3 class="popover-title">
+                    @t.Value(c => c.Column.Configuration.Title)
+                    <button type="button" class="close" @t.BindReject("click")><span aria-hidden="true">×</span></button>
+                </h3>
+                <div class="popover-content">
+                    <select @t.WhenSaving(c => c.Hide())
+                            @t.WhenInvalid(c => c.State.Style("background-color", "#FFF7F7"))
+                            class="form-control input-md"
+                            style="min-width: 150px;"
+                            @t.ThisIsList()
+                            @t.BindChanged("change")
+                            @t.BindCommit("change")>
+                        @using (var itm = t.Each(c => c.Items))
+                        {
+                            <option value="@itm.Value(c => c.Value)">@itm.Value(c => c.Text)</option>
+                        }
+                    </select>
+                    <span class="text-center" style="display: none; min-width: 150px; min-height: 28px; margin-top: 5px;" @t.WhenSaving(c => c.Show())>
+                        <span class="badge"><span class="glyphicon glyphicon-refresh loader"></span> Saving...</span>
+                    </span>
+                </div>
+            </div>
+        </div>
+    }
+
+    using (t.If(c => c.IsRowEdit))
+    {
+        <div>
+            <div @t.WhenInvalid(c => c.State.AddClass("has-error"))>
+                <select @t.WhenSaving(c => c.Attr("disabled", "disabled"))
+                        @t.WhenInvalid(c => c.State.Style("background-color", "#FFF7F7"))
+                        class="form-control input-sm"
+                        @t.ThisIsList()
+                        @t.BindChanged("change")
+                        @t.BindCommit("change")>
+                    @using (var itm = t.Each(c => c.Items))
+                    {
+                        <option value="@itm.Value(c => c.Value)">@itm.Value(c => c.Text)</option>
+                    }
+                </select>
+
+                <div class="tooltip bottom" role="tooltip" style="opacity: 1; top: 21px; display: none;"
+                     @t.WhenInvalid(c => c.State.Show())>
+                    <div class="tooltip-arrow" style="border-bottom-color: #E15C5C; left: 15%"></div>
+                    <div class="tooltip-inner" style="max-width: 400px; background-color: #E15C5C;" @t.WhenInvalid(c => c.Content(v => v.ValidationMessages))></div>
+                </div>
+            </div>
+        </div>
+    }
+
+    using (t.If(c => c.IsFormEdit))
+    {
+        <div class="form-group">
+            <label for="edit-@t.Value(c=>c.Column.RawName)" class="col-sm-2 control-label">@t.Value(c => c.Column.Configuration.Title)</label>
+            <div class="col-sm-10">
+
+                <select id="edit-@t.Value(c => c.Column.RawName)"
+                        @t.WhenSaving(c => c.Attr("disabled", "disabled"))
+                        @t.WhenInvalid(c => c.State.Style("background-color", "#FFF7F7"))
+                        class="form-control" style="max-width:100%"
+                        @t.ThisIsList()
+                        @t.BindChanged("change")
+                        @t.BindCommit("change")>
+                    @using (var itm = t.Each(c => c.Items))
+                    {
+                        <option value="@itm.Value(c => c.Value)">@itm.Value(c => c.Text)</option>
+                    }
+                </select>
+
+                <div class="help-block" @t.WhenInvalid(c => { c.State.Show(); c.Content(d => d.ValidationMessages); }) style="display: none; color: #E15C5C;">
+                </div>
+            </div>
+        </div>
+    }
+}
+
+@using (var t = Plugin.Editor_Memo())
+{
+    using (t.If(c => c.IsCellEdit))
+    {
+        <div style="position: relative" @t.BindReject("out-click")>
+            <div>
+                @t.OriginalContent()
+            </div>
+            <div class="popover fade top in" role="tooltip"
+                 style="top: -160px; left: -50px; display: block; position: absolute; width: 300px;"
+                 @t.WhenSaving(c => c.Style("top", "-86px"))>
+                <div class="arrow" style="top: 100%;"></div>
+                <h3 class="popover-title">
+                    @t.Value(c => c.Column.Configuration.Title)
+                    <button type="button" class="close" @t.BindReject("click")><span aria-hidden="true">×</span></button>
+                </h3>
+                <div class="popover-content">
+                    <div class="col-md-12" @t.WhenSaving(c => c.Hide())>
+                        <textarea class="form-control"
+                                  @t.WhenSaving(c => c.Attr("disabled", "disabled"))
+                                  style="width: 100%; height: 70px"
+                                  @t.ThisIsInput()
+                                  @t.BindChanged("change")
+                                  @t.WhenInvalid(c => c.State.Style("background-color", "#FFF7F7"))
+                                  rows="@t.Value(c => c.Rows)"
+                                  cols="@t.Value(c => c.Columns)"></textarea>
+                    </div>
+                    <br />
+                    <div class="col-md-12" @t.WhenSaving(c => c.Hide())>
+                        <button class="btn btn-default btn-xs btn-block" @t.BindCommit("click") @t.WhenInvalid(c => c.State.Disabled())>Save</button>
+                    </div>
+                    <span class="text-center" style="display: none; min-width: 150px; min-height: 28px; margin-top: -15px;" @t.WhenSaving(c => c.Show())>
+                        <span class="badge"><span class="glyphicon glyphicon-refresh loader"></span> Saving...</span>
+                    </span>
+                </div>
+            </div>
+        </div>
+    }
+
+    using (t.If(c => c.IsRowEdit))
+    {
+        <div>
+            <div @t.WhenInvalid(c => c.State.AddClass("has-error"))>
+                <textarea class="form-control"
+                          @t.WhenSaving(c => c.Attr("disabled", "disabled"))
+                          @t.ThisIsInput()
+                          @t.BindChanged("change")
+                          @t.WhenInvalid(c => c.State.Style("background-color", "#FFF7F7"))
+                          rows="@t.Value(c => c.Rows)"
+                          cols="@t.Value(c => c.Columns)"></textarea>
+
+                <div class="tooltip bottom" role="tooltip" style="opacity: 1; top: 21px; display: none;"
+                     @t.WhenInvalid(c => c.State.Show())>
+                    <div class="tooltip-arrow" style="border-bottom-color: #E15C5C; left: 15%"></div>
+                    <div class="tooltip-inner" style="max-width: 400px; background-color: #E15C5C;" @t.WhenInvalid(c => c.Content(v => v.ValidationMessages))></div>
+                </div>
+            </div>
+        </div>
+    }
+
+    using (t.If(c => c.IsFormEdit))
+    {
+        <div class="form-group">
+            <label for="edit-@t.Value(c=>c.Column.RawName)" class="col-sm-2 control-label">@t.Value(c => c.Column.Configuration.Title)</label>
+            <div class="col-sm-10">
+                <textarea type="text" class="form-control" style="max-width: 100%" id="edit-@t.Value(c=>c.Column.RawName)" placeholder="@t.Value(c => c.Column.Configuration.Title)"
+                          @t.ThisIsInput()
+                          @t.BindChanged("keyup")
+                          @t.BindCommit(DOMEvent.Filter("keyup").Prop(13, "keyCode", "which"))
+                          @t.WhenInvalid(c => c.State.Color("red").Style("border-color", "red"))></textarea>
+                <div class="help-block" @t.WhenInvalid(c => { c.State.Show(); c.Content(d => d.ValidationMessages); }) style="display: none; color: #E15C5C;">
+                </div>
+            </div>
+        </div>
+    }
+}
+
+@using (var t = Plugin.Editor_Check())
+{
+    using (t.If(c => c.IsCellEdit))
+    {
+        <div style="position: relative" @t.BindReject("out-click")>
+            <div>
+                @t.OriginalContent()
+            </div>
+            <div class="popover fade top in" role="tooltip"
+                 style="top: -101px; left: -74px; display: block; position: absolute; width: 300px;"
+                 @t.WhenSaving(c => c.Style("top", "-86px"))>
+                <div class="arrow" style="top: 100%;"></div>
+                <h3 class="popover-title">
+                    @t.Value(c => c.Column.Configuration.Title)
+                    <button type="button" class="close" @t.BindReject("click")><span aria-hidden="true">×</span></button>
+                </h3>
+                <div class="popover-content">
+                    <div class="col-md-12" @t.WhenSaving(c => c.Hide())>
+                        <div class="checkbox">
+                            <label style="padding-left: 10px; line-height: 2; font-size: 16px;">
+                                <input type="checkbox" @t.BindChanged("change") @t.BindCommit("change") style="width: 20px; height: 20px; cursor: pointer"
+                                       @t.WhenChecked(c => c.Attr("checked", "checked")) />
+                                @t.Value(c => c.Column.Configuration.Title)
+                            </label>
+                        </div>
+
+                    </div>
+                    <span class="text-center" style="display: none; min-width: 150px; min-height: 48px; margin-top: -15px;" @t.WhenSaving(c => c.Show())>
+                        <span class="badge" style="margin-top: 20px"><span class="glyphicon glyphicon-refresh loader"></span> Saving...</span>
+                    </span>
+                </div>
+            </div>
+        </div>
+    }
+
+    using (t.If(c => c.IsRowEdit))
+    {
+        <div>
+            <div @t.WhenInvalid(c => c.State.AddClass("has-error"))>
+                <input type="checkbox" style="width: 20px; height: 20px; cursor: pointer"
+                       @t.BindChanged("change") @t.BindCommit("change")
+                       @t.WhenChecked(c => c.Attr("checked", "checked")) />
+                <div class="tooltip bottom" role="tooltip" style="opacity: 1; top: 21px; display: none;"
+                     @t.WhenInvalid(c => c.State.Show())>
+                    <div class="tooltip-arrow" style="border-bottom-color: #E15C5C; left: 15%"></div>
+                    <div class="tooltip-inner" style="max-width: 400px; background-color: #E15C5C;" @t.WhenInvalid(c => c.Content(v => v.ValidationMessages))></div>
+                </div>
+            </div>
+        </div>
+    }
+
+    using (t.If(c => c.IsFormEdit))
+    {
+        <div class="form-group">
+            <div class="col-sm-offset-2 col-sm-10">
+                <div class="checkbox">
+                    <label>
+                        <input type="checkbox" @t.BindChanged("change") @t.BindCommit("change")
+                               @t.WhenChecked(c => c.Attr("checked", "checked"))> @t.Value(c => c.Column.Configuration.Title)
+                        </label>
+                    </div>
+                    <div class="help-block" @t.WhenInvalid(c => { c.State.Show(); c.Content(d => d.ValidationMessages); }) style="display: none; color: #E15C5C;">
+                    </div>
+                </div>
+
+            </div>
+    }
+}
+
+
+@using (var t = Plugin.Editor_Display())
+{
+
+    <div class="form-group">
+        <label class="col-sm-2 control-label">@t.Value(c => c.Column.Configuration.Title)</label>
+        <div class="col-sm-10">
+            <p class="form-control-static" @t.ThisIsContentParent()>@t.Render()</p>
+        </div>
+    </div>
+}

@@ -1,0 +1,14 @@
+@using Reinforced.Lattice.Mvc
+@using Reinforced.Lattice.Templates
+@model Reinforced.Lattice.CaseStudies.GettingItWorking.Models.HomeIndexViewModel
+@{
+    var conf = Model.Table;
+    conf.Column(x => x.IsActive)...  // <-- yes, we can confiure table in .cshtml
+}
+
+<div id="table"></div>
+
+@section scripts {
+    @* ... *@
+    @Model.Table.InitializationScript("table", "window.$$table")
+}

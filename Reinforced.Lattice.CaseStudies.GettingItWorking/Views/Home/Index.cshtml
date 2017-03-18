@@ -4,7 +4,6 @@
 @using Reinforced.Lattice.Templates
 @model Reinforced.Lattice.CaseStudies.GettingItWorking.Models.HomeIndexViewModel
 
-@* Our table will be rendered to this div *@
 <div id="table"></div>
 
 @section scripts {
@@ -16,12 +15,12 @@
     @* Instantiate our table and put it to JS window.$$table variable *@
 
     @Model.Table.InitializationScript("table", "window.$$table")
-    
-    @* 
+
+    @*
         Warning!
         Do not put that code into jQuery's $(document).ready()!
-        
-        Reinforced.Lattice has its own mechanism for rendering when 
+
+        Reinforced.Lattice has its own mechanism for rendering when
         DOM completed loading.
 
         Just do not do that. Seriously, you do not have to do anything else

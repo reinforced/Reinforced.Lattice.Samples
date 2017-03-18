@@ -5,11 +5,11 @@ using System.Runtime.InteropServices;
 // General Information about an assembly is controlled through the following
 // set of attributes. Change these attribute values to modify the information
 // associated with an assembly.
-[assembly: AssemblyTitle("Reinforced.Lattice.CaseStudies.Projections")]
+[assembly: AssemblyTitle("Reinforced.Lattice.CaseStudies.ColumnsOperations")]
 [assembly: AssemblyDescription("")]
 [assembly: AssemblyConfiguration("")]
 [assembly: AssemblyCompany("")]
-[assembly: AssemblyProduct("Reinforced.Lattice.CaseStudies.Projections")]
+[assembly: AssemblyProduct("Reinforced.Lattice.CaseStudies.ColumnsOperations")]
 [assembly: AssemblyCopyright("Copyright ©  2017")]
 [assembly: AssemblyTrademark("")]
 [assembly: AssemblyCulture("")]
