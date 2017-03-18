@@ -42,12 +42,9 @@
     <h3>Step 2 - Connect scrpt</h3>
     <p>Now go to your master page (usually, <code>_Layout.cshtml</code>) and paste following lines to your <code>&lt;head&gt;</code>  tag:</p>
 </div>
-<pre class="language-cshtml wrap-code">
-<code>
-&lt;script type="text/javascript" src="~/Scripts/Reinforced.Lattice/reinforced.lattice.js"&gt;&lt;/script&gt; </code><br />
-<code>
-@RenderSection("scripts", required: false)
-</code>
+
+<pre class="language-cshtml wrap-code" data-src="#doc#/connect-script.cshtml">
+
 </pre>
 <div class="text">
     <p>
@@ -82,12 +79,8 @@
         </li>
     </ol>
 </div>
-<pre class="language-cshtml">
-<code>&lt;div id="table"&gt;&lt;/div&gt;</code> <br /><br />
-<code>@section scripts {</code> <br /> <br />
-<code>@{ Html.RenderTemplates("lt", "Lattice_Templates_Bootstrap"); }</code> <br />
-<code>@Model.Table.InitializationScript("table", "window.$$table");</code> <br /> <br />
-<code>}</code> <br />
+<pre class="language-cshtml" data-src="#doc#/table-init.cshtml">
+
 </pre>
 <div class="text">
     <p>Basically that's how we use configurator to pass necessary data to our client script. <a href="#code_Index_cshtml">Check full page + ViewModel configuration</a>. </p>

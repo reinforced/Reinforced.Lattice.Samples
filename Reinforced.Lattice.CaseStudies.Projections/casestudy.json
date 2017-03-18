@@ -58,7 +58,7 @@
     },
     {
       "Id": "ProjectionTable.cs",
-      "Title": "Configuration with .MappedFrom",
+      "Title": "Configuration with .ProjectDataWith",
       "Description": "Class holding our configuration extension method for .ProjectDataWith",
       "Files": [
         {
