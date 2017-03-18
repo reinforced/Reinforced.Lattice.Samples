@@ -15,7 +15,7 @@
     <p>
         Actually you can configure your table not only in configuration method itself, but in your <code>.cshtml</code> file also. Moreover, <i>I hardly recommend to do so</i> just to keep UI-specific configuration along with other UI. Of course, technically there is no difference where to call all configuration methods mentioned below, but you will:
     </p>    
-    <ul class="blogger-sans">
+    <ul>
         <li>save couple of CPU ticks/few bytes of RAM</li>
         <li>improve code readability</li>
         <li>not have to stop your debugger to change table design</li>
@@ -81,7 +81,7 @@
         Of couse you can create your mixins (static methods) to column configurator to persist some configuration pieces. So you can find useful column configurator types. All these types are located in 
         <code>Reinforced.Lattice.Configuration</code> namespace:
     </p>
-    <ul class="blogger-sans">
+    <ul>
         <li><code>ColumnUsage&lt;TSource, TRow, TColumn&gt;</code> - fully parametrized column configurator that is returned as result of <code>.Column</code> call. <code>TSource</code> corresponds to table source set type, <code>TRow</code> corresponds to table row type, <code>TColumn</code> is type of column.</li>
         <li><code>IColumnTargetProperty&lt;T&gt;</code> - base interface for <code>ColumnUsage&lt;,,&gt;</code> with reduced parametrization. <code>T</code> is type of column</li>
         <li><code>IColumnConfigurator</code> - base interface for <code>IColumnTargetProperty&lt;,&gt;</code>. Non-generic interface</li>
