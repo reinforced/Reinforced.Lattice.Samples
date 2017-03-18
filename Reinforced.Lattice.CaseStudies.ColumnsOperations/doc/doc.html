@@ -76,7 +76,7 @@
     </p>
     <h3>How to change column width</h3>
     <p>
-        Reinforced.Lattice does not treat displaying table as table or datagrid. Templates could be easily overriden and columns will not be columns anymore. So we have to use CSS to change column widths. In order to do that within twitter bootstrap template that is supplied with Reinforced.Lattice out-of-the-box, we will change column header width. Reinforced.Lattice uses <code>data-track</code> attribute to distinguish element on page. For column headers <code>data-track</code> attribute equals to <code>h-%ColumnName%</code> where <code>%ColumnName%</code> is .NET property name that corresponds to desired column. Therefore, let's fix width of <code>IsActive</code> column to 10% by adding following piece of CSS to our page:
+        Reinforced.Lattice does not treat displaying table as table or datagrid. Templates could be easily overriden and columns will not be columns anymore. So we have to use CSS to change column widths. In order to do that within twitter bootstrap template that is supplied with Reinforced.Lattice out-of-the-box, we will change column header (<code>&lt;th&gt;</code> element) width. Reinforced.Lattice uses <code>data-track</code> attribute to distinguish its element, for column headers <code>data-track</code> attribute equals to <code>h-%ColumnName%</code> where <code>%ColumnName%</code> is .NET property name that corresponds to desired column. Therefore, let's fix width of <code>IsActive</code> column to 3% by adding following piece of CSS to our page:
     </p>
 </div>
 <pre class="language-html wrap-code" data-src="#doc#/column-width.html"></pre>
