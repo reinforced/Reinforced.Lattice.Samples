@@ -12,8 +12,6 @@
     var scroll = Model.ScrollbarTable;
     scroll.Scrollbar(c => c.Vertical());
 
-    scroll.Scrollbar(c => c.Vertical().AppendTo(TableElement.Body));
-
     var paging = Model.PagingTable;
     paging.Paging(ui => ui.PagingWithPeriods(useFirstLasPage: false), where: "rb");
 }

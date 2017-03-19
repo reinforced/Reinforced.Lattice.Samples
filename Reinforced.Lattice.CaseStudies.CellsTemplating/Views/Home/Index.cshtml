@@ -35,10 +35,8 @@
         x.Razor(@<a href="mailto:{#}">{#}</a>);
     });
 
-    conf.Column(c => c.Type).TemplateEnum();
-    conf.Column(c => c.Type).FormatEnum();
     conf.Column(c => c.Type).RazorEnum(
-        content: @<span color="@(item.Value == "0" ? "red" : "black")">@item.Value</span>, // optionally override content HTML
+        content: @<span style="color:@(item.Value == "0" ? "red" : "black")">@item.Text</span>, // optionally override content HTML
         deflt: @<span>Not known</span> // optionally override case when value is null or not defined
         );
 
