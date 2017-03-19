@@ -9,6 +9,8 @@ namespace Reinforced.Lattice.CaseStudies.Partition.Models
 {
     public static class ProductsTable
     {
+        // we have moved limiting, loading indicator and templating configuration to separate mixin
+        // just to avoid code duplication
         public static Configurator<Product, Product> Common(this Configurator<Product, Product> conf)
         {
             conf.PrettifyTitles(firstCapitals: true);

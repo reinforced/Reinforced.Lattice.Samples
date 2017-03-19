@@ -1,0 +1,1 @@
+conf.LoadingIndicator(where: "lt");

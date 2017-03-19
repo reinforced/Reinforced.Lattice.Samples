@@ -11,7 +11,7 @@ using Reinforced.Lattice.Mvc;
 
 namespace Reinforced.Lattice.CaseStudies.Partition.Controllers
 {
-    public class ServerPagingController : Controller
+    public class ServerPartitionController : Controller
     {
         public ActionResult Index()
         {
@@ -48,7 +48,7 @@ namespace Reinforced.Lattice.CaseStudies.Partition.Controllers
 
         public DataService<Product> DataService { get; private set; }
 
-        public ServerPagingController()
+        public ServerPartitionController()
         {
             DataService = new DataService<Product>();
             DataService.SetData(MvcApplication.Data);

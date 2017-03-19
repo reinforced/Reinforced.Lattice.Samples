@@ -19,6 +19,19 @@
 <div id="pagingTable"></div>
 
 @section scripts {
+    <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/moment.js/2.17.1/moment.min.js"></script>
+    <script type="text/javascript">
+            function formatRating(v) {
+                var s = "<div style='color:orange' class='text-center'>";
+                for (var i = 0; i < 5; i++) {
+                    if (i < v.DataObject.Rating) s += "<span class='glyphicon glyphicon-star'></span>";
+                    else s += "<span class='glyphicon glyphicon-star-empty'></span>";
+                }
+                s += "</div>";
+                return s;
+            }
+    </script>
+
     @{ Html.RenderTemplates("lt", "Lattice_Templates_Bootstrap"); }
     @Model.ScrollbarTable.InitializationScript("scrollTable", "window.$$scrollTable")
     @Model.PagingTable.InitializationScript("pagingTable", "window.$$pagingTable")

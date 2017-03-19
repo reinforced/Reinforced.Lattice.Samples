@@ -6,7 +6,7 @@ using Reinforced.Lattice.Mvc;
 
 namespace Reinforced.Lattice.CaseStudies.Partition.Controllers
 {
-    public class SequentialPagingController : Controller
+    public class SequentialPartitionController : Controller
     {
         public ActionResult Index()
         {
@@ -43,7 +43,7 @@ namespace Reinforced.Lattice.CaseStudies.Partition.Controllers
 
         public DataService<Product> DataService { get; private set; }
 
-        public SequentialPagingController()
+        public SequentialPartitionController()
         {
             DataService = new DataService<Product>();
             DataService.SetData(MvcApplication.Data);

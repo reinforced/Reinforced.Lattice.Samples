@@ -1,6 +1,6 @@
 {
   "Id": "Partition",
-  "Title": "Data partitioning",
+  "Title": "Data partition",
   "Subtitle": "Showing data partially",
   "Link": "https://github.com/reinforced/Reinforced.Lattice.Samples/tree/master/Reinforced.Lattice.CaseStudies.Partition",
   "Keywords": [],
@@ -14,10 +14,28 @@
   ],
   "LiveDemos": [
     {
-      "Id": "Basic",
-      "Title": "Basic",
-      "Description": "Basic datagrid setup demo",
+      "Id": "Client",
+      "Title": "Client partition",
+      "Description": "Client partition demo",
       "Controller": "HomeController",
+      "Action": "Index",
+      "View": "Index",
+      "Data": "data.json"
+    },
+    {
+      "Id": "Server",
+      "Title": "Server partition",
+      "Description": "Server partition demo",
+      "Controller": "ServerPartitionController",
+      "Action": "Index",
+      "View": "Index",
+      "Data": "data.json"
+    },
+    {
+      "Id": "Sequential",
+      "Title": "Sequential partition",
+      "Description": "Sequential partition demo",
+      "Controller": "SequentialPartitionController",
       "Action": "Index",
       "View": "Index",
       "Data": "data.json"
@@ -25,92 +43,67 @@
   ],
   "CodePieces": [
     {
-      "Id": "_Layout.cshtml",
-      "Title": "_Layout.cshtml",
-      "Description": "MVC Layout file for this test case",
-      "Files": [
-        {
-          "Path": "/Views/Shared/_Layout.cshtml",
-          "Language": "cshtml",
-          "Comment": null,
-          "Title": "_Layout.cshtml"
-        }
-      ]
-    },
-    {
-      "Id": "Index.cshtml",
-      "Title": "Index.cshtml and its ViewModel",
-      "Description": "MVC view for page containing our table and its ViewModel",
+      "Id": "Client_Index.cshtml",
+      "Title": "Index.cshtml for client partition",
+      "Description": "MVC view for page with client-partitioned tables",
       "Files": [
         {
           "Path": "/Views/Home/Index.cshtml",
           "Language": "cshtml",
           "Comment": null,
-          "Title": "Index.cshtml"
-        },
-        {
-          "Path": "/Models/HomeIndexViewModel.cs",
-          "Language": "csharp",
-          "Comment": null,
-          "Title": "HomeIndexViewModel.cs"
+          "Title": "Home/Index.cshtml"
         }
       ]
     },
     {
-      "Id": "DataClasses",
-      "Title": "Data Classes",
-      "Description": "Definitions of Source Data and row ViewModel",
+      "Id": "Server_Index.cshtml",
+      "Title": "Index.cshtml for server partition",
+      "Description": "MVC view for page with server-partitioned tables",
       "Files": [
         {
-          "Path": "/Models/User.cs",
+          "Path": "/Views/ServerPartition/Index.cshtml",
+          "Language": "cshtml",
+          "Comment": null,
+          "Title": "ServerPartition/Index.cshtml"
+        }
+      ]
+    },
+    {
+      "Id": "Sequential_Index.cshtml",
+      "Title": "Index.cshtml for sequential partition",
+      "Description": "MVC view for page with sequential-partitioned tables",
+      "Files": [
+        {
+          "Path": "/Views/SequentialPartition/Index.cshtml",
+          "Language": "cshtml",
+          "Comment": null,
+          "Title": "SequentialPartition/Index.cshtml"
+        }
+      ]
+    },
+    {
+      "Id": "DataClass",
+      "Title": "Data class",
+      "Description": "Definition of source data class",
+      "Files": [
+        {
+          "Path": "/Models/Product.cs",
           "Language": "csharp",
           "Comment": "Data from data source",
           "Title": "User.cs"
-        },
-        {
-          "Path": "/Models/UserRow.cs",
-          "Language": "csharp",
-          "Comment": "ViewModel of table's row",
-          "Title": "UserRow.cs"
         }
       ]
     },
     {
-      "Id": "UsersTable.cs",
+      "Id": "ProductsTable.cs",
       "Title": "Configuration extension class",
-      "Description": "Class holding our configuration extension method",
+      "Description": "Class holding our configuration extension methods for all cases",
       "Files": [
         {
-          "Path": "/Models/UsersTable.cs",
+          "Path": "/Models/ProductsTable.cs",
           "Language": "csharp",
           "Comment": null,
-          "Title": "UsersTable.cs"
-        }
-      ]
-    },
-    {
-      "Id": "HomeController.cs",
-      "Title": "Controller",
-      "Description": "Implementation of MVC controller handling table on server side",
-      "Files": [
-        {
-          "Path": "/Controllers/HomeController.cs",
-          "Language": "csharp",
-          "Comment": null,
-          "Title": "HomeController.cs"
-        }
-      ]
-    },
-    {
-      "Id": "DataService.cs",
-      "Title": "Data service implementation",
-      "Description": "Sample implementation of data service",
-      "Files": [
-        {
-          "Path": "/Data/DataService.cs",
-          "Language": "csharp",
-          "Comment": null,
-          "Title": "DataService.cs"
+          "Title": "ProductsTable.cs"
         }
       ]
     }
