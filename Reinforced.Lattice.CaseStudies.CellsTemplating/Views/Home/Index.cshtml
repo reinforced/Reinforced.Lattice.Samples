@@ -14,21 +14,25 @@
     conf.Column(c => c.UserPic).Title("Customer")
         .Razor(@<div class="row">
             <div class="col-sm-3">
-                <img src="https://raw.githubusercontent.com/reinforced/Reinforced.Lattice.Samples/master/Reinforced.Lattice.CaseStudies.CellsTemplating/Content/icons/{UserPic}" />
+                <img src="https://raw.githubusercontent.com/reinforced/Reinforced.Lattice.Samples/master/Reinforced.Lattice.CaseStudies.CellsTemplating/Content/icons/@item[x=>x.UserPic]" />
             </div>
             <div class="col-sm-9">
-                {FirstName} {LastName} <br />
-                <a href="/Customers/View/{Id}">Profile</a>
+                @item[x => x.FirstName] @item[x => x.LastName] <br />
+                <a href="/Customers/View/@item[x=>x.Id]">Profile</a>
             </div>
         </div>);
-    conf.Column(c => c.LastOrderDate).Title("Last order")
-        .Format("`moment({@}).fromNow()`");
-    conf.Column(c => c.IsActive).Title("Active?").FormatBoolean("'Yes'", "'No'");
+    conf.Column(c => c.LastOrderDate).Title("Last order").Format("`moment({@}).fromNow()`");
+
+    conf.Column(c => c.IsActive).Title("Active?").RazorBoolean(
+        @<span class="glyphicon glyphicon-ok"></span>,
+        @<span class="glyphicon glyphicon-remove"></span>);
+    
     conf.Column(c => c.Email).Template(x =>
     {
         x.IfNotPresent("{@}", "<i>Not provided</i>");
         x.Razor(@<a href="mailto:{#}">{#}</a>);
     });
+
     conf.Column(c => c.Type).TemplateEnum();
     conf.Column(c => c.Gender).Template(x =>
     {

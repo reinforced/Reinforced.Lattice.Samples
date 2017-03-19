@@ -1,0 +1,5 @@
+conf.Column(c => c.Email).Template(x =>
+{
+    x.IfNotPresent("{@}", "<i>Not provided</i>");
+    x.Razor(@<a href="mailto:{#}">{#}</a>);
+});

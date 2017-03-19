@@ -1,0 +1,10 @@
+conf.Column(c => c.UserPic).Title("Customer")
+        .Razor(@<div class="row">
+            <div class="col-sm-3">
+                <img src="https://mycdn.com/icons/{UserPic}" />
+            </div>
+            <div class="col-sm-9">
+                {FirstName} {LastName} <br />
+                <a href="/Customers/View/{Id}">Profile</a>
+            </div>
+        </div>);

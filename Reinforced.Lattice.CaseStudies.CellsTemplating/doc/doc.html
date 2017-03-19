@@ -72,7 +72,10 @@
     <p>
         Also there are <code>.Format</code>/<code>.Razor</code>/<code>.Template</code> for special cases like boolean values and lists.
     </p>
-    <h3>Reinforced.Lattice templating syntax</h3>
+    <h3>`{@}`-notation</h3>
+    <p>
+        Reinforced.Lattice supports its own internal templating syntax: <i>`{@}`-notation</i>. It is pretty similar to <a href="https://mustache.github.io/" target="_blank">mustache syntax</a>. Basically it is used for templating, but also `{@}`-notation engine in other features (filtering, ordering, client expressions, totals) to make JavaScript code generation simple. `{@}`-notation consists of sollowing syntax constructions:
+    </p>
 </div>
 <table class="table table-bordered table-condensed">
     <tr>
@@ -81,30 +84,76 @@
     <tr>
         <td><i>any text</i></td>
         <td>Remains unchanged</td>
-        <td><pre class="language-js wrap-code" data-src="#doc#/syntax-text.cs"></pre></td>
+        <td><pre class="language-csharp wrap-code" data-src="#doc#/syntax-text.cs"></pre></td>
     </tr>
    <tr>
         <td><code>{PropertyName}</code></td>
         <td>Property reference. Replaced with string value of mentioned property</td>
-        <td><pre class="language-js wrap-code" data-src="#doc#/syntax-property.cs"></pre></td>
+        <td><pre class="language-csharp wrap-code" data-src="#doc#/syntax-property.cs"></pre></td>
     </tr>
     <tr>
         <td><code>{@}</code> <br/> <code>{$}</code> <br/> <code>{#}</code> <br/> <code>{%}</code> <br/> <code>{*}</code></td>
         <td>Self-reference. Replaced with value of "current" column</td>
-        <td><pre class="language-js wrap-code" data-src="#doc#/syntax-selfref.cs"></pre></td>
+        <td><pre class="language-csharp wrap-code" data-src="#doc#/syntax-selfref.cs"></pre></td>
     </tr>
     <tr>
         <td><code>`...`</code></td>
         <td>Gravis. Replaced with value of evaluated JavaScript code inside gravis</td>
-        <td><pre class="language-js wrap-code" data-src="#doc#/syntax-gravis.cs"></pre></td>
+        <td><pre class="language-csharp wrap-code" data-src="#doc#/syntax-gravis.cs"></pre></td>
     </tr>
     <tr>
         <td><code>{^...}</code></td>
         <td>Context elevation. Gives access to other properties of cell object outside of <code>cell.DataObject</code></td>
-        <td><pre class="language-js wrap-code" data-src="#doc#/syntax-elev.cs"></pre></td>
+        <td><pre class="language-csharp wrap-code" data-src="#doc#/syntax-elev.cs"></pre></td>
     </tr>
 </table>
 <div class="text">
+    <h3>Reinforced.Lattice template delegates</h3>
+    <p>
+        Methods <code>.Template*</code> consume Reinforced.Lattice templating deleagate: <code>Action&lt;Template&gt;</code>. Reinforced.Lattice <code>Template</code> type behaves mor or less like tag build. It offers following methods:
+    </p>
+</div>
+<table class="table table-bordered table-condensed">
+    <tr>
+        <th>Method</th><th>Description</th>
+    </tr>
+    <tr>
+        <td><code>.Tag(string tagName)</code></td>
+        <td>Sets tag to render. Empty value will render template content without enclosing tag.</td>        
+    </tr>
+   <tr>
+        <td><code>.Css(string key, string value)</code></td>
+        <td>Sets <code>style</code> attribute properties for template tag</td>
+    </tr>
+    <tr>
+        <td><code>.Attr(string key, string value)</code></td>
+        <td>Sets value for attribute of tag</td>
+    </tr>
+    <tr>
+        <td><code>.Data(string key, string value)</code></td>
+        <td>Sets value for <code>data-</code> attribute of tag</td>
+    </tr>
+    <tr>
+        <td><code>.Class(string classesString)</code></td>
+        <td>Adds specified classes (space-separated) to tag (modifies <code>class</code> attribute)</td>
+    </tr>
+    <tr>
+        <td><code>.RemoveClass(string classesString)</code></td>
+        <td>Removes specified class to tag (modifies<code>class</code> attribute)</td>
+    </tr>
+    <tr>
+        <td><code>.Content(string content)</code></td>
+        <td>Sets tag inner contents. This method has overload consuming another <code>Action&lt;Template&gt;</code>, therefore it allows recursively build inner tag contents</td>
+    </tr>
+    <tr>
+        <td><code>.After(string content)</code></td>
+        <td>Sets content that will appear immediately after tag. This method has overload consuming another <code>Action&lt;Template&gt;</code>, therefore it allows recursively build content following after tag</td>
+    </tr>
+</table>
+<div class="text">
+    <p>
+        Reinforced.Lattice template delegates were made in order to support templating mixins. Best practice is to create extension methods for <code>Template</code> type and use them along with <code>.Template*</code> methods.
+    </p>
     <h2>Solution</h2>
     <p>
         Let's consider several different ways to specify templating function. Templates are safe to be specified in <code>.cshtml</code>. We cell use test <a href="#code_DataClasses_cshtml">customer row model</a> to practice templating.
@@ -122,19 +171,41 @@
 </div>
 <pre class="language-csharp wrap-code" data-src="#doc#/template-function.cs"></pre>
 <div class="text">
-    <h3>How to change cell template using Razor</h3>
+    <h3>How to specify cell template using Razor</h3>
     <p> 
-        Then select column and use <code>.TemplateFunction</code> method to point out template function:
+        Use <code>.Razor</code> method. You can use Reinforced.Lattice <span class="tip" data-tip="razor_index">templating syntax</span> within Razor code block:
     </p>
 </div>
+<pre class="language-cshtml wrap-code" data-src="#doc#/razor-syntax.cshtml"></pre>
+<div class="text">
+    <h3>How to template DateTime properly</h3>
+    <p> 
+        Use any JS library that formats date and <code>`...`</code> (gravis) templating syntax. Example below uses <a href="https://momentjs.com" target="_blank">moment.js</a>:
+    </p>
+</div>
+<pre class="language-cshtml wrap-code" data-src="#doc#/date-momentjs.cshtml"></pre>
+<div class="text">
+    <h3>How to template boolean using shortcut method</h3>
+    <p> 
+        Use one of shortcut methods - <code>.FormatBoolean</code>/<code>.TemplateBoolean</code>/<code>.RazorBoolean</code>:
+    </p>
+</div>
+<pre class="language-cshtml wrap-code" data-src="#doc#/format-boolean.cshtml"></pre>
+<div class="text">
+    <h3>How to template null and not presenting values properly</h3>
+    <p> 
+        User <code>.Template</code> method of column and provide your template function flow. To check whether specified property (or expression) is null or undefined please use <code>.IfNotPresent</code>, 
+        <code>.EmptyIfNotPresent</code>, <code>.FlowIfNotPresent</code>, <code>.RazorIfNotPresent</code> methods. They consume `{@}`-expressions as first parameter. Supplied expression will be checked against null or undefined. Following example will output "<i>Not provided</i>" if Email is null, otherwise it will render mailto link:
+    </p>
+</div>
+<pre class="language-cshtml wrap-code" data-src="#doc#/null-format.cshtml"></pre>
 
-<div class="text tiptext" data-tiptext="extension" data-caption="About Configuration extensions">
-    
+<div class="text tiptext" data-tiptext="razor_index" data-caption="Note about using razor syntax">    
     <p>
-        In Reinforced.Lattice table configurations are maintained as C# <a href="https://msdn.microsoft.com/en-us/library/bb383977.aspx" target="_blank">extension methods</a> implementing <a href="https://en.wikipedia.org/wiki/Fluent_interface" target="_blank">fluent interface configuration</a>.
-        So you can chain your configurations methods and therefore combine configurations obtaining new configurations. <br />
-        No XML configuration, no <a href="https://datatables.net/" target="_blank">JSON configuration</a>, no <a href="https://demos.devexpress.com/MVCxGridViewDemos/" target="_blank">assigning properties</a>, even
-        no <a href="https://demos.telerik.com/aspnet-mvc/grid" target="_blank">creating separate web project to enable grids</a>! Just clear, precise, chainable and maintainable fluent configuration. <br />
-        Unfortunately you cannot chain configurations for cells templating, but you can do lot more other fun with them.
+        If you want to keed field references strongly types then you can use <code>@item[x => x.Field]</code> syntax inside Razor block:
+    </p>
+    <pre class="language-cshtml wrap-code" data-src="#doc#/razor-syntax-typed.cshtml"></pre>
+    <p>
+        It looks little bit weird and less readable but preserves strong typing. 
     </p>
 </div>

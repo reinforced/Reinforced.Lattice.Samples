@@ -1,0 +1,9 @@
+conf.Column(c => c.IsActive).FormatBoolean("'Yes'", "'No'");
+
+conf.Column(c => c.IsActive).RazorBoolean(
+    @<span class="glyphicon glyphicon-ok"></span>,
+    @<span class="glyphicon glyphicon-remove"></span>);
+
+conf.Column(c => c.IsActive).TemplateBoolean(
+    x => x.Tag("span").Class("glyphicon glyphicon-ok"), 
+    x => x.Tag("span").Class("glyphicon glyphicon-remove"));
