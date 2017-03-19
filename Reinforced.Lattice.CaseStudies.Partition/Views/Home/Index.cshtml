@@ -1,0 +1,25 @@
+﻿@{ ViewBag.Title = "Full-client partition demo"; }
+
+@using Reinforced.Lattice.CellTemplating
+@using Reinforced.Lattice.Configuration
+@using Reinforced.Lattice.Mvc
+@using Reinforced.Lattice.Plugins.Loading
+@using Reinforced.Lattice.Plugins.Paging
+@using Reinforced.Lattice.Plugins.Scrollbar
+@using Reinforced.Lattice.Templates
+@model Reinforced.Lattice.CaseStudies.Partition.Models.HomeIndexViewModel
+@{
+    var scroll = Model.ScrollbarTable;
+    scroll.Scrollbar(c => c.Vertical());
+    
+    var paging = Model.PagingTable;
+    paging.Paging(ui => ui.PagingWithPeriods(useFirstLasPage: true).UseGotoPage(), where: "rb");
+}
+<div id="scrollTable"></div>
+<div id="pagingTable"></div>
+
+@section scripts {
+    @{ Html.RenderTemplates("lt", "Lattice_Templates_Bootstrap"); }
+    @Model.ScrollbarTable.InitializationScript("scrollTable", "window.$$scrollTable")
+    @Model.PagingTable.InitializationScript("pagingTable", "window.$$pagingTable")
+}
