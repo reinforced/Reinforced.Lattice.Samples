@@ -1,4 +1,5 @@
-conf.Column(c => c.UserPic).Title("Customer")
+@{
+    conf.Column(c => c.UserPic).Title("Customer")
         .Razor(@<div class="row">
             <div class="col-sm-3">
                 <img src="https://mycdn.com/icons/{UserPic}" />
@@ -8,3 +9,4 @@ conf.Column(c => c.UserPic).Title("Customer")
                 <a href="/Customers/View/{Id}">Profile</a>
             </div>
         </div>);
+}
