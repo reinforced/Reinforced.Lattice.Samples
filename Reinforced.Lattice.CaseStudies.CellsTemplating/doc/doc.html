@@ -33,11 +33,7 @@
     <tr>
         <td><code>enum</code></td>
         <td>integer value corresponding to enum</td>
-    </tr>
-    <tr>
-        <td><code>enum</code></td>
-        <td>integer value corresponding to enum</td>
-    </tr>
+    </tr>    
      <tr>
         <td><code>DateTime</code></td>
         <td>JS Date object</td>
@@ -80,47 +76,32 @@
 </div>
 <table class="table table-bordered table-condensed">
     <tr>
-        <th>Syntax</th><th>Description</th><th>Example</th><th>Result</th>
+        <th>Syntax</th><th>Description</th><th>Example</th>
     </tr>
     <tr>
         <td><i>any text</i></td>
         <td>Remains unchanged</td>
         <td><pre class="language-js wrap-code" data-src="#doc#/syntax-text.cs"></pre></td>
-        <td>Here will be rating</td>
     </tr>
    <tr>
-        <td>Property reference: <code>{PropertyName}</code></td>
-        <td>String value of mentioned property</td>
-        <td><pre class="language-js wrap-code" data-src="#doc#/syntax-proeprty.cs"></pre></td>
-        <td>User name: John Smith</td>
+        <td><code>{PropertyName}</code></td>
+        <td>Property reference. Replaced with string value of mentioned property</td>
+        <td><pre class="language-js wrap-code" data-src="#doc#/syntax-property.cs"></pre></td>
     </tr>
     <tr>
-        <td>Self-reference: <code>{@}</code> or <code>{$}</code> or <code>{#}</code> or <code>{%}</code> or <code>{*}</code></td>
-        <td>Replaced with value of "current" column</td>
+        <td><code>{@}</code> <br/> <code>{$}</code> <br/> <code>{#}</code> <br/> <code>{%}</code> <br/> <code>{*}</code></td>
+        <td>Self-reference. Replaced with value of "current" column</td>
         <td><pre class="language-js wrap-code" data-src="#doc#/syntax-selfref.cs"></pre></td>
-        <td>
-            Rating: 5<br/>
-            First name: John<br/>
-            Last name: Smith
-        </td>
     </tr>
     <tr>
-        <td>Gravis: <code>`...`</code></td>
-        <td>Replaced with value of evaluated JavaScript code inside gravis</td>
+        <td><code>`...`</code></td>
+        <td>Gravis. Replaced with value of evaluated JavaScript code inside gravis</td>
         <td><pre class="language-js wrap-code" data-src="#doc#/syntax-gravis.cs"></pre></td>
-        <td>
-            Registered 3 days ago<br/>
-            Registered moment(25 May 2016).fromNow()<br/>            
-        </td>
     </tr>
     <tr>
-        <td>Context elevation: <code>{^...}</code></td>
-        <td>Gives access to other properties of cell object outside of <code>cell.DataObject</code></td>
+        <td><code>{^...}</code></td>
+        <td>Context elevation. Gives access to other properties of cell object outside of <code>cell.DataObject</code></td>
         <td><pre class="language-js wrap-code" data-src="#doc#/syntax-elev.cs"></pre></td>
-        <td>
-            John takes place 1<br/>
-            Last name is Smith            
-        </td>
     </tr>
 </table>
 <div class="text">
