@@ -2,7 +2,7 @@ var cell = {
     Row: {  // IRow object that represents row containing current cell
         DataObject: object { /*...*/ }, // Whole data object for current row
         Index: number,              // Zero-based row displaying index. 
-        MasterTable:  { /*...*/ };      // reference to root table object this row behinds to
+        MasterTable:  { /*...*/ };      // reference to root table object this row belongs to
         Cells: {                    // Cells collection for this particular row
             "name" : ICell { /*...*/ },       // key = Raw column name (equals to C# property name)
             "name" : ICell { /*...*/ },       // value = ICell object
@@ -17,7 +17,7 @@ var cell = {
             Meta: object { /*...*/ },    // Column metadata object
             IsNullable: boolean    // True when corresponding C# property is nullable
         },
-        MasterTable:  { /*...*/ };      // reference to root table object this column behinds to
+        MasterTable:  { /*...*/ };      // reference to root table object this column belongs to
         Order: number;              // Column order (left-to-right)
         IsDateTime: boolean;        // True when corresponding C# property type is DateTime
         IsInteger: boolean;         // True when corresponding C# property type is one of integer types (int, short, uint etc...)

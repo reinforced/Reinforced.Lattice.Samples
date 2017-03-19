@@ -1,0 +1,1 @@
+conf.Column(c => c.Rating).TemplateFunction("formatRating");

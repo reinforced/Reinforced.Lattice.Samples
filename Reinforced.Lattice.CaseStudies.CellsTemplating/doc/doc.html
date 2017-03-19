@@ -9,7 +9,7 @@
         In order to accomplish data request, Reinforced.Lattice retrieves <code>IQueryable&lt;TSource&gt;</code>. Then it filters/orders/pages this set. Then applies projection defined either by <code>.ProjectDataWith</code> or <code>.MapFrom</code> along with automatic mappings in order to get set of <code>TRow</code> instances. Then, all of <code>TRow</code> instances are being transferred to client-side using JS-array serialization and then unpacked back to full-sized JS objects containig fields corresponding to <code>TRow</code> properties. You can access set of these objects by accessing <code>table.DataHolder.StoredData</code> from JavaScript. <br/>  Now let's consider following table that explains relations between types of <code>TRow</code> properties and types of client-side JavaScript object fields:
     </p>
 </div>
-<table class="table">
+<table class="table table-bordered table-condensed">
     <tr>
         <th><code>TRow</code> type</th>
         <th>JavaScript type</th>
@@ -58,13 +58,27 @@
     </p>    
 </div>
 
-<pre class="language-js wrap-code" data-src="#doc#/cell-object.ts">
-</pre>
+<pre class="language-js wrap-code" data-src="#doc#/cell-object.ts"></pre>
 <div class="text">
     <p> 
-        If templating function is not provided then Reinforced.Lattice will simply call <code>cell.Data.toString()</code> and assumes result is cell content. If <code>cell.Data</code>> is null then empty HTML content assumed. You can override templating function in several different ways. 
+        If templating function is not provided then Reinforced.Lattice will simply call <code>cell.Data.toString()</code> and assumes result is cell content. If <code>cell.Data</code> is null then empty HTML content assumed. Reinforced.Lattice provides you with several ways to specify templating function. 
+    </p>
+    <h2>Solution</h2>
+    <p>
+        Let's consider several different ways to specify templating function. Templates are safe to be specified in <code>.cshtml</code>. We cell use test <a href="#code_DataClasses_cshtml">customer row model</a> to practice templating.
+    </p>
+    <h3>How to specify templating function explicitly</h3>
+    <p>
+        Add following <code>&lt;script&gt;</code> block to page:
     </p>
 </div>
+<pre class="language-html wrap-code" data-src="#doc#/rating-format.html"></pre>
+<div class="text">
+    <p> 
+        Then select column and use <code>.TemplateFunction</code> method to point out template function:
+    </p>
+</div>
+<pre class="language-csharp wrap-code" data-src="#doc#/template-function.cs"></pre>
 
 <div class="text tiptext" data-tiptext="extension" data-caption="About Configuration extensions">
     

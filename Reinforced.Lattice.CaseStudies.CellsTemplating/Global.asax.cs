@@ -24,7 +24,7 @@ namespace Reinforced.Lattice.CaseStudies.CellsTemplating
             BundleConfig.RegisterBundles(BundleTable.Bundles);
 
             var file = HttpContext.Current.Server.MapPath("~/App_Data/data.json");
-            Data = JsonConvert.DeserializeObject<List<User>>(File.ReadAllText(file),
+            Data = JsonConvert.DeserializeObject<List<Customer>>(File.ReadAllText(file),
                 new IsoDateTimeConverter());
         }
 

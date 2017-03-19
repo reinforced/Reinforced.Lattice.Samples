@@ -1,12 +1,42 @@
-﻿@{ ViewBag.Title = "Getting It Working"; }
+﻿@{ ViewBag.Title = "Cells templating"; }
 
+@using Reinforced.Lattice.Configuration
 @using Reinforced.Lattice.Mvc
 @using Reinforced.Lattice.Templates
 @model Reinforced.Lattice.CaseStudies.CellsTemplating.Models.HomeIndexViewModel
-
+@{
+    var conf = Model.Table;
+    conf.Column(c => c.Rating).TemplateFunction("formatRating");
+    conf.Column(c => c.Id).DataOnly();
+    conf.Column(c => c.FirstName).DataOnly();
+    conf.Column(c => c.LastName).DataOnly();
+    conf.Column(c => c.UserPic).Title("User")
+        .Razor(@<div class="row">
+                   <div class="col-sm-3">
+                       <img src=""/>
+                   </div>
+               </div>);
+}
 <div id="table"></div>
 
 @section scripts {
+    
+<script type="text/javascript">
+function formatRating(v) {
+    // here v - is ICell instance
+    var s = "<h4 style='color:orange'>";
+    for (var i = 0; i < 5; i++) {
+
+        // we access v.DataObject to retrieve current row's
+        // Rating field. You also can use v.Data to make this function
+        // multipurpose
+        if (i < v.DataObject.Rating) s += "<span class='glyphicon glyphicon-star'></span>";
+        else s += "<span class='glyphicon glyphicon-star-empty'></span>";
+    }
+    s += "</h4>";
+    return s;
+}
+</script>
 
     @{ Html.RenderTemplates("lt", "Lattice_Templates_Bootstrap"); }
 

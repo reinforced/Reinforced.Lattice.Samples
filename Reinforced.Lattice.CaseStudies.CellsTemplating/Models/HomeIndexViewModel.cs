@@ -4,6 +4,6 @@ namespace Reinforced.Lattice.CaseStudies.CellsTemplating.Models
 {
     public class HomeIndexViewModel
     {
-        public Configurator<User,UserRow> Table { get; set; }
+        public Configurator<Customer, CustomerRow> Table { get; set; }
     }
 }

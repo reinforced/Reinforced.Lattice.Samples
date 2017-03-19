@@ -2,9 +2,9 @@
 
 namespace Reinforced.Lattice.CaseStudies.CellsTemplating.Models
 {
-    public static class UsersTable
+    public static class CustomersTable
     {
-        public static Configurator<User, UserRow> Configure(this Configurator<User, UserRow> conf)
+        public static Configurator<Customer, CustomerRow> Configure(this Configurator<Customer, CustomerRow> conf)
         {
             return conf;
         }
