@@ -1,0 +1,78 @@
+﻿<div class="text">
+    <h2>Case</h2>
+    <p>
+        You have to change visual representation of data inside table cell
+    </p>
+    <h2>Necessary knowledge</h2>
+    <h3>Relation between client and server data types</h3>
+    <p>
+        In order to accomplish data request, Reinforced.Lattice retrieves <code>IQueryable&lt;TSource&gt;</code>. Then it filters/orders/pages this set. Then applies projection defined either by <code>.ProjectDataWith</code> or <code>.MapFrom</code> along with automatic mappings in order to get set of <code>TRow</code> instances. Then, all of <code>TRow</code> instances are being transferred to client-side using JS-array serialization and then unpacked back to full-sized JS objects containig fields corresponding to <code>TRow</code> properties. You can access set of these objects by accessing <code>table.DataHolder.StoredData</code> from JavaScript. <br/>  Now let's consider following table that explains relations between types of <code>TRow</code> properties and types of client-side Javascript object fields:
+    </p>
+</div>
+<table class="table">
+    <tr>
+        <th><code>TRow</code> type</th>
+        <th>Javscrpt type</th>
+    </tr>
+    <tr>
+        <td>Numeric (<code>(s)byte</code>, <code>(u)short</code>, <code>(u)int</code>, <code>(u)long</code>, <code>float</code>,<code>double</code>,<code>decimal</code>)</td>
+        <td>JS number (integer or not integer)</td>
+    </tr>
+    <tr>
+        <td><code>string</code></td>
+        <td>JS string</td>
+    </tr>
+    <tr>
+        <td><code>bool</code></td>
+        <td>JS boolean (true/false)</td>
+    </tr>
+    <tr>
+        <td><code>null</code> (regardless nullable type or reference type)</td>
+        <td>null</td>
+    </tr>
+    <tr>
+        <td><code>enum</code></td>
+        <td>integer value corresponding to enum</td>
+    </tr>
+    <tr>
+        <td><code>enum</code></td>
+        <td>integer value corresponding to enum</td>
+    </tr>
+     <tr>
+        <td><code>DateTime</code></td>
+        <td>JS Date object</td>
+    </tr>
+    <tr>
+        <td><code>System.Guid</code></td>
+        <td>JS string</td>
+    </tr>
+    <tr>
+        <td>Other types</td>
+        <td>Serialized as JSON</td>
+    </tr>
+</table>
+<div class="text">
+    <h3>Templating function</h3>
+    <p>
+        The sense of cell templating is to provide Reinforced.Lattice with templating function. <i>Templating function</i> is JavaScript function that converts <i>cell</i> object to HTML content. Cell object is:
+    </p>    
+</div>
+
+<pre class="language-js wrap-code" data-src="#doc#/cell-object.js">
+</pre>
+<div class="text">
+    <p> 
+        If templating function is not provided then Reinforced.Lattice will simply call <code>cell.Data.toString()</code> and assumes result is cell content. If <code>cell.Data</code>> is null then empty HTML content assumed. You can override templating function in several different ways. 
+    </p>
+</div>
+
+<div class="text tiptext" data-tiptext="extension" data-caption="About Configuration extensions">
+    
+    <p>
+        In Reinforced.Lattice table configurations are maintained as C# <a href="https://msdn.microsoft.com/en-us/library/bb383977.aspx" target="_blank">extension methods</a> implementing <a href="https://en.wikipedia.org/wiki/Fluent_interface" target="_blank">fluent interface configuration</a>.
+        So you can chain your configurations methods and therefore combine configurations obtaining new configurations. <br />
+        No XML configuration, no <a href="https://datatables.net/" target="_blank">JSON configuration</a>, no <a href="https://demos.devexpress.com/MVCxGridViewDemos/" target="_blank">assigning properties</a>, even
+        no <a href="https://demos.telerik.com/aspnet-mvc/grid" target="_blank">creating separate web project to enable grids</a>! Just clear, precise, chainable and maintainable fluent configuration. <br />
+        Unfortunately you cannot chain configurations for cells templating, but you can do lot more other fun with them.
+    </p>
+</div>

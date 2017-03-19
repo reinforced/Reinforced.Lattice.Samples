@@ -1,0 +1,14 @@
+﻿@{ ViewBag.Title = "Getting It Working"; }
+
+@using Reinforced.Lattice.Mvc
+@using Reinforced.Lattice.Templates
+@model Reinforced.Lattice.CaseStudies.CellsTemplating.Models.HomeIndexViewModel
+
+<div id="table"></div>
+
+@section scripts {
+
+    @{ Html.RenderTemplates("lt", "Lattice_Templates_Bootstrap"); }
+
+    @Model.Table.InitializationScript("table", "window.$$table")
+}
