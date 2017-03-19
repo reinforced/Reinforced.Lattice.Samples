@@ -1,33 +1,35 @@
-conf.Column(c => c.Rating).Template(x =>
-{
-    /* Nulls and undefined values handling */
-    x.EmptyIfNotPresent("{@}"); // -> empty cell if column value is null or undefined
-    x.IfNotPresent("{Email}", "No email"); // -> "No email" label in "Rating" cell if email is null or undefined
-    x.RazorIfNotPresent("{Phone}", @<span>{FirstName} has no phone</span>); // -> Same as above, with razor
-
-    /* returning value */
-    x.Returns("No rating"); // -> .Returns adds "return" statement to the end of templating function
-    x.Razor(@<span>{#} stars</span>); // -> same as .Returns, but with razor
-
-    /* conditions */
-    x.ReturnsIf("{@}==5", "{FirstName} is awesome customer"); // -> oppressive return in case of specified condition
-    x.RazorIf("{@}==5", @<span>{FirstName} is razor customer</span>); // -> the same, but with razor
-
-    x.FlowIf("{Type}==2", y => // -> surrounds piece of templating logic with if by specified condition
+@{
+    conf.Column(c => c.Rating).Template(x =>
     {
-        x.FlowReturns("No B2B rating"); // -> appends "return" to the end of if-block
-    });
+        /* Nulls and undefined values handling */
+        x.EmptyIfNotPresent("{@}"); // -> empty cell if column value is null or undefined
+        x.IfNotPresent("{Email}", "No email"); // -> "No email" label in "Rating" cell if email is null or undefined
+        x.RazorIfNotPresent("{Phone}", @<span>{FirstName} has no phone</span>); // -> Same as above, with razor
 
-    /* switch */
-    x.Switch("{@}", s => s
-        .Cases(new int[] {1, 2, 3}, f => f.ToString(), (tpl, i) => tpl.Content(i + " value"))
-        .Default("No match"));
-    /*
-     * switch (Rating) {
-     *      case 1: return "1 value";
-     *      case 2: return "2 value";
-     *      case 3: return "3 value";
-     *      default: return "No match";
-     * }
-     */
-});
+        /* returning value */
+        x.Returns("No rating"); // -> .Returns adds "return" statement to the end of templating function
+        x.Razor(@<span>{#} stars</span>); // -> same as .Returns, but with razor
+
+        /* conditions */
+        x.ReturnsIf("{@}==5", "{FirstName} is awesome customer"); // -> oppressive return in case of specified condition
+        x.RazorIf("{@}==5", @<span>{FirstName} is razor customer</span>); // -> the same, but with razor
+
+        x.FlowIf("{Type}==2", y => // -> surrounds piece of templating logic with if by specified condition
+        {
+            x.FlowReturns("No B2B rating"); // -> appends "return" to the end of if-block
+        });
+
+        /* switch */
+        x.Switch("{@}", s => s
+            .Cases(new int[] {1, 2, 3}, f => f.ToString(), (tpl, i) => tpl.Content(i + " value"))
+            .Default("No match"));
+        /*
+         * switch (Rating) {
+         *      case 1: return "1 value";
+         *      case 2: return "2 value";
+         *      case 3: return "3 value";
+         *      default: return "No match";
+         * }
+         */
+    });
+}
