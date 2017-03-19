@@ -66,7 +66,7 @@
     <ul>
         <li><code>.TemplateFunction</code> - specifies templating JS function explicitly</li>
         <li><code>.Format</code> - consumes template expression written in built-in Reinforced.Lattice syntax (see below) and compiles it to inline JS function</li>
-        <li><code>.Template</code> - consumes fluent call against <code>CellTemplateBuilder</code>, provides more control over templating process flow </li>
+        <li><code>.Template</code> - so-called template flow builder. Consumes fluent call against <code>CellTemplateBuilder</code>, provides more control over templating process flow </li>
         <li><code>.Razor</code> - consumes MVC Razor template delegate mixed with Reinforced.Lattice templatin syntax</li>
     </ul>
     <p>
@@ -199,6 +199,25 @@
     </p>
 </div>
 <pre class="language-cshtml wrap-code" data-src="#doc#/null-format.cshtml"></pre>
+<div class="text">
+    <h3>How to use template flow builder</h3>
+    <p> 
+        Template flow builder is powerful tool to generate templating function for particular column. To access it use <code>.Template</code> method of column:
+    </p>
+</div>
+<pre class="language-cshtml wrap-code" data-src="#doc#/template-flow.cshtml"></pre>
+<div class="text">
+    <h3>How to template enumerations properly</h3>
+    <p> 
+        Like in case of templating booleans, use shortcut method - <code>.FormatEnum</code>/<code>.TemplateEnum</code>/<code>.RazorEnum</code>:
+    </p>
+</div>
+<pre class="language-cshtml wrap-code" data-src="#doc#/format-enum.cshtml"></pre>
+<div class="text">
+    <p> 
+        Enumeration templating is built on top of <code>.Swith</code> method functionality. You can template any pre-known set of values using <code>.TemplateSelectList</code> if you have <code>IEnumerable&gt;SelectListItem&lt;</code> set that is kind of default approach for ASP.NET MVC. Use <code>.Switch</code>/<code>.RazorSwitch</code> inside <code>.Template</code> flow to generate switch inside templating function.
+    </p>
+</div>
 
 <div class="text tiptext" data-tiptext="razor_index" data-caption="Note about using razor syntax">    
     <p>

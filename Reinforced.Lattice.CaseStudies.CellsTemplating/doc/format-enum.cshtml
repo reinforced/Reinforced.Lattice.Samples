@@ -1,0 +1,12 @@
+// using .TemplateEnum
+conf.Column(c => c.Type).TemplateEnum();
+
+// using .FormatEnum
+conf.Column(c => c.Type).FormatEnum();
+
+// using .RazorEnum
+conf.Column(c => c.Type).RazorEnum(
+    content: @<span color="@(item.Value == "0" ? "red" : "black")">@item.Value</span>, // optionally override content HTML
+    // item type is System.Web.Mvc.SelectListItem
+    deflt: @<span>Not known</span> // optionally override case when value is null or undefined
+    );

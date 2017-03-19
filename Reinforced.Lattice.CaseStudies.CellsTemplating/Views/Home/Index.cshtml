@@ -1,5 +1,7 @@
 ﻿@{ ViewBag.Title = "Cells templating"; }
 
+@using System.IdentityModel
+@using Reinforced.Lattice.CaseStudies.CellsTemplating.Models
 @using Reinforced.Lattice.CellTemplating
 @using Reinforced.Lattice.Configuration
 @using Reinforced.Lattice.Mvc
@@ -26,7 +28,7 @@
     conf.Column(c => c.IsActive).Title("Active?").RazorBoolean(
         @<span class="glyphicon glyphicon-ok"></span>,
         @<span class="glyphicon glyphicon-remove"></span>);
-    
+
     conf.Column(c => c.Email).Template(x =>
     {
         x.IfNotPresent("{@}", "<i>Not provided</i>");
@@ -34,12 +36,19 @@
     });
 
     conf.Column(c => c.Type).TemplateEnum();
+    conf.Column(c => c.Type).FormatEnum();
+    conf.Column(c => c.Type).RazorEnum(
+        content: @<span color="@(item.Value == "0" ? "red" : "black")">@item.Value</span>, // optionally override content HTML
+        deflt: @<span>Not known</span> // optionally override case when value is null or not defined
+        );
+
     conf.Column(c => c.Gender).Template(x =>
     {
         x.IfNotPresent("{@}", "<i>Not provided</i>");
         x.RazorIf("{@}==0", @<b style="color:#407ac3"> Male </b>);
         x.RazorIf("{@}==1", @<b style="color:#f043c3"> Female </b>);
     });
+
     conf.Column(c => c.Phone).DataOnly();
     conf.Column(c => c.PhoneType).TemplateEnum(content: (a, v) =>
     {
