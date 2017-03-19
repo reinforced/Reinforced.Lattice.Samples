@@ -6,13 +6,13 @@
     <h2>Necessary knowledge</h2>
     <h3>Relation between client and server data types</h3>
     <p>
-        In order to accomplish data request, Reinforced.Lattice retrieves <code>IQueryable&lt;TSource&gt;</code>. Then it filters/orders/pages this set. Then applies projection defined either by <code>.ProjectDataWith</code> or <code>.MapFrom</code> along with automatic mappings in order to get set of <code>TRow</code> instances. Then, all of <code>TRow</code> instances are being transferred to client-side using JS-array serialization and then unpacked back to full-sized JS objects containig fields corresponding to <code>TRow</code> properties. You can access set of these objects by accessing <code>table.DataHolder.StoredData</code> from JavaScript. <br/>  Now let's consider following table that explains relations between types of <code>TRow</code> properties and types of client-side Javascript object fields:
+        In order to accomplish data request, Reinforced.Lattice retrieves <code>IQueryable&lt;TSource&gt;</code>. Then it filters/orders/pages this set. Then applies projection defined either by <code>.ProjectDataWith</code> or <code>.MapFrom</code> along with automatic mappings in order to get set of <code>TRow</code> instances. Then, all of <code>TRow</code> instances are being transferred to client-side using JS-array serialization and then unpacked back to full-sized JS objects containig fields corresponding to <code>TRow</code> properties. You can access set of these objects by accessing <code>table.DataHolder.StoredData</code> from JavaScript. <br/>  Now let's consider following table that explains relations between types of <code>TRow</code> properties and types of client-side JavaScript object fields:
     </p>
 </div>
 <table class="table">
     <tr>
         <th><code>TRow</code> type</th>
-        <th>Javscrpt type</th>
+        <th>JavaScript type</th>
     </tr>
     <tr>
         <td>Numeric (<code>(s)byte</code>, <code>(u)short</code>, <code>(u)int</code>, <code>(u)long</code>, <code>float</code>,<code>double</code>,<code>decimal</code>)</td>
@@ -58,7 +58,7 @@
     </p>    
 </div>
 
-<pre class="language-js wrap-code" data-src="#doc#/cell-object.js">
+<pre class="language-js wrap-code" data-src="#doc#/cell-object.ts">
 </pre>
 <div class="text">
     <p> 
