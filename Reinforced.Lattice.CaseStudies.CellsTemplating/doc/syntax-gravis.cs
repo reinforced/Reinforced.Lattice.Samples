@@ -1,0 +1,1 @@
+conf.Column(c => c.Registered).Format("Registered `moment({@}).fromNow()`");

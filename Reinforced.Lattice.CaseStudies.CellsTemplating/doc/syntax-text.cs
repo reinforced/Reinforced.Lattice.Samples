@@ -1,0 +1,1 @@
+conf.Column(c => c.Rating).Format("Here will be rating");

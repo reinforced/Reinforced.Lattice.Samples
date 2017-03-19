@@ -1,7 +1,7 @@
 var cell = {
     Row: {  // IRow object that represents row containing current cell
         DataObject: object { /*...*/ }, // Whole data object for current row
-        Index: number,              // Zero-based row displaying index. 
+        Index: number,              // Unique row number. 
         MasterTable:  { /*...*/ };      // reference to root table object this row belongs to
         Cells: {                    // Cells collection for this particular row
             "name" : ICell { /*...*/ },       // key = Raw column name (equals to C# property name)

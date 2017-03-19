@@ -1,5 +1,6 @@
 ﻿@{ ViewBag.Title = "Cells templating"; }
 
+@using Reinforced.Lattice.CellTemplating
 @using Reinforced.Lattice.Configuration
 @using Reinforced.Lattice.Mvc
 @using Reinforced.Lattice.Templates
@@ -10,33 +11,63 @@
     conf.Column(c => c.Id).DataOnly();
     conf.Column(c => c.FirstName).DataOnly();
     conf.Column(c => c.LastName).DataOnly();
-    conf.Column(c => c.UserPic).Title("User")
+    conf.Column(c => c.UserPic).Title("Customer")
         .Razor(@<div class="row">
-                   <div class="col-sm-3">
-                       <img src=""/>
-                   </div>
-               </div>);
+            <div class="col-sm-3">
+                <img src="https://raw.githubusercontent.com/reinforced/Reinforced.Lattice.Samples/master/Reinforced.Lattice.CaseStudies.CellsTemplating/Content/icons/{UserPic}" />
+            </div>
+            <div class="col-sm-9">
+                {FirstName} {LastName} <br />
+                <a href="/Customers/View/{Id}">Profile</a>
+            </div>
+        </div>);
+    conf.Column(c => c.LastOrderDate).Title("Last order")
+        .Format("`moment({@}).fromNow()`");
+    conf.Column(c => c.IsActive).Title("Active?").FormatBoolean("'Yes'", "'No'");
+    conf.Column(c => c.Email).Template(x =>
+    {
+        x.IfNotPresent("{@}", "<i>Not provided</i>");
+        x.Razor(@<a href="mailto:{#}">{#}</a>);
+    });
+    conf.Column(c => c.Type).TemplateEnum();
+    conf.Column(c => c.Gender).Template(x =>
+    {
+        x.IfNotPresent("{@}", "<i>Not provided</i>");
+        x.RazorIf("{@}==0", @<b style="color:#407ac3"> Male </b>);
+        x.RazorIf("{@}==1", @<b style="color:#f043c3"> Female </b>);
+    });
+    conf.Column(c => c.Phone).DataOnly();
+    conf.Column(c => c.PhoneType).TemplateEnum(content: (a, v) =>
+    {
+        a.Tag("span").Class("glyphicon");
+        if (v.Value == "0") a.Class("glyphicon-phone");
+        if (v.Value == "1") a.Class("glyphicon-phone-alt");
+        if (v.Value == "2") a.Class("glyphicon-earphone");
+        a.After(" {Phone}");
+    });
+
 }
 <div id="table"></div>
 
 @section scripts {
-    
-<script type="text/javascript">
-function formatRating(v) {
-    // here v - is ICell instance
-    var s = "<h4 style='color:orange'>";
-    for (var i = 0; i < 5; i++) {
+    <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/moment.js/2.17.1/moment.min.js"></script>
 
-        // we access v.DataObject to retrieve current row's
-        // Rating field. You also can use v.Data to make this function
-        // multipurpose
-        if (i < v.DataObject.Rating) s += "<span class='glyphicon glyphicon-star'></span>";
-        else s += "<span class='glyphicon glyphicon-star-empty'></span>";
-    }
-    s += "</h4>";
-    return s;
-}
-</script>
+    <script type="text/javascript">
+        function formatRating(v) {
+            // here v - is ICell instance
+            var s = "<h4 style='color:orange'>";
+            for (var i = 0; i < 5; i++) {
+
+                // we access v.DataObject to retrieve current row's
+                // Rating field. You also can use v.Data to make this function
+                // multipurpose
+                if (i < v.DataObject.Rating) s += "<span class='glyphicon glyphicon-star'></span>";
+                else s += "<span class='glyphicon glyphicon-star-empty'></span>";
+            }
+            s += "</h4>";
+            return s;
+        }
+    </script>
 
     @{ Html.RenderTemplates("lt", "Lattice_Templates_Bootstrap"); }
 
