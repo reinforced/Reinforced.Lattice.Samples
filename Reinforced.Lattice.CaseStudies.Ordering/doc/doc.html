@@ -1,0 +1,133 @@
+﻿<div class="text">
+    <h2>Case</h2>
+    <p>
+        You have heard about Reinforced.Lattice somewhere. Or your colleague told to you about that and you decided to try.
+        Or your boss have directed you to embed it to the project because he has heard somewhere that it is
+        cool and handy to use. However, you are here and want to start with Reinforced.Lattice. <br />
+        <i>Do not be afraid of complex manual - it will be significantly simplier in future! Initial setup is the most complex part.</i> <br />
+        Also, If you are too lazy to read - you can download this case study source code using buttons above. Code comments hold almost same information. <br/>
+        Read carefully, follow the steps and here we go.
+    </p>
+    <h2>Solution</h2>
+    <h3>Step 1 - Download and install</h3>
+    <p>
+        Let's assume that you already have ASP.NET MVC5 project and also you have some DB connected to it. It must be behind
+        ORM supporting LINQ and IQueryables. If you do not have database - you can use any other data source supplying IQueryable
+        of some entitites you want to display. <br />
+        I will provide examples using
+        <code>User</code> class as my source entity stored in database and ORM that I want to display and also <code>UserRow</code>
+        class acting like POCO ViewModel (<a href="#code_DataClasses" data-inpage>show</a>).
+        If you do not have ViewModel - create it just as you <span class="tip" data-tip="vm">regulary create ViewModels for MVC forms</span>.
+        Of course, you can do it later.
+        <br />
+        Go to your NuGet Package Manager Console and type there:
+    </p>
+</div>
+<pre class="pm-console">
+    PM > Install-Package Reinforced.Lattice.Bundle.Mvc5
+    </pre>
+<div class="text">
+    <p>
+        Or you can use Visual Studio NuGet's Ui if you like it. <br />
+        Reinforced.Lattice bundle package will bring several important things:
+    </p>
+    <ul class="blogger-sans">
+        <li><b>Reinforced.Lattice core library</b> itself</li>
+        <li><b>Client script</b> to be used on your pages</li>
+        <li><b>Huge templates page</b> containing default datagrid template for Twitter Bootstrap</li>
+        <li><b>Reinforced.Lattice.Mvc5</b> library that contains extensions for its requests handling via Mvc5</li>
+        <li><b>Reinforced.Lattice.Mvc5.Razor</b> library with some handy extensions for Razor templating</li>
+    </ul>
+    <p>Remember all these components - we will use them later</p>
+    <h3>Step 2 - Connect scrpt</h3>
+    <p>Now go to your master page (usually, <code>_Layout.cshtml</code>) and paste following lines to your <code>&lt;head&gt;</code>  tag:</p>
+</div>
+
+<pre class="language-cshtml wrap-code" data-src="#doc#/connect-script.cshtml">
+
+</pre>
+<div class="text">
+    <p>
+        Compare with <a href="#code__Layout_cshtml" data-inpage>my one</a> if you're not sure. We will need this "scripts" section later. It is critically important for
+        it to follow <b>after</b> Reinforced.Lattice script connection.
+    </p>
+    <h3>Step 3 - Prepare your ViewModel</h3>
+    <ol>
+        <li>Go to your page's ViewModel</li>
+        <li>Add <code>using</code> to <code>Reinforced.Lattice.Configuration</code> namespace</li>
+        <li><span class="tip" data-tip="parametrization">Put a property</span> of type <code>Configurator&lt;User,UserRow&gt;</code> called Table to your ViewModel (<a href="#code_Index_cshtml">verify with my one if you aren't sure</a>)</li>
+        <li>Create somewhere a <code>static</code> class - we will use it to store our table's configuration</li>
+        <li>
+            Navigate to static class created at previous step and create there <span class="tip" data-tip="extension">
+                static method
+            </span> consuming configurator as <code>this</code>-parameter and returning itself.
+            Put some code using configurator into it. <a href="#code_UsersTable_cs">See how I do that</a>.
+        </li>
+
+    </ol>
+    <p>
+        <code>Configurator&lt;,&gt;</code> is key class exposing Reinforced.Lattice functionality. It is being used to produce piece of JSON code for client side as well as for
+        maintaining upcoming requests to server side. And we have to keep it in the same (well, almost same) state both in our controller and in our ViewModel. That's why we use
+        extension method for configuration.
+    </p>
+    <h3>Step 4 - Prepare your page</h3>
+    <ol>
+        <li>Go to your page that you want to put table to</li>
+        <li>Pick a <code>&lt;div&gt;</code> or another tag you wish to display table in and assign <code>id="table"</code> to it</li>
+        <li>
+            Go to the bottom of the page and set up following code around your <code>scripts</code> section:
+        </li>
+    </ol>
+</div>
+<pre class="language-cshtml" data-src="#doc#/table-init.cshtml">
+
+</pre>
+<div class="text">
+    <p>Basically that's how we use configurator to pass necessary data to our client script. <a href="#code_Index_cshtml">Check full page + ViewModel configuration</a>. </p>
+
+    <h3>Step 5 - Prepare your controller</h3>
+    <p>
+        Now you have to make table crunch your <code>IQueryable&lt;TSource&gt;</code> and produce results. To do that you have to implement so-called "handle method" within your controller. Also add necessary initializations of your ViewModel with empty configurator, calling configuration method on it that you've created before. <br />
+        <a href="#code_HomeController_cs" data-inpage>Please refer to controller class explained with comments</a> as it is too senseless to reveal it to step-by-step process.
+    </p>
+    <h3>And we are done here</h3>
+    <p>
+        After changing controller code you can press <kbd>F5</kbd> or <code>Run</code> button in your Visual Studio, or run local IIS and navigate to <code>/Home/Index</code> page. <br/>
+        Also you can launch live demo on all documentation pages using green "Live Demo" button.
+    </p>
+</div>
+<div class="text tiptext" data-tiptext="vm" data-caption="About ViewModels">
+    <p>
+        Reinforced.Lattice ViewModels are of course are little bit different than regular MVC forms ViewModels.
+        E.g. you do not have to put arrays of <code>SelectListItem</code>s to it. Also complex nested types are not allowed there.
+        Optimal way is to keep you ViewModel for Lattice as <b>flat</b> and as plain-est as possible. Try to put actually all the fields
+        that you are displaying to there. Of course, Lattice works with nested types, but it <i>may</i> reduce performance.
+    </p>
+</div>
+<div class="text tiptext" data-tiptext="parametrization" data-caption="About Configurator parametrization">
+
+    <b>NB! <code>Configurator&lt;,&gt;</code> type parameters. Learn them clearly.</b>
+    <ul>
+        <li>
+            <code>TSource</code> - first one. Is actually type of data from your ORM. It is safe to put entities from DataContext/DbContext here.
+            Also may be referred as "first", "left", "source", "from".
+        </li>
+        <li>
+            <code>TRow</code> - second one. Is actually type of your ViewModel for <i>single row in table</i>.
+            Also may be referred as "second", "right", "target", "to"
+        </li>
+    </ul>
+    <p>
+        Do not mess them - there 2 types are your best friends. It is important to understand what is applicable to <code>TSource</code> and what is applicable to <code>TRow</code>
+    </p>
+</div>
+
+<div class="text tiptext" data-tiptext="extension" data-caption="About Configuration extensions">
+    <p>
+        In Reinforced.Lattice table configurations are maintained as C# <a href="https://msdn.microsoft.com/en-us/library/bb383977.aspx" target="_blank">extension methods</a> implementing <a href="https://en.wikipedia.org/wiki/Fluent_interface" target="_blank">fluent interface configuration</a>.
+        So you can chain your configurations methods and therefore combine configurations obtaining new configurations. <br />
+        No XML configuration, no <a href="https://datatables.net/" target="_blank">JSON configuration</a>, no <a href="https://demos.devexpress.com/MVCxGridViewDemos/" target="_blank">assigning properties</a>, even
+        no <a href="https://demos.telerik.com/aspnet-mvc/grid" target="_blank">creating separate web project to enable grids</a>! Just clear, precise, chainable and maintainable fluent configuration. <br />
+        Unfortunately you cannot chain configurations for cells templating, but you can do lot more other fun with them.
+    </p>
+</div>

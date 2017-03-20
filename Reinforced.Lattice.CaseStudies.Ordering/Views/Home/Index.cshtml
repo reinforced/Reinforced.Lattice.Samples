@@ -1,0 +1,60 @@
+﻿@{ ViewBag.Title = "Ordering demo"; }
+
+@using Reinforced.Lattice
+@using Reinforced.Lattice.CellTemplating
+@using Reinforced.Lattice.Configuration
+@using Reinforced.Lattice.Mvc
+@using Reinforced.Lattice.Plugins.Loading
+@using Reinforced.Lattice.Plugins.Ordering
+@using Reinforced.Lattice.Templates
+@model Reinforced.Lattice.CaseStudies.Ordering.Models.HomeIndexViewModel
+@{
+    var conf = Model.Table;
+    conf.LoadingIndicator(); // to see when data retrieved from server
+    conf.Column(c => c.RegistrationDate)
+        .Title("Registered <br/> <span class='subscript'>Client ordering, but server one also persisted</span>")
+        .Format("`moment({@}).fromNow()`");
+    conf.Column(c => c.UserType).TemplateEnum();
+    conf.Column(c => c.IsActive).RazorBoolean(
+        @<div class="text-center" style="color: #669026"><span class="glyphicon glyphicon-ok"></span></div>,
+        @<div class="text-center" style="color: #c91818"><span class="glyphicon glyphicon-remove"></span></div>);
+    conf.Column(c => c.FirstName)
+        .Title("First Name <br/> <span class='subscript'>Client order</span>")
+        .OrderableUi(x => x.UseClientOrdering());
+
+    conf.Column(c => c.LastName)
+        .Title("Last name <br/> <span class='subscript'>Server ordering</span>");
+
+    conf.Column(c => c.IsActive)
+        .Title("Active? <br/> <span class='subscript'>Client ordering, ascending by default</span>")
+        .OrderableUi(x => x.UseClientOrdering().DefaultOrdering(Ordering.Ascending));
+
+    conf.Column(c => c.UserType)
+        .Title("User type <br/> <span class='subscript'>Server ordering, admins on top</span>");
+
+    conf.Column(c => c.Email)
+        .Title("Email <br/> <span class='subscript'>Client ordering, by email domain</span>")
+        .OrderableUi(c => c.UseClientOrdering("orderByEmailDomain"));
+}
+<div id="table"></div>
+
+@section scripts {
+    <style type="text/css">
+        .subscript {
+            font-weight: normal;
+            font-size: 11px;
+            color: #0586e1;
+            font-family: monospace;
+        }
+    </style>
+    <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/moment.js/2.17.1/moment.min.js"></script>
+    <script type="text/javascript">
+        function orderByEmailDomain(x, y) {
+            var domainX = x.Email.substring(x.Email.indexOf('@Html.Raw("@")'));
+            var domainY = y.Email.substring(y.Email.indexOf('@Html.Raw("@")'));
+            return domainX.localeCompare(domainY);
+        }
+    </script>
+    @{ Html.RenderTemplates("lt", "Lattice_Templates_Bootstrap"); }
+    @Model.Table.InitializationScript("table", "window.$$table")
+}
