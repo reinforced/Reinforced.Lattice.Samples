@@ -198,9 +198,9 @@
         @using (t.If(c => c.IsNeutral))
         { <span class="glyphicon glyphicon-sort" style="color: #bac5d3; float: right;"></span> }
         @using (t.If(c => c.IsAscending))
-        { <span class="glyphicon glyphicon-arrow-down" style="color: #bac5d3; float: right;"></span> }
-        @using (t.If(c => c.IsDescending))
         { <span class="glyphicon glyphicon-arrow-up" style="color: #bac5d3; float: right;"></span> }
+        @using (t.If(c => c.IsDescending))
+        { <span class="glyphicon glyphicon-arrow-down" style="color: #bac5d3; float: right;"></span> }
     </th>
 }
 

@@ -162,413 +162,6 @@ var Reinforced;
 (function (Reinforced) {
     var Lattice;
     (function (Lattice) {
-        /**
-         * This enumeration distinguishes which way
-         * underlying query will be used
-         */
-        (function (QueryScope) {
-            /**
-             * Mentioned query will be sent to server to obtain
-             * data (probably) for further local filtration.
-             * All locally filtered fields should be excluded from
-             * underlying query
-             */
-            QueryScope[QueryScope["Server"] = 0] = "Server";
-            /**
-             * Mentioned query will be used for local data filtration.
-             * To gain performance, please exclude all data settings that were
-             * applied during server request
-             */
-            QueryScope[QueryScope["Client"] = 1] = "Client";
-            /**
-             * This query should contain both data for client and server filtering.
-             * Transboundary queries are used to obtain query settings
-             * that will be used on server side to retrieve data set that
-             * will be used for server command handling, so server needs all filtering settings
-             */
-            QueryScope[QueryScope["Transboundary"] = 2] = "Transboundary";
-        })(Lattice.QueryScope || (Lattice.QueryScope = {}));
-        var QueryScope = Lattice.QueryScope;
-        (function (EventDirection) {
-            EventDirection[EventDirection["Before"] = 0] = "Before";
-            EventDirection[EventDirection["After"] = 1] = "After";
-            EventDirection[EventDirection["Undirected"] = 2] = "Undirected";
-        })(Lattice.EventDirection || (Lattice.EventDirection = {}));
-        var EventDirection = Lattice.EventDirection;
-    })(Lattice = Reinforced.Lattice || (Reinforced.Lattice = {}));
-})(Reinforced || (Reinforced = {}));
-var Reinforced;
-(function (Reinforced) {
-    var Lattice;
-    (function (Lattice) {
-        var Rendering;
-        (function (Rendering) {
-            var Resensor = (function () {
-                function Resensor(element, handler) {
-                    this._element = element;
-                    this._handler = handler;
-                    this._resizeBoud = this.onResized.bind(this);
-                    this.requestAnimationFrame = window.requestAnimationFrame ||
-                        window['mozRequestAnimationFrame'] ||
-                        window['webkitRequestAnimationFrame'] ||
-                        function (fn) {
-                            return window.setTimeout(fn, 20);
-                        };
-                }
-                Resensor.prototype.attach = function () {
-                    this._sensor = document.createElement('div');
-                    this._sensor.className = 'resize-sensor';
-                    var style = 'position: absolute; left: 0; top: 0; right: 0; bottom: 0; overflow: hidden; z-index: -1; visibility: hidden;';
-                    var styleChild = 'position: absolute; left: 0; top: 0; transition: 0s;';
-                    this._sensor.style.cssText = style;
-                    this._sensor.innerHTML =
-                        "<div class=\"resize-sensor-expand\" style=\"" + style + "\"><div style=\"" + styleChild + "\"></div></div><div class=\"resize-sensor-shrink\" style=\"" + style + "\"><div style=\"" + styleChild + " width: 200%; height: 200%\"></div></div>";
-                    this._element.appendChild(this._sensor);
-                    if (Resensor.getComputedStyle(this._element, 'position') == 'static') {
-                        this._element.style.position = 'relative';
-                    }
-                    this._expand = this._sensor.childNodes.item(0);
-                    this._expandChild = this._expand.childNodes[0];
-                    this._shrink = this._sensor.childNodes[1];
-                    this._lastWidth = this._element.offsetWidth;
-                    this._lastHeight = this._element.offsetHeight;
-                    this.reset();
-                    Reinforced.Lattice.Services.EventsDelegatorService.addHandler(this._expand, 'scroll', this.onScroll.bind(this));
-                    Reinforced.Lattice.Services.EventsDelegatorService.addHandler(this._shrink, 'scroll', this.onScroll.bind(this));
-                };
-                Resensor.prototype.onResized = function () {
-                    this._rafId = 0;
-                    if (!this._dirty)
-                        return;
-                    this._lastWidth = this._newWidth;
-                    this._lastHeight = this._newHeight;
-                    this._handler.call();
-                };
-                Resensor.prototype.onScroll = function () {
-                    this._newWidth = this._element.offsetWidth;
-                    this._newHeight = this._element.offsetHeight;
-                    this._dirty = this._newWidth != this._lastWidth || this._newHeight != this._lastHeight;
-                    var bnd = this._resizeBoud;
-                    if (this._dirty && !this._rafId) {
-                        this._rafId = this.requestAnimationFrame.call(window, function () { bnd(); });
-                    }
-                    this.reset();
-                };
-                Resensor.prototype.reset = function () {
-                    this._expandChild.style.width = '100000px';
-                    this._expandChild.style.height = '100000px';
-                    this._expand.scrollLeft = 100000;
-                    this._expand.scrollTop = 100000;
-                    this._shrink.scrollLeft = 100000;
-                    this._shrink.scrollTop = 100000;
-                };
-                Resensor.getComputedStyle = function (element, prop) {
-                    if (element.currentStyle) {
-                        return element.currentStyle[prop];
-                    }
-                    else if (window.getComputedStyle) {
-                        return window.getComputedStyle(element, null).getPropertyValue(prop);
-                    }
-                    else {
-                        return element.style[prop];
-                    }
-                };
-                return Resensor;
-            }());
-            Rendering.Resensor = Resensor;
-        })(Rendering = Lattice.Rendering || (Lattice.Rendering = {}));
-    })(Lattice = Reinforced.Lattice || (Reinforced.Lattice = {}));
-})(Reinforced || (Reinforced = {}));
-var Reinforced;
-(function (Reinforced) {
-    var Lattice;
-    (function (Lattice) {
-        var Templating;
-        (function (Templating) {
-            var TemplateProcess = (function () {
-                function TemplateProcess(uiColumns, executor) {
-                    this.Html = '';
-                    this._stack = new Reinforced.Lattice.Templating.RenderingStack();
-                    this.BackInfo = {
-                        CachedVisualStates: {},
-                        CallbacksQueue: [],
-                        DatepickersQueue: [],
-                        DestroyCallbacksQueue: [],
-                        EventsQueue: [],
-                        HasVisualStates: false,
-                        MarkQueue: []
-                    };
-                    this.w = this.append.bind(this);
-                    this.s = this.spaceW.bind(this);
-                    this.UiColumns = uiColumns();
-                    this.Executor = executor;
-                }
-                TemplateProcess.prototype.append = function (str) {
-                    if (str == null || str == undefined)
-                        return;
-                    if (this.Context.CurrentTrack != null && !this.Context.IsTrackWritten) {
-                        var strPiece = str.toString();
-                        this.autotrack(strPiece);
-                    }
-                    else
-                        this.Html += str.toString();
-                };
-                TemplateProcess.prototype.autotrack = function (str) {
-                    this.Context.TrackBuffer += str;
-                    var idx = this.findStartTag(this.Context.TrackBuffer);
-                    if (idx < 0)
-                        return;
-                    if (idx === this.Context.TrackBuffer.length) {
-                        this.Context.TrackBuffer += this.trackAttr();
-                    }
-                    else {
-                        var head = this.Context.TrackBuffer.substr(0, idx);
-                        var tail = this.Context.TrackBuffer.substring(idx, this.Context.TrackBuffer.length);
-                        this.Context.TrackBuffer = head + this.trackAttr() + tail;
-                    }
-                    this.Html += this.Context.TrackBuffer;
-                    this.Context.IsTrackWritten = true;
-                };
-                TemplateProcess.prototype.findStartTag = function (buf) {
-                    var idx = buf.indexOf('<');
-                    if (idx < 0)
-                        return -1;
-                    while ((idx + 1 < buf.length - 1) && (!TemplateProcess.alphaRegex.test(buf.charAt(idx + 1)))) {
-                        idx = buf.indexOf('<', idx + 1);
-                    }
-                    if (idx < 0)
-                        return -1;
-                    idx++;
-                    while ((idx < buf.length) && TemplateProcess.alphaRegex.test(buf.charAt(idx)))
-                        idx++;
-                    return idx;
-                };
-                TemplateProcess.prototype.nest = function (data, templateId) {
-                    this.Executor.nest(data, templateId, this);
-                };
-                TemplateProcess.prototype.spc = function (num) {
-                    if (this.Executor.Spaces[num])
-                        return this.Executor.Spaces[num];
-                    var r = '';
-                    for (var i = 0; i < num; i++) {
-                        r += ' ';
-                    }
-                    this.Executor[num] = r;
-                    return r;
-                };
-                TemplateProcess.prototype.spaceW = function () {
-                    for (var i = 0; i < arguments.length; i++) {
-                        if (typeof arguments[i] === "number") {
-                            this.w(this.spc(arguments[i]));
-                        }
-                        else {
-                            this.w(arguments[i]);
-                        }
-                    }
-                };
-                TemplateProcess.prototype.nestElement = function (e, templateId, type) {
-                    if (e.renderElement) {
-                        this.d(e, type);
-                        e.renderElement(this);
-                        this.u();
-                    }
-                    else {
-                        if (!templateId)
-                            throw new Error('Renderable object must have either .renderElement implemented or templateId specified');
-                        this.nest(e, templateId);
-                    }
-                };
-                TemplateProcess.prototype.nestContent = function (e, templateId) {
-                    if (e.renderContent) {
-                        e.renderContent(this);
-                    }
-                    else {
-                        if (!templateId)
-                            throw new Error('Renderable object must have either .renderContent implemented or templateId specified');
-                        this.nest(e, templateId);
-                    }
-                };
-                TemplateProcess.prototype.d = function (model, type) {
-                    this._stack.push(type, model);
-                    this.Context = this._stack.Current;
-                };
-                TemplateProcess.prototype.u = function () {
-                    this._stack.popContext();
-                    if (!this._stack.Current) {
-                        this.Context = null;
-                    }
-                    else {
-                        this.Context = this._stack.Current;
-                    }
-                };
-                TemplateProcess.prototype.vs = function (stateName, state) {
-                    state.Receiver = this.Context.Object;
-                    if (!this.BackInfo.CachedVisualStates[stateName])
-                        this.BackInfo.CachedVisualStates[stateName] = [];
-                    var index = this.BackInfo.CachedVisualStates[stateName].length;
-                    this.BackInfo.CachedVisualStates[stateName].push(state);
-                    this.BackInfo.HasVisualStates = true;
-                    this.w("data-state-" + stateName + "=\"" + index + "\"");
-                };
-                TemplateProcess.prototype.e = function (commaSeparatedFunctions, commaSeparatedEvents, eventArgs) {
-                    var ed = {
-                        EventReceiver: this.Context.Object,
-                        Functions: commaSeparatedFunctions.split(','),
-                        Events: commaSeparatedEvents.split(','),
-                        EventArguments: eventArgs
-                    };
-                    var index = this.BackInfo.EventsQueue.length;
-                    this.BackInfo.EventsQueue.push(ed);
-                    this.w("data-be-" + index + "=\"" + index + "\" data-evb=\"true\"");
-                };
-                TemplateProcess.prototype.rc = function (fn, args) {
-                    var index = this.BackInfo.CallbacksQueue.length;
-                    this.BackInfo.CallbacksQueue.push({
-                        Callback: fn,
-                        CallbackArguments: args,
-                        Target: window
-                    });
-                    this.w("data-cb=\"" + index + "\"");
-                };
-                TemplateProcess.prototype.dc = function (fn, args) {
-                    var index = this.BackInfo.DestroyCallbacksQueue.length;
-                    this.BackInfo.DestroyCallbacksQueue.push({
-                        Callback: fn,
-                        CallbackArguments: args,
-                        Target: window
-                    });
-                    this.w("data-dcb=\"" + index + "\"");
-                };
-                TemplateProcess.prototype.m = function (fieldName, key, receiverPath) {
-                    var index = this.BackInfo.MarkQueue.length;
-                    var receiver = this.Context.Object;
-                    if (receiverPath != null) {
-                        var tp = Reinforced.Lattice.Rendering.BackBinder.traverseWindowPath(receiverPath);
-                        receiver = tp.target || tp.parent;
-                    }
-                    var md = {
-                        ElementReceiver: receiver,
-                        FieldName: fieldName,
-                        Key: key
-                    };
-                    this.BackInfo.MarkQueue.push(md);
-                    this.w("data-mrk=\"" + index + "\"");
-                };
-                TemplateProcess.prototype.dp = function (condition, nullable) {
-                    var index = this.BackInfo.DatepickersQueue.length;
-                    if (condition) {
-                        var md = {
-                            ElementReceiver: this.Context.Object,
-                            IsNullable: nullable
-                        };
-                        this.BackInfo.DatepickersQueue.push(md);
-                        this.w("data-dp=\"" + index + "\"");
-                    }
-                };
-                TemplateProcess.prototype.trackAttr = function () {
-                    var trk = this._stack.Current.CurrentTrack;
-                    if (trk.length === 0)
-                        return null;
-                    var tra = "data-track=\"" + trk + "\"";
-                    if (this.Context.Type === RenderedObject.Row || this.Context.Type === RenderedObject.Partition) {
-                        if (this.Context.Object.IsSpecial) {
-                            tra += " data-spr='true'";
-                        }
-                    }
-                    return ' ' + tra + ' ';
-                };
-                TemplateProcess.prototype.isLoc = function (location) {
-                    var loc = this.Context.Object['PluginLocation'];
-                    if (loc.length < location.length)
-                        return false;
-                    if (loc.length === location.length && loc === location)
-                        return true;
-                    if (loc.substring(0, location.length) === location)
-                        return true;
-                    return false;
-                };
-                TemplateProcess.prototype.isLocation = function () {
-                    if (this.Context.Type === RenderedObject.Plugin) {
-                        for (var i = 0; i < arguments.length; i++) {
-                            if (this.isLoc(arguments[i]))
-                                return true;
-                        }
-                    }
-                    return false;
-                };
-                TemplateProcess.alphaRegex = /[a-zA-Z]/;
-                return TemplateProcess;
-            }());
-            Templating.TemplateProcess = TemplateProcess;
-            /**
-             * What renders in current helper method
-             */
-            (function (RenderedObject) {
-                /**
-                 * Plugin (0)
-                 */
-                RenderedObject[RenderedObject["Plugin"] = 0] = "Plugin";
-                /**
-                 * Column header (1)
-                 */
-                RenderedObject[RenderedObject["Header"] = 1] = "Header";
-                /**
-                 * Row (containing cells) (2)
-                 */
-                RenderedObject[RenderedObject["Row"] = 2] = "Row";
-                /**
-                 * Cell (belonging to row and column) (3)
-                 */
-                RenderedObject[RenderedObject["Cell"] = 3] = "Cell";
-                /**
-                 * Template region for messages
-                 */
-                RenderedObject[RenderedObject["Message"] = 4] = "Message";
-                /**
-                 * Template region for partition tools row
-                 */
-                RenderedObject[RenderedObject["Partition"] = 5] = "Partition";
-                /**
-                 * Custom rendering object.
-                 * Needed for rendering of random templates bound to random objects
-                 */
-                RenderedObject[RenderedObject["Custom"] = 6] = "Custom";
-            })(Templating.RenderedObject || (Templating.RenderedObject = {}));
-            var RenderedObject = Templating.RenderedObject;
-        })(Templating = Lattice.Templating || (Lattice.Templating = {}));
-    })(Lattice = Reinforced.Lattice || (Reinforced.Lattice = {}));
-})(Reinforced || (Reinforced = {}));
-var Reinforced;
-(function (Reinforced) {
-    var Lattice;
-    (function (Lattice) {
-        var Templating;
-        (function (Templating) {
-            var _ltcTpl = (function () {
-                function _ltcTpl() {
-                }
-                _ltcTpl._ = function (prefix, id, tpl) {
-                    if (!_ltcTpl._lib[prefix])
-                        _ltcTpl._lib[prefix] = { Prefix: prefix, Templates: {} };
-                    _ltcTpl._lib[prefix].Templates[id] = tpl;
-                };
-                _ltcTpl.executor = function (prefix, table) {
-                    if (!_ltcTpl._lib.hasOwnProperty(prefix)) {
-                        throw new Error("Cannot find templates set with prefix " + prefix);
-                    }
-                    return new Templating.TemplatesExecutor(_ltcTpl._lib[prefix], table);
-                };
-                _ltcTpl._lib = {};
-                return _ltcTpl;
-            }());
-            Templating._ltcTpl = _ltcTpl;
-        })(Templating = Lattice.Templating || (Lattice.Templating = {}));
-    })(Lattice = Reinforced.Lattice || (Reinforced.Lattice = {}));
-})(Reinforced || (Reinforced = {}));
-var Reinforced;
-(function (Reinforced) {
-    var Lattice;
-    (function (Lattice) {
         var Templating;
         (function (Templating) {
             var TemplatesExecutor = (function () {
@@ -667,138 +260,6 @@ var Reinforced;
                 return TemplatesExecutor;
             }());
             Templating.TemplatesExecutor = TemplatesExecutor;
-        })(Templating = Lattice.Templating || (Lattice.Templating = {}));
-    })(Lattice = Reinforced.Lattice || (Reinforced.Lattice = {}));
-})(Reinforced || (Reinforced = {}));
-var Reinforced;
-(function (Reinforced) {
-    var Lattice;
-    (function (Lattice) {
-        var Templating;
-        (function (Templating) {
-            var Driver = (function () {
-                function Driver() {
-                }
-                Driver.body = function (p) {
-                    p.w('<input type="hidden" data-track="tableBodyHere" style="display:none;"/>');
-                };
-                Driver.content = function (p, columnName) {
-                    if (p.Context.Object.renderContent) {
-                        p.Context.Object.renderContent(p);
-                    }
-                    else {
-                        switch (p.Context.Type) {
-                            case Templating.RenderedObject.Header:
-                                Driver.headerContent(p.Context.Object, p);
-                                break;
-                            case Templating.RenderedObject.Plugin:
-                                // if we are here then plugin's renderContent is not 
-                                // overriden
-                                throw new Error('It is required to override renderContent for plugin');
-                            case Templating.RenderedObject.Row:
-                                Driver.rowContent(p.Context.Object, p, columnName);
-                                break;
-                            case Templating.RenderedObject.Cell:
-                                Driver.cellContent(p.Context.Object, p);
-                                break;
-                            default:
-                                throw new Error('Unknown rendering context type');
-                        }
-                    }
-                };
-                Driver.row = function (p, row) {
-                    p.nestElement(row, p.Executor.obtainRowTemplate(row), Templating.RenderedObject.Row);
-                };
-                Driver.headerContent = function (head, p) {
-                    var content = head.Column.Configuration.Title || head.Column.RawName;
-                    p.w(content);
-                };
-                Driver.rowContent = function (row, p, columnName) {
-                    var columns = p.UiColumns;
-                    for (var i = 0; i < columns.length; i++) {
-                        var c = row.Cells[columns[i].RawName];
-                        if (columnName != null && columnName != undefined && typeof columnName == 'string') {
-                            if (c.Column.RawName === columnName) {
-                                Driver.cell(p, c);
-                            }
-                        }
-                        else {
-                            Driver.cell(p, c);
-                        }
-                    }
-                };
-                Driver.cell = function (p, cell) {
-                    p.nestElement(cell, p.Executor.obtainCellTemplate(cell), Templating.RenderedObject.Cell);
-                };
-                Driver.cellContent = function (c, p) {
-                    var tpl = p.Executor.ColumnRenderes[c.Column.RawName];
-                    if (typeof tpl === "string") {
-                        p.nest(c, c.Column.Configuration.CellRenderingTemplateId);
-                    }
-                    else {
-                        p.w(tpl(c));
-                    }
-                };
-                Driver.plugin = function (p, pluginPosition, pluginId) {
-                    var plugin = p.Executor.Instances.getPlugin(pluginId, pluginPosition);
-                    Driver.renderPlugin(p, plugin);
-                };
-                Driver.plugins = function (p, pluginPosition) {
-                    var plugins = p.Executor.Instances.getPlugins(pluginPosition);
-                    if (!plugins)
-                        return;
-                    for (var a in plugins) {
-                        if (plugins.hasOwnProperty(a)) {
-                            var v = plugins[a];
-                            Driver.renderPlugin(p, v);
-                        }
-                    }
-                };
-                Driver.renderPlugin = function (p, plugin) {
-                    if (plugin.renderElement) {
-                        p.d(plugin, Templating.RenderedObject.Plugin);
-                        plugin.renderElement(p);
-                        p.u();
-                        return;
-                    }
-                    if (!plugin.renderContent)
-                        return;
-                    p.nest(plugin, p.Executor.CoreTemplateIds.PluginWrapper);
-                };
-                Driver.colHeader = function (p, columnName) {
-                    try {
-                        Driver.header(p, p.Executor.Instances.getColumn(columnName));
-                    }
-                    catch (a) {
-                    }
-                };
-                /**
-                 * Renders specified column's header into string including its wrapper
-                 *
-                 * @param column Column which header is about to be rendered
-                 * @returns {}
-                 */
-                Driver.header = function (p, column) {
-                    if (column.Header.renderElement) {
-                        p.d(column.Header, Templating.RenderedObject.Header);
-                        column.Header.renderElement(p);
-                        p.u();
-                    }
-                    else {
-                        p.nest(column.Header, column.Header.TemplateIdOverride || p.Executor.CoreTemplateIds.HeaderWrapper);
-                    }
-                };
-                Driver.headers = function (p) {
-                    var columns = p.UiColumns;
-                    for (var a in columns) {
-                        if (columns.hasOwnProperty(a)) {
-                            Driver.header(p, columns[a]);
-                        }
-                    }
-                };
-                return Driver;
-            }());
-            Templating.Driver = Driver;
         })(Templating = Lattice.Templating || (Lattice.Templating = {}));
     })(Lattice = Reinforced.Lattice || (Reinforced.Lattice = {}));
 })(Reinforced || (Reinforced = {}));
@@ -945,192 +406,7 @@ var Reinforced;
         Lattice.TableEvent = TableEvent;
     })(Lattice = Reinforced.Lattice || (Reinforced.Lattice = {}));
 })(Reinforced || (Reinforced = {}));
-var Reinforced;
-(function (Reinforced) {
-    var Lattice;
-    (function (Lattice) {
-        /**
-        * Helper class for producing track ids.
-        * You can use this class directly, but it is better to use it via @memberref Reinforced.Lattice.Master.Renderer.Rendering.Modifier instance
-        */
-        var TrackHelper = (function () {
-            function TrackHelper() {
-            }
-            /**
-             * Returns string track ID for cell
-             */
-            TrackHelper.getCellTrack = function (cell) {
-                var colIdx = cell.Column.Order;
-                var rowIdx = cell.Row.Index;
-                return TrackHelper.getCellTrackByIndexes(rowIdx, colIdx);
-            };
-            /**
-             * Returns string track ID for cell
-             */
-            TrackHelper.getCellTrackByIndexes = function (rowIndex, columnIndex) {
-                return "c-r" + rowIndex + "-c" + columnIndex;
-            };
-            /**
-             * Returns string track ID for plugin
-             */
-            TrackHelper.getPluginTrack = function (plugin) {
-                return "p-" + plugin.PluginLocation;
-            };
-            /**
-             * Returns string track ID for plugin
-             */
-            TrackHelper.getPluginTrackByLocation = function (pluginLocation) {
-                return "p-" + pluginLocation;
-            };
-            /**
-             * Returns string track ID for header
-             */
-            TrackHelper.getHeaderTrack = function (header) {
-                return "h-" + header.Column.RawName;
-            };
-            /**
-             * Returns string track ID for header
-             */
-            TrackHelper.getHeaderTrackByColumnName = function (columnName) {
-                return "h-" + columnName;
-            };
-            /**
-             * Returns string track ID for row
-             */
-            TrackHelper.getRowTrack = function (row) {
-                return this.getRowTrackByIndex(row.Index);
-            };
-            /**
-             * Returns string track ID for row
-             */
-            TrackHelper.getRowTrackByObject = function (dataObject) {
-                return this.getRowTrackByIndex(dataObject['__i']);
-            };
-            /**
-             * Returns string track ID for row
-             */
-            TrackHelper.getMessageTrack = function () {
-                return 'r-msg';
-            };
-            /**
-             * Returns string track ID for row
-             */
-            TrackHelper.getPartitionRowTrack = function () {
-                return 'r-partition';
-            };
-            /**
-             * Returns string track ID for row
-             */
-            TrackHelper.getRowTrackByIndex = function (index) {
-                return "r-" + index;
-            };
-            /**
-             * Parses cell track to retrieve column and row index
-             *
-             * @param e HTML element containing cell with wrapper
-             * @returns {ICellLocation} Cell location
-             */
-            TrackHelper.getCellLocation = function (e) {
-                if (!e)
-                    return null;
-                if (!e.getAttribute)
-                    return null;
-                var trk = e.getAttribute('data-track').substring(3).split('-c');
-                return {
-                    RowIndex: parseInt(trk[0]),
-                    ColumnIndex: parseInt(trk[1])
-                };
-            };
-            /**
-             * Parses row track to retrieve row index
-             *
-             * @param e HTML element containing row with wrapper
-             * @returns {number} Row index
-             */
-            TrackHelper.getRowIndex = function (e) {
-                if (!e)
-                    return null;
-                if (!e.getAttribute)
-                    return null;
-                var trk = e.getAttribute('data-track').substring(2);
-                return parseInt(trk);
-            };
-            return TrackHelper;
-        }());
-        Lattice.TrackHelper = TrackHelper;
-    })(Lattice = Reinforced.Lattice || (Reinforced.Lattice = {}));
-})(Reinforced || (Reinforced = {}));
-var Reinforced;
-(function (Reinforced) {
-    var Lattice;
-    (function (Lattice) {
-        /**
-         * Components container for registration/resolving plugins
-         */
-        var ComponentsContainer = (function () {
-            function ComponentsContainer() {
-            }
-            /**
-             * Registers component in components container for further instantiation
-             * @param key Text ID for component
-             * @param ctor Constructor function
-             * @returns {}
-             */
-            ComponentsContainer.registerComponent = function (key, ctor) {
-                this._components[key] = ctor;
-            };
-            /**
-             * Instantiates component by its ID with specified arguments
-             * @param key Text ID of desired component
-             * @param args String arguments for instantiation
-             * @returns {}
-             */
-            ComponentsContainer.resolveComponent = function (key, args) {
-                if (this._components[key] == null || this._components[key] == undefined)
-                    throw new Error("Component " + key + " is not registered. Please ensure that you have connected all the additional scripts");
-                if (!args)
-                    return new (this._components[key]);
-                else {
-                    var ctor = this._components[key];
-                    var boundCtor = Function.prototype.bind.apply(ctor, [null].concat(args));
-                    return new boundCtor();
-                }
-            };
-            /**
-             * Registers component-provided events in particular EventsService instance.
-             * It is important to register all component's events befor instantiation and .init call
-             * to make them available to subscribe each other's events.
-             *
-             * Instance manager asserts that .registerEvent will be called exactly once for
-             * each component used in table
-             *
-             * @param key Text ID of desired component
-             * @param eventsManager Events manager instance
-             * @returns {}
-             */
-            ComponentsContainer.registerComponentEvents = function (key, eventsManager, masterTable) {
-                if (this._components[key] == null || this._components[key] == undefined)
-                    throw new Error("Component " + key + " is not registered. Please ensure that you have connected all the additional scripts");
-                if (this._components[key].registerEvents && typeof this._components[key].registerEvents === 'function') {
-                    this._components[key].registerEvents.call(eventsManager, eventsManager, masterTable);
-                }
-            };
-            /*
-             * @internal
-             */
-            ComponentsContainer.registerAllEvents = function (eventsManager, masterTable) {
-                for (var key in this._components) {
-                    if (this._components[key].registerEvents && typeof this._components[key].registerEvents === 'function') {
-                        this._components[key].registerEvents.call(eventsManager, eventsManager, masterTable);
-                    }
-                }
-            };
-            ComponentsContainer._components = {};
-            return ComponentsContainer;
-        }());
-        Lattice.ComponentsContainer = ComponentsContainer;
-    })(Lattice = Reinforced.Lattice || (Reinforced.Lattice = {}));
-})(Reinforced || (Reinforced = {}));
+///<reference path="../Event.ts"/>
 var Reinforced;
 (function (Reinforced) {
     var Lattice;
@@ -1138,201 +414,48 @@ var Reinforced;
         var Services;
         (function (Services) {
             /**
-             * API responsible for dates operations
+             * Events manager for table.
+             * Contains all available events
              */
-            var DateService = (function () {
-                /*
-                 * @internal
-                 */
-                function DateService(datepickerOptions) {
-                    this._datepickerOptions = datepickerOptions;
+            var EventsService = (function () {
+                function EventsService(masterTable) {
+                    this._masterTable = masterTable;
+                    this.QueryGathering = new Lattice.TableEvent(masterTable);
+                    this.ClientQueryGathering = new Lattice.TableEvent(masterTable);
+                    this.Loading = new Lattice.TableEvent(masterTable);
+                    this.LoadingError = new Lattice.TableEvent(masterTable);
+                    this.ColumnsCreation = new Lattice.TableEvent(masterTable);
+                    this.DataReceived = new Lattice.TableEvent(masterTable);
+                    this.LayoutRendered = new Lattice.TableEvent(masterTable);
+                    this.ClientDataProcessing = new Lattice.TableEvent(masterTable);
+                    this.DataRendered = new Lattice.TableEvent(masterTable);
+                    this.DeferredDataReceived = new Lattice.TableEvent(masterTable);
+                    this.Adjustment = new Lattice.TableEvent(masterTable);
+                    this.Edit = new Lattice.TableEvent(masterTable);
+                    this.EditValidationFailed = new Lattice.TableEvent(masterTable);
+                    this.SelectionChanged = new Lattice.TableEvent(masterTable);
+                    this.PartitionChanged = new Lattice.TableEvent(masterTable);
+                    this.Filtered = new Lattice.TableEvent(masterTable);
+                    this.Ordered = new Lattice.TableEvent(masterTable);
+                    this.Partitioned = new Lattice.TableEvent(masterTable);
+                    this.AdjustmentRender = new Lattice.TableEvent(masterTable);
                 }
-                DateService.prototype.ensureDpo = function () {
-                    if (this._datepickerOptions == null || this._datepickerOptions == undefined) {
-                        throw new Error('For this functionality you need 3rd-party datepicker. Please connect one using .Datepicker method');
-                    }
-                };
                 /**
-                 * Determines is passed object valid Date object
-                 * @param date
+                 * Registers new event for events manager.
+                 * This method is to be used by plugins to provide their
+                 * own events.
+                 *
+                 * Events being added should be described in plugin's .d.ts file
+                 * as extensions to Events manager
+                 * @param eventName Event name
                  * @returns {}
                  */
-                DateService.prototype.isValidDate = function (date) {
-                    if (date === null)
-                        return true;
-                    if (date == undefined)
-                        return false;
-                    if (Object.prototype.toString.call(date) === "[object Date]") {
-                        if (isNaN(date.getTime()))
-                            return false;
-                        else
-                            return true;
-                    }
-                    return false;
+                EventsService.prototype.registerEvent = function (eventName) {
+                    this[eventName] = new Lattice.TableEvent(this._masterTable);
                 };
-                /**
-                 * Converts jsDate object to server's understandable format
-                 *
-                 * @param date Date object
-                 * @returns {string} Date in ISO 8601 format
-                 */
-                DateService.prototype.serialize = function (date) {
-                    if (date === null || date == undefined)
-                        return '';
-                    if (Object.prototype.toString.call(date) === "[object Date]") {
-                        if (isNaN(date.getTime()))
-                            return '';
-                        else
-                            return Date.prototype.toISOString.call(date);
-                    }
-                    else
-                        throw new Error(date + " is not a date at all");
-                };
-                /**
-                 * Parses ISO date string to regular Date object
-                 *
-                 * @param dateString Date string containing date in ISO 8601
-                 * @returns {}
-                 */
-                DateService.prototype.parse = function (dateString) {
-                    var date = new Date(dateString);
-                    if (Object.prototype.toString.call(date) === "[object Date]") {
-                        if (isNaN(date.getTime()))
-                            return null;
-                        else
-                            return date;
-                    }
-                    throw new Error(dateString + " is not a date at all");
-                };
-                /**
-                 * Retrieves Date object from 3rd party datepicker exposed by HTML element
-                 *
-                 * @param element HTML element containing datepicker componen
-                 * @returns {Date} Date object or null
-                 */
-                DateService.prototype.getDateFromDatePicker = function (element) {
-                    this.ensureDpo();
-                    if (element == null || element == undefined)
-                        return null;
-                    var date = this._datepickerOptions.GetFromDatePicker(element);
-                    if (date == null)
-                        return null;
-                    if (Object.prototype.toString.call(date) === "[object Date]") {
-                        if (isNaN(date.getTime()))
-                            return null;
-                        else
-                            return date;
-                    }
-                    throw new Error(date + " from datepicker is not a date at all");
-                };
-                /**
-                 * Creates datepicker object of HTML element using configured function
-                 *
-                 * @param element HTML element that should be converted to datepicker
-                 */
-                DateService.prototype.createDatePicker = function (element, isNullableDate) {
-                    this.ensureDpo();
-                    if (element == null || element == undefined)
-                        return;
-                    if (!isNullableDate)
-                        isNullableDate = false;
-                    this._datepickerOptions.CreateDatePicker(element, isNullableDate);
-                };
-                /**
-                 * Creates datepicker object of HTML element using configured function
-                 *
-                 * @param element HTML element that should be converted to datepicker
-                 */
-                DateService.prototype.destroyDatePicker = function (element) {
-                    this.ensureDpo();
-                    if (element == null || element == undefined)
-                        return;
-                    this._datepickerOptions.DestroyDatepicker(element);
-                };
-                /**
-                 * Passes Date object to datepicker element
-                 *
-                 * @param element HTML element containing datepicker componen
-                 * @param date Date object to supply to datepicker or null
-                 */
-                DateService.prototype.putDateToDatePicker = function (element, date) {
-                    this.ensureDpo();
-                    if (element == null || element == undefined)
-                        return;
-                    this._datepickerOptions.PutToDatePicker(element, date);
-                };
-                return DateService;
+                return EventsService;
             }());
-            Services.DateService = DateService;
-        })(Services = Lattice.Services || (Lattice.Services = {}));
-    })(Lattice = Reinforced.Lattice || (Reinforced.Lattice = {}));
-})(Reinforced || (Reinforced = {}));
-if (!Date.prototype.toISOString) {
-    (function () {
-        function pad(number) {
-            if (number < 10) {
-                return '0' + number;
-            }
-            return number;
-        }
-        Date.prototype.toISOString = function () {
-            return this.getUTCFullYear() +
-                '-' + pad(this.getUTCMonth() + 1) +
-                '-' + pad(this.getUTCDate()) +
-                'T' + pad(this.getUTCHours()) +
-                ':' + pad(this.getUTCMinutes()) +
-                ':' + pad(this.getUTCSeconds()) +
-                '.' + (this.getUTCMilliseconds() / 1000).toFixed(3).slice(2, 5) +
-                'Z';
-        };
-    }());
-}
-var Reinforced;
-(function (Reinforced) {
-    var Lattice;
-    (function (Lattice) {
-        var Services;
-        (function (Services) {
-            var StatsService = (function () {
-                function StatsService(master) {
-                    this._master = master;
-                }
-                StatsService.prototype.IsSetFinite = function () { return this._master.Partition.isAmountFinite(); };
-                StatsService.prototype.Mode = function () { return this._master.Configuration.Partition.Type; };
-                StatsService.prototype.ServerCount = function () { return this._master.Partition.totalAmount(); };
-                StatsService.prototype.Stored = function () { return this._master.DataHolder.StoredData.length; };
-                StatsService.prototype.Filtered = function () { return (!this._master.DataHolder.Filtered) ? 0 : this._master.DataHolder.Filtered.length; };
-                StatsService.prototype.Displayed = function () { return (!this._master.DataHolder.DisplayedData) ? 0 : this._master.DataHolder.DisplayedData.length; };
-                StatsService.prototype.Ordered = function () { return (!this._master.DataHolder.Ordered) ? 0 : this._master.DataHolder.Ordered.length; };
-                StatsService.prototype.Skip = function () { return this._master.Partition.Skip; };
-                StatsService.prototype.Take = function () { return this._master.Partition.Take; };
-                StatsService.prototype.Pages = function () {
-                    if (this._master.Partition.Take === 0)
-                        return 1;
-                    var tp = this._master.Partition.amount() / this._master.Partition.Take;
-                    if (tp !== Math.floor(tp)) {
-                        tp = Math.floor(tp) + 1;
-                    }
-                    return tp;
-                };
-                StatsService.prototype.CurrentPage = function () {
-                    if (this._master.Partition.Skip + this._master.Partition.Take >= this._master.Partition.amount()) {
-                        return this.Pages() - 1;
-                    }
-                    if (this._master.Partition.Take === 0)
-                        return 0;
-                    if (this._master.Partition.Skip < this._master.Partition.Take)
-                        return 0;
-                    var sp = this._master.Partition.Skip / this._master.Partition.Take;
-                    return Math.floor(sp);
-                };
-                StatsService.prototype.IsAllDataLoaded = function () {
-                    if (this._master.Configuration.Partition.Type === Reinforced.Lattice.PartitionType.Client)
-                        return true;
-                };
-                return StatsService;
-            }());
-            Services.StatsService = StatsService;
+            Services.EventsService = EventsService;
         })(Services = Lattice.Services || (Lattice.Services = {}));
     })(Lattice = Reinforced.Lattice || (Reinforced.Lattice = {}));
 })(Reinforced || (Reinforced = {}));
@@ -1859,6 +982,839 @@ var Reinforced;
         })(Services = Lattice.Services || (Lattice.Services = {}));
     })(Lattice = Reinforced.Lattice || (Reinforced.Lattice = {}));
 })(Reinforced || (Reinforced = {}));
+///<reference path="Templating/TemplatesExecutor.ts"/>
+///<reference path="Services/EventsService.ts"/>
+///<reference path="Services/EventsDelegatorService.ts"/>
+var Reinforced;
+(function (Reinforced) {
+    var Lattice;
+    (function (Lattice) {
+        /**
+         * This enumeration distinguishes which way
+         * underlying query will be used
+         */
+        (function (QueryScope) {
+            /**
+             * Mentioned query will be sent to server to obtain
+             * data (probably) for further local filtration.
+             * All locally filtered fields should be excluded from
+             * underlying query
+             */
+            QueryScope[QueryScope["Server"] = 0] = "Server";
+            /**
+             * Mentioned query will be used for local data filtration.
+             * To gain performance, please exclude all data settings that were
+             * applied during server request
+             */
+            QueryScope[QueryScope["Client"] = 1] = "Client";
+            /**
+             * This query should contain both data for client and server filtering.
+             * Transboundary queries are used to obtain query settings
+             * that will be used on server side to retrieve data set that
+             * will be used for server command handling, so server needs all filtering settings
+             */
+            QueryScope[QueryScope["Transboundary"] = 2] = "Transboundary";
+        })(Lattice.QueryScope || (Lattice.QueryScope = {}));
+        var QueryScope = Lattice.QueryScope;
+        (function (EventDirection) {
+            EventDirection[EventDirection["Before"] = 0] = "Before";
+            EventDirection[EventDirection["After"] = 1] = "After";
+            EventDirection[EventDirection["Undirected"] = 2] = "Undirected";
+        })(Lattice.EventDirection || (Lattice.EventDirection = {}));
+        var EventDirection = Lattice.EventDirection;
+    })(Lattice = Reinforced.Lattice || (Reinforced.Lattice = {}));
+})(Reinforced || (Reinforced = {}));
+///<reference path="Services/EventsService.ts"/>
+var Reinforced;
+(function (Reinforced) {
+    var Lattice;
+    (function (Lattice) {
+        /**
+         * Components container for registration/resolving plugins
+         */
+        var ComponentsContainer = (function () {
+            function ComponentsContainer() {
+            }
+            /**
+             * Registers component in components container for further instantiation
+             * @param key Text ID for component
+             * @param ctor Constructor function
+             * @returns {}
+             */
+            ComponentsContainer.registerComponent = function (key, ctor) {
+                this._components[key] = ctor;
+            };
+            /**
+             * Instantiates component by its ID with specified arguments
+             * @param key Text ID of desired component
+             * @param args String arguments for instantiation
+             * @returns {}
+             */
+            ComponentsContainer.resolveComponent = function (key, args) {
+                if (this._components[key] == null || this._components[key] == undefined)
+                    throw new Error("Component " + key + " is not registered. Please ensure that you have connected all the additional scripts");
+                if (!args)
+                    return new (this._components[key]);
+                else {
+                    var ctor = this._components[key];
+                    var boundCtor = Function.prototype.bind.apply(ctor, [null].concat(args));
+                    return new boundCtor();
+                }
+            };
+            /**
+             * Registers component-provided events in particular EventsService instance.
+             * It is important to register all component's events befor instantiation and .init call
+             * to make them available to subscribe each other's events.
+             *
+             * Instance manager asserts that .registerEvent will be called exactly once for
+             * each component used in table
+             *
+             * @param key Text ID of desired component
+             * @param eventsManager Events manager instance
+             * @returns {}
+             */
+            ComponentsContainer.registerComponentEvents = function (key, eventsManager, masterTable) {
+                if (this._components[key] == null || this._components[key] == undefined)
+                    throw new Error("Component " + key + " is not registered. Please ensure that you have connected all the additional scripts");
+                if (this._components[key].registerEvents && typeof this._components[key].registerEvents === 'function') {
+                    this._components[key].registerEvents.call(eventsManager, eventsManager, masterTable);
+                }
+            };
+            /*
+             * @internal
+             */
+            ComponentsContainer.registerAllEvents = function (eventsManager, masterTable) {
+                for (var key in this._components) {
+                    if (this._components[key].registerEvents && typeof this._components[key].registerEvents === 'function') {
+                        this._components[key].registerEvents.call(eventsManager, eventsManager, masterTable);
+                    }
+                }
+            };
+            ComponentsContainer._components = {};
+            return ComponentsContainer;
+        }());
+        Lattice.ComponentsContainer = ComponentsContainer;
+    })(Lattice = Reinforced.Lattice || (Reinforced.Lattice = {}));
+})(Reinforced || (Reinforced = {}));
+var Reinforced;
+(function (Reinforced) {
+    var Lattice;
+    (function (Lattice) {
+        var Rendering;
+        (function (Rendering) {
+            var Resensor = (function () {
+                function Resensor(element, handler) {
+                    this._element = element;
+                    this._handler = handler;
+                    this._resizeBoud = this.onResized.bind(this);
+                    this.requestAnimationFrame = window.requestAnimationFrame ||
+                        window['mozRequestAnimationFrame'] ||
+                        window['webkitRequestAnimationFrame'] ||
+                        function (fn) {
+                            return window.setTimeout(fn, 20);
+                        };
+                }
+                Resensor.prototype.attach = function () {
+                    this._sensor = document.createElement('div');
+                    this._sensor.className = 'resize-sensor';
+                    var style = 'position: absolute; left: 0; top: 0; right: 0; bottom: 0; overflow: hidden; z-index: -1; visibility: hidden;';
+                    var styleChild = 'position: absolute; left: 0; top: 0; transition: 0s;';
+                    this._sensor.style.cssText = style;
+                    this._sensor.innerHTML =
+                        "<div class=\"resize-sensor-expand\" style=\"" + style + "\"><div style=\"" + styleChild + "\"></div></div><div class=\"resize-sensor-shrink\" style=\"" + style + "\"><div style=\"" + styleChild + " width: 200%; height: 200%\"></div></div>";
+                    this._element.appendChild(this._sensor);
+                    if (Resensor.getComputedStyle(this._element, 'position') == 'static') {
+                        this._element.style.position = 'relative';
+                    }
+                    this._expand = this._sensor.childNodes.item(0);
+                    this._expandChild = this._expand.childNodes[0];
+                    this._shrink = this._sensor.childNodes[1];
+                    this._lastWidth = this._element.offsetWidth;
+                    this._lastHeight = this._element.offsetHeight;
+                    this.reset();
+                    Reinforced.Lattice.Services.EventsDelegatorService.addHandler(this._expand, 'scroll', this.onScroll.bind(this));
+                    Reinforced.Lattice.Services.EventsDelegatorService.addHandler(this._shrink, 'scroll', this.onScroll.bind(this));
+                };
+                Resensor.prototype.onResized = function () {
+                    this._rafId = 0;
+                    if (!this._dirty)
+                        return;
+                    this._lastWidth = this._newWidth;
+                    this._lastHeight = this._newHeight;
+                    this._handler.call();
+                };
+                Resensor.prototype.onScroll = function () {
+                    this._newWidth = this._element.offsetWidth;
+                    this._newHeight = this._element.offsetHeight;
+                    this._dirty = this._newWidth != this._lastWidth || this._newHeight != this._lastHeight;
+                    var bnd = this._resizeBoud;
+                    if (this._dirty && !this._rafId) {
+                        this._rafId = this.requestAnimationFrame.call(window, function () { bnd(); });
+                    }
+                    this.reset();
+                };
+                Resensor.prototype.reset = function () {
+                    this._expandChild.style.width = '100000px';
+                    this._expandChild.style.height = '100000px';
+                    this._expand.scrollLeft = 100000;
+                    this._expand.scrollTop = 100000;
+                    this._shrink.scrollLeft = 100000;
+                    this._shrink.scrollTop = 100000;
+                };
+                Resensor.getComputedStyle = function (element, prop) {
+                    if (element.currentStyle) {
+                        return element.currentStyle[prop];
+                    }
+                    else if (window.getComputedStyle) {
+                        return window.getComputedStyle(element, null).getPropertyValue(prop);
+                    }
+                    else {
+                        return element.style[prop];
+                    }
+                };
+                return Resensor;
+            }());
+            Rendering.Resensor = Resensor;
+        })(Rendering = Lattice.Rendering || (Lattice.Rendering = {}));
+    })(Lattice = Reinforced.Lattice || (Reinforced.Lattice = {}));
+})(Reinforced || (Reinforced = {}));
+var Reinforced;
+(function (Reinforced) {
+    var Lattice;
+    (function (Lattice) {
+        /**
+        * Helper class for producing track ids.
+        * You can use this class directly, but it is better to use it via @memberref Reinforced.Lattice.Master.Renderer.Rendering.Modifier instance
+        */
+        var TrackHelper = (function () {
+            function TrackHelper() {
+            }
+            /**
+             * Returns string track ID for cell
+             */
+            TrackHelper.getCellTrack = function (cell) {
+                var colIdx = cell.Column.Order;
+                var rowIdx = cell.Row.Index;
+                return this.getCellTrackByIndexes(rowIdx, colIdx);
+            };
+            /**
+             * Returns string track ID for cell
+             */
+            TrackHelper.getCellTrackByIndexes = function (rowIndex, columnIndex) {
+                return "c-r" + rowIndex + "-c" + columnIndex;
+            };
+            /**
+             * Returns string track ID for plugin
+             */
+            TrackHelper.getPluginTrack = function (plugin) {
+                return "p-" + plugin.PluginLocation;
+            };
+            /**
+             * Returns string track ID for plugin
+             */
+            TrackHelper.getPluginTrackByLocation = function (pluginLocation) {
+                return "p-" + pluginLocation;
+            };
+            /**
+             * Returns string track ID for header
+             */
+            TrackHelper.getHeaderTrack = function (header) {
+                return "h-" + header.Column.RawName;
+            };
+            /**
+             * Returns string track ID for header
+             */
+            TrackHelper.getHeaderTrackByColumnName = function (columnName) {
+                return "h-" + columnName;
+            };
+            /**
+             * Returns string track ID for row
+             */
+            TrackHelper.getRowTrack = function (row) {
+                return this.getRowTrackByIndex(row.Index);
+            };
+            /**
+             * Returns string track ID for row
+             */
+            TrackHelper.getRowTrackByObject = function (dataObject) {
+                return this.getRowTrackByIndex(dataObject['__i']);
+            };
+            /**
+             * Returns string track ID for row
+             */
+            TrackHelper.getMessageTrack = function () {
+                return 'r-msg';
+            };
+            /**
+             * Returns string track ID for row
+             */
+            TrackHelper.getPartitionRowTrack = function () {
+                return 'r-partition';
+            };
+            /**
+             * Returns string track ID for row
+             */
+            TrackHelper.getRowTrackByIndex = function (index) {
+                return "r-" + index;
+            };
+            /**
+             * Parses cell track to retrieve column and row index
+             *
+             * @param e HTML element containing cell with wrapper
+             * @returns {ICellLocation} Cell location
+             */
+            TrackHelper.getCellLocation = function (e) {
+                if (!e)
+                    return null;
+                if (!e.getAttribute)
+                    return null;
+                var trk = e.getAttribute('data-track').substring(3).split('-c');
+                return {
+                    RowIndex: parseInt(trk[0]),
+                    ColumnIndex: parseInt(trk[1])
+                };
+            };
+            /**
+             * Parses row track to retrieve row index
+             *
+             * @param e HTML element containing row with wrapper
+             * @returns {number} Row index
+             */
+            TrackHelper.getRowIndex = function (e) {
+                if (!e)
+                    return null;
+                if (!e.getAttribute)
+                    return null;
+                var trk = e.getAttribute('data-track').substring(2);
+                return parseInt(trk);
+            };
+            return TrackHelper;
+        }());
+        Lattice.TrackHelper = TrackHelper;
+    })(Lattice = Reinforced.Lattice || (Reinforced.Lattice = {}));
+})(Reinforced || (Reinforced = {}));
+///<reference path="../TrackHelper.ts"/>
+var Reinforced;
+(function (Reinforced) {
+    var Lattice;
+    (function (Lattice) {
+        var Templating;
+        (function (Templating) {
+            /**
+             * Rendering stack class. Provives common helper
+             * infrastructure for context-oriented rendering
+             * @internal
+             */
+            var RenderingStack = (function () {
+                function RenderingStack() {
+                    this._contextStack = [];
+                    /**
+                     * Current rendering context
+                     */
+                    this.Current = null;
+                }
+                /**
+                 * Clears rendering stack
+                 * @returns {}
+                 */
+                RenderingStack.prototype.clear = function () {
+                    this.Current = null;
+                    if (this._contextStack.length === 0)
+                        return;
+                    this._contextStack = [];
+                };
+                /**
+                 * Pushes rendering context into stack
+                 * @param ctx
+                 * @returns {}
+                 */
+                RenderingStack.prototype.pushContext = function (ctx) {
+                    this._contextStack.push(ctx);
+                    this.Current = ctx;
+                };
+                /**
+                 * Pushes rendering context into stack
+                 * @param elementType What is being rendered
+                 * @param element Reference to object is being rendered
+                 * @param columnName Optional column name - for column-contexted rendering objects
+                 * @returns {}
+                 */
+                RenderingStack.prototype.push = function (elementType, element) {
+                    var ctx = {
+                        Type: elementType,
+                        Object: element,
+                        CurrentTrack: this.getTrack(elementType, element),
+                        IsTrackWritten: false,
+                        TrackBuffer: ''
+                    };
+                    this._contextStack.push(ctx);
+                    this.Current = ctx;
+                };
+                RenderingStack.prototype.getTrack = function (elementType, element) {
+                    var trk;
+                    switch (elementType) {
+                        case Templating.RenderedObject.Plugin:
+                            trk = Lattice.TrackHelper.getPluginTrack(element);
+                            break;
+                        case Templating.RenderedObject.Header:
+                            trk = Lattice.TrackHelper.getHeaderTrack(element);
+                            break;
+                        case Templating.RenderedObject.Cell:
+                            trk = Lattice.TrackHelper.getCellTrack(element);
+                            break;
+                        case Templating.RenderedObject.Row:
+                            trk = Lattice.TrackHelper.getRowTrack(element);
+                            break;
+                        case Templating.RenderedObject.Message:
+                            trk = Lattice.TrackHelper.getMessageTrack();
+                            break;
+                        case Templating.RenderedObject.Partition:
+                            trk = Lattice.TrackHelper.getPartitionRowTrack();
+                            break;
+                        case Templating.RenderedObject.Custom:
+                            trk = null;
+                            break;
+                        default:
+                            throw new Error('Invalid context element type');
+                    }
+                    return trk;
+                };
+                /**
+                 * Pops rendering context from stack
+                 * @returns {}
+                 */
+                RenderingStack.prototype.popContext = function () {
+                    this._contextStack.pop();
+                    if (this._contextStack.length === 0)
+                        this.Current = null;
+                    else
+                        this.Current = this._contextStack[this._contextStack.length - 1];
+                };
+                return RenderingStack;
+            }());
+            Templating.RenderingStack = RenderingStack;
+        })(Templating = Lattice.Templating || (Lattice.Templating = {}));
+    })(Lattice = Reinforced.Lattice || (Reinforced.Lattice = {}));
+})(Reinforced || (Reinforced = {}));
+///<reference path="RenderingStack.ts"/>
+var Reinforced;
+(function (Reinforced) {
+    var Lattice;
+    (function (Lattice) {
+        var Templating;
+        (function (Templating) {
+            var TemplateProcess = (function () {
+                function TemplateProcess(uiColumns, executor) {
+                    this.Html = '';
+                    this._stack = new Reinforced.Lattice.Templating.RenderingStack();
+                    this.BackInfo = {
+                        CachedVisualStates: {},
+                        CallbacksQueue: [],
+                        DatepickersQueue: [],
+                        DestroyCallbacksQueue: [],
+                        EventsQueue: [],
+                        HasVisualStates: false,
+                        MarkQueue: []
+                    };
+                    this.w = this.append.bind(this);
+                    this.s = this.spaceW.bind(this);
+                    this.UiColumns = uiColumns();
+                    this.Executor = executor;
+                }
+                TemplateProcess.prototype.append = function (str) {
+                    if (str == null || str == undefined)
+                        return;
+                    if (this.Context.CurrentTrack != null && !this.Context.IsTrackWritten) {
+                        var strPiece = str.toString();
+                        this.autotrack(strPiece);
+                    }
+                    else
+                        this.Html += str.toString();
+                };
+                TemplateProcess.prototype.autotrack = function (str) {
+                    this.Context.TrackBuffer += str;
+                    var idx = this.findStartTag(this.Context.TrackBuffer);
+                    if (idx < 0)
+                        return;
+                    if (idx === this.Context.TrackBuffer.length) {
+                        this.Context.TrackBuffer += this.trackAttr();
+                    }
+                    else {
+                        var head = this.Context.TrackBuffer.substr(0, idx);
+                        var tail = this.Context.TrackBuffer.substring(idx, this.Context.TrackBuffer.length);
+                        this.Context.TrackBuffer = head + this.trackAttr() + tail;
+                    }
+                    this.Html += this.Context.TrackBuffer;
+                    this.Context.IsTrackWritten = true;
+                };
+                TemplateProcess.prototype.findStartTag = function (buf) {
+                    var idx = buf.indexOf('<');
+                    if (idx < 0)
+                        return -1;
+                    while ((idx + 1 < buf.length - 1) && (!TemplateProcess.alphaRegex.test(buf.charAt(idx + 1)))) {
+                        idx = buf.indexOf('<', idx + 1);
+                    }
+                    if (idx < 0)
+                        return -1;
+                    idx++;
+                    while ((idx < buf.length) && TemplateProcess.alphaRegex.test(buf.charAt(idx)))
+                        idx++;
+                    return idx;
+                };
+                TemplateProcess.prototype.nest = function (data, templateId) {
+                    this.Executor.nest(data, templateId, this);
+                };
+                TemplateProcess.prototype.spc = function (num) {
+                    if (this.Executor.Spaces[num])
+                        return this.Executor.Spaces[num];
+                    var r = '';
+                    for (var i = 0; i < num; i++) {
+                        r += ' ';
+                    }
+                    this.Executor[num] = r;
+                    return r;
+                };
+                TemplateProcess.prototype.spaceW = function () {
+                    for (var i = 0; i < arguments.length; i++) {
+                        if (typeof arguments[i] === "number") {
+                            this.w(this.spc(arguments[i]));
+                        }
+                        else {
+                            this.w(arguments[i]);
+                        }
+                    }
+                };
+                TemplateProcess.prototype.nestElement = function (e, templateId, type) {
+                    if (e.renderElement) {
+                        this.d(e, type);
+                        e.renderElement(this);
+                        this.u();
+                    }
+                    else {
+                        if (!templateId)
+                            throw new Error('Renderable object must have either .renderElement implemented or templateId specified');
+                        this.nest(e, templateId);
+                    }
+                };
+                TemplateProcess.prototype.nestContent = function (e, templateId) {
+                    if (e.renderContent) {
+                        e.renderContent(this);
+                    }
+                    else {
+                        if (!templateId)
+                            throw new Error('Renderable object must have either .renderContent implemented or templateId specified');
+                        this.nest(e, templateId);
+                    }
+                };
+                TemplateProcess.prototype.d = function (model, type) {
+                    this._stack.push(type, model);
+                    this.Context = this._stack.Current;
+                };
+                TemplateProcess.prototype.u = function () {
+                    this._stack.popContext();
+                    if (!this._stack.Current) {
+                        this.Context = null;
+                    }
+                    else {
+                        this.Context = this._stack.Current;
+                    }
+                };
+                TemplateProcess.prototype.vs = function (stateName, state) {
+                    state.Receiver = this.Context.Object;
+                    if (!this.BackInfo.CachedVisualStates[stateName])
+                        this.BackInfo.CachedVisualStates[stateName] = [];
+                    var index = this.BackInfo.CachedVisualStates[stateName].length;
+                    this.BackInfo.CachedVisualStates[stateName].push(state);
+                    this.BackInfo.HasVisualStates = true;
+                    this.w("data-state-" + stateName + "=\"" + index + "\"");
+                };
+                TemplateProcess.prototype.e = function (commaSeparatedFunctions, commaSeparatedEvents, eventArgs) {
+                    var ed = {
+                        EventReceiver: this.Context.Object,
+                        Functions: commaSeparatedFunctions.split(','),
+                        Events: commaSeparatedEvents.split(','),
+                        EventArguments: eventArgs
+                    };
+                    var index = this.BackInfo.EventsQueue.length;
+                    this.BackInfo.EventsQueue.push(ed);
+                    this.w("data-be-" + index + "=\"" + index + "\" data-evb=\"true\"");
+                };
+                TemplateProcess.prototype.rc = function (fn, args) {
+                    var index = this.BackInfo.CallbacksQueue.length;
+                    this.BackInfo.CallbacksQueue.push({
+                        Callback: fn,
+                        CallbackArguments: args,
+                        Target: window
+                    });
+                    this.w("data-cb=\"" + index + "\"");
+                };
+                TemplateProcess.prototype.dc = function (fn, args) {
+                    var index = this.BackInfo.DestroyCallbacksQueue.length;
+                    this.BackInfo.DestroyCallbacksQueue.push({
+                        Callback: fn,
+                        CallbackArguments: args,
+                        Target: window
+                    });
+                    this.w("data-dcb=\"" + index + "\"");
+                };
+                TemplateProcess.prototype.m = function (fieldName, key, receiverPath) {
+                    var index = this.BackInfo.MarkQueue.length;
+                    var receiver = this.Context.Object;
+                    if (receiverPath != null) {
+                        var tp = Reinforced.Lattice.Rendering.BackBinder.traverseWindowPath(receiverPath);
+                        receiver = tp.target || tp.parent;
+                    }
+                    var md = {
+                        ElementReceiver: receiver,
+                        FieldName: fieldName,
+                        Key: key
+                    };
+                    this.BackInfo.MarkQueue.push(md);
+                    this.w("data-mrk=\"" + index + "\"");
+                };
+                TemplateProcess.prototype.dp = function (condition, nullable) {
+                    var index = this.BackInfo.DatepickersQueue.length;
+                    if (condition) {
+                        var md = {
+                            ElementReceiver: this.Context.Object,
+                            IsNullable: nullable
+                        };
+                        this.BackInfo.DatepickersQueue.push(md);
+                        this.w("data-dp=\"" + index + "\"");
+                    }
+                };
+                TemplateProcess.prototype.trackAttr = function () {
+                    var trk = this._stack.Current.CurrentTrack;
+                    if (trk.length === 0)
+                        return null;
+                    var tra = "data-track=\"" + trk + "\"";
+                    if (this.Context.Type === RenderedObject.Row || this.Context.Type === RenderedObject.Partition) {
+                        if (this.Context.Object.IsSpecial) {
+                            tra += " data-spr='true'";
+                        }
+                    }
+                    return ' ' + tra + ' ';
+                };
+                TemplateProcess.prototype.isLoc = function (location) {
+                    var loc = this.Context.Object['PluginLocation'];
+                    if (loc.length < location.length)
+                        return false;
+                    if (loc.length === location.length && loc === location)
+                        return true;
+                    if (loc.substring(0, location.length) === location)
+                        return true;
+                    return false;
+                };
+                TemplateProcess.prototype.isLocation = function () {
+                    if (this.Context.Type === RenderedObject.Plugin) {
+                        for (var i = 0; i < arguments.length; i++) {
+                            if (this.isLoc(arguments[i]))
+                                return true;
+                        }
+                    }
+                    return false;
+                };
+                TemplateProcess.alphaRegex = /[a-zA-Z]/;
+                return TemplateProcess;
+            }());
+            Templating.TemplateProcess = TemplateProcess;
+            /**
+             * What renders in current helper method
+             */
+            (function (RenderedObject) {
+                /**
+                 * Plugin (0)
+                 */
+                RenderedObject[RenderedObject["Plugin"] = 0] = "Plugin";
+                /**
+                 * Column header (1)
+                 */
+                RenderedObject[RenderedObject["Header"] = 1] = "Header";
+                /**
+                 * Row (containing cells) (2)
+                 */
+                RenderedObject[RenderedObject["Row"] = 2] = "Row";
+                /**
+                 * Cell (belonging to row and column) (3)
+                 */
+                RenderedObject[RenderedObject["Cell"] = 3] = "Cell";
+                /**
+                 * Template region for messages
+                 */
+                RenderedObject[RenderedObject["Message"] = 4] = "Message";
+                /**
+                 * Template region for partition tools row
+                 */
+                RenderedObject[RenderedObject["Partition"] = 5] = "Partition";
+                /**
+                 * Custom rendering object.
+                 * Needed for rendering of random templates bound to random objects
+                 */
+                RenderedObject[RenderedObject["Custom"] = 6] = "Custom";
+            })(Templating.RenderedObject || (Templating.RenderedObject = {}));
+            var RenderedObject = Templating.RenderedObject;
+        })(Templating = Lattice.Templating || (Lattice.Templating = {}));
+    })(Lattice = Reinforced.Lattice || (Reinforced.Lattice = {}));
+})(Reinforced || (Reinforced = {}));
+var Reinforced;
+(function (Reinforced) {
+    var Lattice;
+    (function (Lattice) {
+        var Templating;
+        (function (Templating) {
+            var _ltcTpl = (function () {
+                function _ltcTpl() {
+                }
+                _ltcTpl._ = function (prefix, id, tpl) {
+                    if (!_ltcTpl._lib[prefix])
+                        _ltcTpl._lib[prefix] = { Prefix: prefix, Templates: {} };
+                    _ltcTpl._lib[prefix].Templates[id] = tpl;
+                };
+                _ltcTpl.executor = function (prefix, table) {
+                    if (!_ltcTpl._lib.hasOwnProperty(prefix)) {
+                        throw new Error("Cannot find templates set with prefix " + prefix);
+                    }
+                    return new Templating.TemplatesExecutor(_ltcTpl._lib[prefix], table);
+                };
+                _ltcTpl._lib = {};
+                return _ltcTpl;
+            }());
+            Templating._ltcTpl = _ltcTpl;
+        })(Templating = Lattice.Templating || (Lattice.Templating = {}));
+    })(Lattice = Reinforced.Lattice || (Reinforced.Lattice = {}));
+})(Reinforced || (Reinforced = {}));
+var Reinforced;
+(function (Reinforced) {
+    var Lattice;
+    (function (Lattice) {
+        var Templating;
+        (function (Templating) {
+            var Driver = (function () {
+                function Driver() {
+                }
+                Driver.body = function (p) {
+                    p.w('<input type="hidden" data-track="tableBodyHere" style="display:none;"/>');
+                };
+                Driver.content = function (p, columnName) {
+                    if (p.Context.Object.renderContent) {
+                        p.Context.Object.renderContent(p);
+                    }
+                    else {
+                        switch (p.Context.Type) {
+                            case Templating.RenderedObject.Header:
+                                Driver.headerContent(p.Context.Object, p);
+                                break;
+                            case Templating.RenderedObject.Plugin:
+                                // if we are here then plugin's renderContent is not 
+                                // overriden
+                                throw new Error('It is required to override renderContent for plugin');
+                            case Templating.RenderedObject.Row:
+                                Driver.rowContent(p.Context.Object, p, columnName);
+                                break;
+                            case Templating.RenderedObject.Cell:
+                                Driver.cellContent(p.Context.Object, p);
+                                break;
+                            default:
+                                throw new Error('Unknown rendering context type');
+                        }
+                    }
+                };
+                Driver.row = function (p, row) {
+                    p.nestElement(row, p.Executor.obtainRowTemplate(row), Templating.RenderedObject.Row);
+                };
+                Driver.headerContent = function (head, p) {
+                    var content = head.Column.Configuration.Title || head.Column.RawName;
+                    p.w(content);
+                };
+                Driver.rowContent = function (row, p, columnName) {
+                    var columns = p.UiColumns;
+                    for (var i = 0; i < columns.length; i++) {
+                        var c = row.Cells[columns[i].RawName];
+                        if (columnName != null && columnName != undefined && typeof columnName == 'string') {
+                            if (c.Column.RawName === columnName) {
+                                Driver.cell(p, c);
+                            }
+                        }
+                        else {
+                            Driver.cell(p, c);
+                        }
+                    }
+                };
+                Driver.cell = function (p, cell) {
+                    p.nestElement(cell, p.Executor.obtainCellTemplate(cell), Templating.RenderedObject.Cell);
+                };
+                Driver.cellContent = function (c, p) {
+                    var tpl = p.Executor.ColumnRenderes[c.Column.RawName];
+                    if (typeof tpl === "string") {
+                        p.nest(c, c.Column.Configuration.CellRenderingTemplateId);
+                    }
+                    else {
+                        p.w(tpl(c));
+                    }
+                };
+                Driver.plugin = function (p, pluginPosition, pluginId) {
+                    var plugin = p.Executor.Instances.getPlugin(pluginId, pluginPosition);
+                    Driver.renderPlugin(p, plugin);
+                };
+                Driver.plugins = function (p, pluginPosition) {
+                    var plugins = p.Executor.Instances.getPlugins(pluginPosition);
+                    if (!plugins)
+                        return;
+                    for (var a in plugins) {
+                        if (plugins.hasOwnProperty(a)) {
+                            var v = plugins[a];
+                            Driver.renderPlugin(p, v);
+                        }
+                    }
+                };
+                Driver.renderPlugin = function (p, plugin) {
+                    if (plugin.renderElement) {
+                        p.d(plugin, Templating.RenderedObject.Plugin);
+                        plugin.renderElement(p);
+                        p.u();
+                        return;
+                    }
+                    if (!plugin.renderContent)
+                        return;
+                    p.nest(plugin, p.Executor.CoreTemplateIds.PluginWrapper);
+                };
+                Driver.colHeader = function (p, columnName) {
+                    try {
+                        Driver.header(p, p.Executor.Instances.getColumn(columnName));
+                    }
+                    catch (a) {
+                    }
+                };
+                /**
+                 * Renders specified column's header into string including its wrapper
+                 *
+                 * @param column Column which header is about to be rendered
+                 * @returns {}
+                 */
+                Driver.header = function (p, column) {
+                    if (column.Header.renderElement) {
+                        p.d(column.Header, Templating.RenderedObject.Header);
+                        column.Header.renderElement(p);
+                        p.u();
+                    }
+                    else {
+                        p.nest(column.Header, column.Header.TemplateIdOverride || p.Executor.CoreTemplateIds.HeaderWrapper);
+                    }
+                };
+                Driver.headers = function (p) {
+                    var columns = p.UiColumns;
+                    for (var a in columns) {
+                        if (columns.hasOwnProperty(a)) {
+                            Driver.header(p, columns[a]);
+                        }
+                    }
+                };
+                return Driver;
+            }());
+            Templating.Driver = Driver;
+        })(Templating = Lattice.Templating || (Lattice.Templating = {}));
+    })(Lattice = Reinforced.Lattice || (Reinforced.Lattice = {}));
+})(Reinforced || (Reinforced = {}));
 var Reinforced;
 (function (Reinforced) {
     var Lattice;
@@ -1866,48 +1822,201 @@ var Reinforced;
         var Services;
         (function (Services) {
             /**
-             * Events manager for table.
-             * Contains all available events
+             * API responsible for dates operations
              */
-            var EventsService = (function () {
-                function EventsService(masterTable) {
-                    this._masterTable = masterTable;
-                    this.QueryGathering = new Lattice.TableEvent(masterTable);
-                    this.ClientQueryGathering = new Lattice.TableEvent(masterTable);
-                    this.Loading = new Lattice.TableEvent(masterTable);
-                    this.LoadingError = new Lattice.TableEvent(masterTable);
-                    this.ColumnsCreation = new Lattice.TableEvent(masterTable);
-                    this.DataReceived = new Lattice.TableEvent(masterTable);
-                    this.LayoutRendered = new Lattice.TableEvent(masterTable);
-                    this.ClientDataProcessing = new Lattice.TableEvent(masterTable);
-                    this.DataRendered = new Lattice.TableEvent(masterTable);
-                    this.DeferredDataReceived = new Lattice.TableEvent(masterTable);
-                    this.Adjustment = new Lattice.TableEvent(masterTable);
-                    this.Edit = new Lattice.TableEvent(masterTable);
-                    this.EditValidationFailed = new Lattice.TableEvent(masterTable);
-                    this.SelectionChanged = new Lattice.TableEvent(masterTable);
-                    this.PartitionChanged = new Lattice.TableEvent(masterTable);
-                    this.Filtered = new Lattice.TableEvent(masterTable);
-                    this.Ordered = new Lattice.TableEvent(masterTable);
-                    this.Partitioned = new Lattice.TableEvent(masterTable);
-                    this.AdjustmentRender = new Lattice.TableEvent(masterTable);
+            var DateService = (function () {
+                /*
+                 * @internal
+                 */
+                function DateService(datepickerOptions) {
+                    this._datepickerOptions = datepickerOptions;
                 }
+                DateService.prototype.ensureDpo = function () {
+                    if (this._datepickerOptions == null || this._datepickerOptions == undefined) {
+                        throw new Error('For this functionality you need 3rd-party datepicker. Please connect one using .Datepicker method');
+                    }
+                };
                 /**
-                 * Registers new event for events manager.
-                 * This method is to be used by plugins to provide their
-                 * own events.
-                 *
-                 * Events being added should be described in plugin's .d.ts file
-                 * as extensions to Events manager
-                 * @param eventName Event name
+                 * Determines is passed object valid Date object
+                 * @param date
                  * @returns {}
                  */
-                EventsService.prototype.registerEvent = function (eventName) {
-                    this[eventName] = new Lattice.TableEvent(this._masterTable);
+                DateService.prototype.isValidDate = function (date) {
+                    if (date === null)
+                        return true;
+                    if (date == undefined)
+                        return false;
+                    if (Object.prototype.toString.call(date) === "[object Date]") {
+                        if (isNaN(date.getTime()))
+                            return false;
+                        else
+                            return true;
+                    }
+                    return false;
                 };
-                return EventsService;
+                /**
+                 * Converts jsDate object to server's understandable format
+                 *
+                 * @param date Date object
+                 * @returns {string} Date in ISO 8601 format
+                 */
+                DateService.prototype.serialize = function (date) {
+                    if (date === null || date == undefined)
+                        return '';
+                    if (Object.prototype.toString.call(date) === "[object Date]") {
+                        if (isNaN(date.getTime()))
+                            return '';
+                        else
+                            return Date.prototype.toISOString.call(date);
+                    }
+                    else
+                        throw new Error(date + " is not a date at all");
+                };
+                /**
+                 * Parses ISO date string to regular Date object
+                 *
+                 * @param dateString Date string containing date in ISO 8601
+                 * @returns {}
+                 */
+                DateService.prototype.parse = function (dateString) {
+                    var date = new Date(dateString);
+                    if (Object.prototype.toString.call(date) === "[object Date]") {
+                        if (isNaN(date.getTime()))
+                            return null;
+                        else
+                            return date;
+                    }
+                    throw new Error(dateString + " is not a date at all");
+                };
+                /**
+                 * Retrieves Date object from 3rd party datepicker exposed by HTML element
+                 *
+                 * @param element HTML element containing datepicker componen
+                 * @returns {Date} Date object or null
+                 */
+                DateService.prototype.getDateFromDatePicker = function (element) {
+                    this.ensureDpo();
+                    if (element == null || element == undefined)
+                        return null;
+                    var date = this._datepickerOptions.GetFromDatePicker(element);
+                    if (date == null)
+                        return null;
+                    if (Object.prototype.toString.call(date) === "[object Date]") {
+                        if (isNaN(date.getTime()))
+                            return null;
+                        else
+                            return date;
+                    }
+                    throw new Error(date + " from datepicker is not a date at all");
+                };
+                /**
+                 * Creates datepicker object of HTML element using configured function
+                 *
+                 * @param element HTML element that should be converted to datepicker
+                 */
+                DateService.prototype.createDatePicker = function (element, isNullableDate) {
+                    this.ensureDpo();
+                    if (element == null || element == undefined)
+                        return;
+                    if (!isNullableDate)
+                        isNullableDate = false;
+                    this._datepickerOptions.CreateDatePicker(element, isNullableDate);
+                };
+                /**
+                 * Creates datepicker object of HTML element using configured function
+                 *
+                 * @param element HTML element that should be converted to datepicker
+                 */
+                DateService.prototype.destroyDatePicker = function (element) {
+                    this.ensureDpo();
+                    if (element == null || element == undefined)
+                        return;
+                    this._datepickerOptions.DestroyDatepicker(element);
+                };
+                /**
+                 * Passes Date object to datepicker element
+                 *
+                 * @param element HTML element containing datepicker componen
+                 * @param date Date object to supply to datepicker or null
+                 */
+                DateService.prototype.putDateToDatePicker = function (element, date) {
+                    this.ensureDpo();
+                    if (element == null || element == undefined)
+                        return;
+                    this._datepickerOptions.PutToDatePicker(element, date);
+                };
+                return DateService;
             }());
-            Services.EventsService = EventsService;
+            Services.DateService = DateService;
+        })(Services = Lattice.Services || (Lattice.Services = {}));
+    })(Lattice = Reinforced.Lattice || (Reinforced.Lattice = {}));
+})(Reinforced || (Reinforced = {}));
+if (!Date.prototype.toISOString) {
+    (function () {
+        function pad(number) {
+            if (number < 10) {
+                return '0' + number;
+            }
+            return number;
+        }
+        Date.prototype.toISOString = function () {
+            return this.getUTCFullYear() +
+                '-' + pad(this.getUTCMonth() + 1) +
+                '-' + pad(this.getUTCDate()) +
+                'T' + pad(this.getUTCHours()) +
+                ':' + pad(this.getUTCMinutes()) +
+                ':' + pad(this.getUTCSeconds()) +
+                '.' + (this.getUTCMilliseconds() / 1000).toFixed(3).slice(2, 5) +
+                'Z';
+        };
+    }());
+}
+var Reinforced;
+(function (Reinforced) {
+    var Lattice;
+    (function (Lattice) {
+        var Services;
+        (function (Services) {
+            var StatsService = (function () {
+                function StatsService(master) {
+                    this._master = master;
+                }
+                StatsService.prototype.IsSetFinite = function () { return this._master.Partition.isAmountFinite(); };
+                StatsService.prototype.Mode = function () { return this._master.Configuration.Partition.Type; };
+                StatsService.prototype.ServerCount = function () { return this._master.Partition.totalAmount(); };
+                StatsService.prototype.Stored = function () { return this._master.DataHolder.StoredData.length; };
+                StatsService.prototype.Filtered = function () { return (!this._master.DataHolder.Filtered) ? 0 : this._master.DataHolder.Filtered.length; };
+                StatsService.prototype.Displayed = function () { return (!this._master.DataHolder.DisplayedData) ? 0 : this._master.DataHolder.DisplayedData.length; };
+                StatsService.prototype.Ordered = function () { return (!this._master.DataHolder.Ordered) ? 0 : this._master.DataHolder.Ordered.length; };
+                StatsService.prototype.Skip = function () { return this._master.Partition.Skip; };
+                StatsService.prototype.Take = function () { return this._master.Partition.Take; };
+                StatsService.prototype.Pages = function () {
+                    if (this._master.Partition.Take === 0)
+                        return 1;
+                    var tp = this._master.Partition.amount() / this._master.Partition.Take;
+                    if (tp !== Math.floor(tp)) {
+                        tp = Math.floor(tp) + 1;
+                    }
+                    return tp;
+                };
+                StatsService.prototype.CurrentPage = function () {
+                    if (this._master.Partition.Skip + this._master.Partition.Take >= this._master.Partition.amount()) {
+                        return this.Pages() - 1;
+                    }
+                    if (this._master.Partition.Take === 0)
+                        return 0;
+                    if (this._master.Partition.Skip < this._master.Partition.Take)
+                        return 0;
+                    var sp = this._master.Partition.Skip / this._master.Partition.Take;
+                    return Math.floor(sp);
+                };
+                StatsService.prototype.IsAllDataLoaded = function () {
+                    if (this._master.Configuration.Partition.Type === Reinforced.Lattice.PartitionType.Client)
+                        return true;
+                };
+                return StatsService;
+            }());
+            Services.StatsService = StatsService;
         })(Services = Lattice.Services || (Lattice.Services = {}));
     })(Lattice = Reinforced.Lattice || (Reinforced.Lattice = {}));
 })(Reinforced || (Reinforced = {}));
@@ -2836,12 +2945,12 @@ var Reinforced;
                  */
                 InstanceManagerService.classifyType = function (fieldType) {
                     return {
-                        IsDateTime: InstanceManagerService._datetimeTypes.indexOf(fieldType) > -1,
-                        IsString: InstanceManagerService._stringTypes.indexOf(fieldType) > -1,
-                        IsFloat: InstanceManagerService._floatTypes.indexOf(fieldType) > -1,
-                        IsInteger: InstanceManagerService._integerTypes.indexOf(fieldType) > -1,
-                        IsBoolean: InstanceManagerService._booleanTypes.indexOf(fieldType) > -1,
-                        IsNullable: InstanceManagerService.endsWith(fieldType, '?')
+                        IsDateTime: this._datetimeTypes.indexOf(fieldType) > -1,
+                        IsString: this._stringTypes.indexOf(fieldType) > -1,
+                        IsFloat: this._floatTypes.indexOf(fieldType) > -1,
+                        IsInteger: this._integerTypes.indexOf(fieldType) > -1,
+                        IsBoolean: this._booleanTypes.indexOf(fieldType) > -1,
+                        IsNullable: this.endsWith(fieldType, '?')
                     };
                 };
                 InstanceManagerService.prototype.initColumns = function () {
@@ -5834,108 +5943,6 @@ var Reinforced;
 (function (Reinforced) {
     var Lattice;
     (function (Lattice) {
-        var Templating;
-        (function (Templating) {
-            /**
-             * Rendering stack class. Provives common helper
-             * infrastructure for context-oriented rendering
-             * @internal
-             */
-            var RenderingStack = (function () {
-                function RenderingStack() {
-                    this._contextStack = [];
-                    /**
-                     * Current rendering context
-                     */
-                    this.Current = null;
-                }
-                /**
-                 * Clears rendering stack
-                 * @returns {}
-                 */
-                RenderingStack.prototype.clear = function () {
-                    this.Current = null;
-                    if (this._contextStack.length === 0)
-                        return;
-                    this._contextStack = [];
-                };
-                /**
-                 * Pushes rendering context into stack
-                 * @param ctx
-                 * @returns {}
-                 */
-                RenderingStack.prototype.pushContext = function (ctx) {
-                    this._contextStack.push(ctx);
-                    this.Current = ctx;
-                };
-                /**
-                 * Pushes rendering context into stack
-                 * @param elementType What is being rendered
-                 * @param element Reference to object is being rendered
-                 * @param columnName Optional column name - for column-contexted rendering objects
-                 * @returns {}
-                 */
-                RenderingStack.prototype.push = function (elementType, element) {
-                    var ctx = {
-                        Type: elementType,
-                        Object: element,
-                        CurrentTrack: this.getTrack(elementType, element),
-                        IsTrackWritten: false,
-                        TrackBuffer: ''
-                    };
-                    this._contextStack.push(ctx);
-                    this.Current = ctx;
-                };
-                RenderingStack.prototype.getTrack = function (elementType, element) {
-                    var trk;
-                    switch (elementType) {
-                        case Templating.RenderedObject.Plugin:
-                            trk = Lattice.TrackHelper.getPluginTrack(element);
-                            break;
-                        case Templating.RenderedObject.Header:
-                            trk = Lattice.TrackHelper.getHeaderTrack(element);
-                            break;
-                        case Templating.RenderedObject.Cell:
-                            trk = Lattice.TrackHelper.getCellTrack(element);
-                            break;
-                        case Templating.RenderedObject.Row:
-                            trk = Lattice.TrackHelper.getRowTrack(element);
-                            break;
-                        case Templating.RenderedObject.Message:
-                            trk = Lattice.TrackHelper.getMessageTrack();
-                            break;
-                        case Templating.RenderedObject.Partition:
-                            trk = Lattice.TrackHelper.getPartitionRowTrack();
-                            break;
-                        case Templating.RenderedObject.Custom:
-                            trk = null;
-                            break;
-                        default:
-                            throw new Error('Invalid context element type');
-                    }
-                    return trk;
-                };
-                /**
-                 * Pops rendering context from stack
-                 * @returns {}
-                 */
-                RenderingStack.prototype.popContext = function () {
-                    this._contextStack.pop();
-                    if (this._contextStack.length === 0)
-                        this.Current = null;
-                    else
-                        this.Current = this._contextStack[this._contextStack.length - 1];
-                };
-                return RenderingStack;
-            }());
-            Templating.RenderingStack = RenderingStack;
-        })(Templating = Lattice.Templating || (Lattice.Templating = {}));
-    })(Lattice = Reinforced.Lattice || (Reinforced.Lattice = {}));
-})(Reinforced || (Reinforced = {}));
-var Reinforced;
-(function (Reinforced) {
-    var Lattice;
-    (function (Lattice) {
         var Rendering;
         (function (Rendering) {
             /**
@@ -6275,6 +6282,7 @@ var Reinforced;
         Lattice.Master = Master;
     })(Lattice = Reinforced.Lattice || (Reinforced.Lattice = {}));
 })(Reinforced || (Reinforced = {}));
+///<reference path="../CoreInterfaces.ts"/>
 var Reinforced;
 (function (Reinforced) {
     var Lattice;
@@ -6360,6 +6368,7 @@ var Reinforced;
     })(Lattice = Reinforced.Lattice || (Reinforced.Lattice = {}));
 })(Reinforced || (Reinforced = {}));
 ///<reference path="PluginBase.ts"/>
+///<reference path="../Filters/FilterBase.ts"/>
 var Reinforced;
 (function (Reinforced) {
     var Lattice;
@@ -6386,11 +6395,13 @@ var Reinforced;
                         var templId = this.RawConfig.TemplateId;
                         for (var ck in columns) {
                             if (columns.hasOwnProperty(ck)) {
-                                var ordering = this.Configuration.DefaultOrderingsForColumns[ck];
-                                this.updateOrdering(ck, ordering);
+                                var ordering = this.Configuration.OrderingsForColumns[ck];
+                                if (ordering == null || ordering == undefined)
+                                    continue;
+                                this.updateOrdering(ck, ordering.DefaultOrdering);
                                 if (columns[ck].Configuration.IsDataOnly)
                                     continue;
-                                if (ordering == null || ordering == undefined)
+                                if (ordering.Hidden)
                                     continue;
                                 var newHeader = {
                                     Column: columns[ck],
@@ -6400,7 +6411,7 @@ var Reinforced;
                                     TemplateIdOverride: templId,
                                     IsClientOrdering: this.isClient(ck)
                                 };
-                                this.specifyOrdering(newHeader, ordering);
+                                this.specifyOrdering(newHeader, ordering.DefaultOrdering);
                                 columns[ck].Header = newHeader;
                             }
                         }
@@ -6426,10 +6437,10 @@ var Reinforced;
                         }
                     };
                     OrderingPlugin.prototype.isClient = function (columnName) {
-                        return this.Configuration.ClientSortableColumns.hasOwnProperty(columnName);
+                        return this.Configuration.OrderingsForColumns.hasOwnProperty(columnName);
                     };
                     OrderingPlugin.prototype.switchOrderingForColumn = function (columnName) {
-                        if (this.Configuration.DefaultOrderingsForColumns[columnName] == null || this.Configuration.DefaultOrderingsForColumns[columnName] == undefined)
+                        if (this.Configuration.OrderingsForColumns[columnName] == null || this.Configuration.OrderingsForColumns[columnName] == undefined)
                             throw new Error("Ordering is not configured for column " + columnName);
                         var orderingsCollection = this.isClient(columnName) ? this._clientOrderings : this._serverOrderings;
                         var next = this.nextOrdering(orderingsCollection[columnName]);
@@ -6444,8 +6455,10 @@ var Reinforced;
                     OrderingPlugin.prototype.setOrderingForColumn = function (columnName, ordering) {
                         this.updateOrderingWithUi(columnName, ordering);
                         if (this.Configuration.RadioOrdering) {
-                            for (var ck in this.Configuration.DefaultOrderingsForColumns) {
-                                if ((ck !== columnName) && (!this.MasterTable.InstanceManager.Columns[ck].Configuration.IsDataOnly)) {
+                            for (var ck in this.Configuration.OrderingsForColumns) {
+                                if ((ck !== columnName)
+                                    && (!this.MasterTable.InstanceManager.Columns[ck].Configuration.IsDataOnly)
+                                    && !this.Configuration.OrderingsForColumns[ck].Hidden) {
                                     this.updateOrderingWithUi(ck, Reinforced.Lattice.Ordering.Neutral);
                                 }
                             }
@@ -6481,13 +6494,14 @@ var Reinforced;
                         _super.prototype.init.call(this, masterTable);
                         var hasClientOrderings = false;
                         var fn;
-                        for (var cls in this.Configuration.ClientSortableColumns) {
-                            if (this.Configuration.ClientSortableColumns.hasOwnProperty(cls)) {
+                        for (var cls in this.Configuration.OrderingsForColumns) {
+                            if (this.Configuration.OrderingsForColumns.hasOwnProperty(cls)) {
                                 hasClientOrderings = true;
-                                fn = this.Configuration.ClientSortableColumns[cls];
+                                var ordering = this.Configuration.OrderingsForColumns[cls];
+                                fn = ordering.Function;
                                 if (!fn) {
                                     fn = this.makeDefaultOrderingFunction(cls);
-                                    this.Configuration.ClientSortableColumns[cls] = fn;
+                                    ordering.Function = fn;
                                 }
                                 this.MasterTable.DataHolder.registerClientOrdering(cls, fn);
                             }
@@ -6496,7 +6510,7 @@ var Reinforced;
                             // if we have at least 1 client ordering then we have to reorder whole 
                             // received data on client
                             // to avoid client ordering priority
-                            for (var serverColumn in this.Configuration.DefaultOrderingsForColumns) {
+                            for (var serverColumn in this.Configuration.OrderingsForColumns) {
                                 if (this.isClient(serverColumn))
                                     continue;
                                 fn = this.makeDefaultOrderingFunction(serverColumn);
@@ -7676,6 +7690,657 @@ var Reinforced;
                 Checkboxify.CheckboxifyPlugin = CheckboxifyPlugin;
                 Lattice.ComponentsContainer.registerComponent('Checkboxify', CheckboxifyPlugin);
             })(Checkboxify = Plugins.Checkboxify || (Plugins.Checkboxify = {}));
+        })(Plugins = Lattice.Plugins || (Lattice.Plugins = {}));
+    })(Lattice = Reinforced.Lattice || (Reinforced.Lattice = {}));
+})(Reinforced || (Reinforced = {}));
+///<reference path="PluginBase.ts"/>
+var Reinforced;
+(function (Reinforced) {
+    var Lattice;
+    (function (Lattice) {
+        var Plugins;
+        (function (Plugins) {
+            var Hierarchy;
+            (function (Hierarchy) {
+                var HierarchyPlugin = (function (_super) {
+                    __extends(HierarchyPlugin, _super);
+                    function HierarchyPlugin() {
+                        _super.apply(this, arguments);
+                        this._globalHierarchy = {};
+                        this._currentHierarchy = {};
+                        this._notInHierarchy = {};
+                    }
+                    HierarchyPlugin.prototype.init = function (masterTable) {
+                        _super.prototype.init.call(this, masterTable);
+                        this._parentKeyFunction = this.MasterTable.DataHolder
+                            .compileKeyFunction(this.Configuration.ParentKeyFields);
+                        //this.MasterTable.DataHolder.registerClientOrdering("TreeOrder", this.hierarchicalOrder.bind(this));
+                        this.MasterTable.DataHolder.registerClientFilter(this);
+                    };
+                    //#region Event catchers
+                    HierarchyPlugin.prototype.expandRow = function (args) {
+                        this.toggleSubtreeByObject(this.MasterTable.DataHolder.StoredCache[args.Row], true);
+                    };
+                    HierarchyPlugin.prototype.expandLoadRow = function (args) {
+                        this.loadRow(this.MasterTable.DataHolder.StoredCache[args.Row]);
+                    };
+                    HierarchyPlugin.prototype.toggleLoadRow = function (args) {
+                        this.toggleSubtreeOrLoad(this.MasterTable.DataHolder.StoredCache[args.Row], null);
+                    };
+                    HierarchyPlugin.prototype.collapseRow = function (args) {
+                        this.toggleSubtreeByObject(this.MasterTable.DataHolder.StoredCache[args.Row], false);
+                    };
+                    HierarchyPlugin.prototype.toggleRow = function (args) {
+                        this.toggleSubtreeByObject(this.MasterTable.DataHolder.StoredCache[args.Row], null);
+                    };
+                    //#endregion
+                    HierarchyPlugin.prototype.toggleSubtreeOrLoad = function (dataObject, turnOpen) {
+                        if (dataObject == null || dataObject == undefined)
+                            return;
+                        if (turnOpen == null || turnOpen == undefined)
+                            turnOpen = !dataObject.__isExpanded;
+                        if (dataObject.__isExpanded === turnOpen)
+                            return;
+                        if (turnOpen) {
+                            if (dataObject.__isLoaded)
+                                this.expand(dataObject);
+                            else
+                                this.loadRow(dataObject);
+                        }
+                        else
+                            this.collapse(dataObject, true);
+                    };
+                    HierarchyPlugin.prototype.toggleSubtreeByObject = function (dataObject, turnOpen) {
+                        if (dataObject == null || dataObject == undefined)
+                            return;
+                        if (turnOpen == null || turnOpen == undefined)
+                            turnOpen = !dataObject.__isExpanded;
+                        if (dataObject.__isExpanded === turnOpen)
+                            return;
+                        if (turnOpen)
+                            this.expand(dataObject);
+                        else
+                            this.collapse(dataObject, true);
+                    };
+                    HierarchyPlugin.prototype.loadRow = function (dataObject) {
+                        var _this = this;
+                        dataObject.IsLoading = true;
+                        dataObject.IsExpanded = true;
+                        dataObject.__isExpanded = true;
+                        this.MasterTable.Controller.redrawVisibleDataObject(dataObject);
+                        this.MasterTable.Commands.triggerCommand('_Children', dataObject, function () {
+                            dataObject.IsLoading = false;
+                            dataObject.__isLoaded = true;
+                            _this.MasterTable.Controller.redrawVisibleDataObject(dataObject);
+                        });
+                        return;
+                    };
+                    HierarchyPlugin.prototype.isParentExpanded = function (dataObject) {
+                        if (dataObject.__parent == null)
+                            return true;
+                        var parent = this.MasterTable.DataHolder.getByPrimaryKey(dataObject.__parent);
+                        return parent.__isExpanded;
+                    };
+                    //#region Expand
+                    HierarchyPlugin.prototype.expand = function (dataObject) {
+                        dataObject.IsExpanded = true;
+                        dataObject.__isExpanded = true;
+                        if (!this.isParentExpanded(dataObject))
+                            return;
+                        var toggled = this.toggleVisibleChildren(dataObject, true);
+                        var st = this.MasterTable.DataHolder.StoredCache;
+                        this.MasterTable.Controller.redrawVisibleDataObject(dataObject);
+                        var src = [];
+                        for (var i = 0; i < toggled.length; i++) {
+                            src.push(st[toggled[i]]);
+                        }
+                        src = this.MasterTable.DataHolder.orderWithCurrentOrderings(src);
+                        src = this.orderHierarchy(src, dataObject.Deepness + 1);
+                        var ordered = this.MasterTable.DataHolder.Ordered;
+                        var displayed = this.MasterTable.DataHolder.DisplayedData;
+                        var orderedIdx = ordered.indexOf(dataObject);
+                        this.MasterTable.DataHolder.Ordered.splice.apply(this.MasterTable.DataHolder.Ordered, [orderedIdx + 1, 0].concat(src));
+                        var pos = displayed.indexOf(dataObject);
+                        var newNodes = src;
+                        // if we added more rows and partition's take was enabled
+                        // then we must cut it to prevent redundant nodes
+                        // creation
+                        var existingDisplayed = this.MasterTable.DataHolder.DisplayedData.length;
+                        var head = displayed.slice(0, pos + 1), tail = displayed.slice(pos + 1);
+                        var rows = null;
+                        if (this.MasterTable.Partition.Take > 0) {
+                            if (pos === existingDisplayed - 1) {
+                                // if we expanded last row then it is nothing to add
+                                // we can just fire PartitionChanged event and quit
+                                this.firePartitionChange();
+                                return;
+                            }
+                            // head and tail are displaying
+                            var totallength = head.length + newNodes.length + tail.length;
+                            // if we will add all nodes right after original, removing last nodes
+                            // - will there be enough space?
+                            if (totallength > this.MasterTable.Partition.Take) {
+                                // ok, doesnt fit, lets cut
+                                var needToCut = totallength - this.MasterTable.Partition.Take;
+                                // first, we cut tail
+                                if (needToCut < tail.length) {
+                                    // if it is enough to cut tail - ok
+                                    this.removeNLastRows(needToCut);
+                                    tail = tail.slice(0, tail.length - needToCut);
+                                    this.appendNodes(newNodes, tail);
+                                }
+                                else {
+                                    // else we remove whole tail
+                                    this.removeNLastRows(tail.length);
+                                    needToCut -= tail.length;
+                                    tail = [];
+                                    if (needToCut > 0) {
+                                        // and cut off some new nodes
+                                        newNodes = newNodes.slice(0, newNodes.length - needToCut);
+                                    }
+                                    rows = this.MasterTable.Controller.produceRowsFromData(newNodes);
+                                    for (var j = 0; j < rows.length; j++) {
+                                        this.MasterTable.Renderer.Modifier.appendRow(rows[j]);
+                                    }
+                                }
+                            }
+                            else {
+                                // otherwise - we do not have to cut anything
+                                this.appendNodes(newNodes, tail);
+                            }
+                        }
+                        else {
+                            // if take is set to all - we simply add new rows at needed index
+                            this.appendNodes(newNodes, tail);
+                        }
+                        this.MasterTable.DataHolder.DisplayedData = head.concat(newNodes, tail);
+                        this.firePartitionChange();
+                    };
+                    HierarchyPlugin.prototype.appendNodes = function (newNodes, tail) {
+                        var beforeIdx = tail.length === 0 ? null : tail[0]['__i'];
+                        var rows = this.MasterTable.Controller.produceRowsFromData(newNodes);
+                        for (var j = 0; j < rows.length; j++) {
+                            this.MasterTable.Renderer.Modifier.appendRow(rows[j], beforeIdx);
+                        }
+                    };
+                    HierarchyPlugin.prototype.firePartitionChange = function (tk, sk) {
+                        tk = tk == null ? this.MasterTable.Partition.Take : tk;
+                        sk = sk == null ? this.MasterTable.Partition.Skip : sk;
+                        var prevTk = this.MasterTable.Partition.Take;
+                        var prevSk = this.MasterTable.Partition.Skip;
+                        this.MasterTable.Partition.Take = tk;
+                        this.MasterTable.Partition.Skip = sk;
+                        this.MasterTable.Events.PartitionChanged.invokeAfter(this, {
+                            Take: tk, PreviousTake: prevTk, Skip: sk, PreviousSkip: prevSk
+                        });
+                    };
+                    HierarchyPlugin.prototype.removeNLastRows = function (n) {
+                        var last = this.MasterTable.DataHolder
+                            .DisplayedData[this.MasterTable.DataHolder.DisplayedData.length - 1];
+                        var lastRow = this.MasterTable.Renderer.Locator.getRowElementByObject(last);
+                        for (var i = 0; i < n; i++) {
+                            var lr = lastRow.previousElementSibling;
+                            this.MasterTable.Renderer.Modifier.destroyElement(lastRow);
+                            lastRow = lr;
+                        }
+                    };
+                    HierarchyPlugin.prototype.toggleVisibleChildren = function (dataObject, visible, hierarchy) {
+                        if (!hierarchy)
+                            hierarchy = this._currentHierarchy;
+                        var subtree = hierarchy[dataObject.__i];
+                        if (!subtree)
+                            return [];
+                        var result = [];
+                        for (var i = 0; i < subtree.length; i++) {
+                            var child = this.MasterTable.DataHolder.StoredCache[subtree[i]];
+                            var nodeToggled = this.toggleVisible(child, visible);
+                            result = result.concat(nodeToggled);
+                        }
+                        return result;
+                    };
+                    HierarchyPlugin.prototype.toggleVisible = function (dataObject, visible, hierarchy) {
+                        if (!hierarchy)
+                            hierarchy = this._currentHierarchy;
+                        var result = [dataObject.__i];
+                        dataObject.__visible = visible;
+                        if (!dataObject.__isExpanded)
+                            return result;
+                        var subtree = hierarchy[dataObject.__i];
+                        for (var j = 0; j < subtree.length; j++) {
+                            var obj = this.MasterTable.DataHolder.StoredCache[subtree[j]];
+                            obj.__visible = visible;
+                            result = result.concat(this.toggleVisible(obj, visible));
+                        }
+                        return result;
+                    };
+                    //#endregion
+                    //#region Collapse
+                    HierarchyPlugin.prototype.collapse = function (dataObject, redraw) {
+                        dataObject.IsExpanded = false;
+                        dataObject.__isExpanded = false;
+                        if (!this.isParentExpanded(dataObject))
+                            return;
+                        var displayed = this.MasterTable.DataHolder.DisplayedData;
+                        var ordered = this.MasterTable.DataHolder.Ordered;
+                        var hidden = this.toggleVisibleChildren(dataObject, false);
+                        var hiddenCount = hidden.length;
+                        this.MasterTable.Controller.redrawVisibleDataObject(dataObject);
+                        var row = this.MasterTable.Renderer.Locator.getRowElementByIndex(dataObject.__i);
+                        var orIdx = ordered.indexOf(dataObject);
+                        var dIdx = displayed.indexOf(dataObject);
+                        ordered.splice(orIdx + 1, hiddenCount);
+                        var oldDisplayedLength = displayed.length;
+                        var displayedHidden = displayed.splice(dIdx + 1, hiddenCount).length;
+                        var head = [];
+                        var stay = displayed.splice(dIdx + 1);
+                        var tail = ordered.slice(orIdx + 1 + stay.length, orIdx + 1 + stay.length + displayedHidden);
+                        var increaseTail = 0;
+                        var nskip = null;
+                        var totalLength = displayed.length + stay.length + tail.length;
+                        if (totalLength < oldDisplayedLength && this.MasterTable.Partition.Skip > 0) {
+                            nskip = this.MasterTable.Partition.Skip;
+                            nskip -= (oldDisplayedLength - totalLength);
+                            if (nskip < 0) {
+                                increaseTail = -nskip;
+                                nskip = 0;
+                            }
+                            head = ordered.slice(nskip, this.MasterTable.Partition.Skip);
+                        }
+                        if (increaseTail > 0) {
+                            tail = ordered.slice(orIdx + 1 + stay.length, orIdx + 1 + displayedHidden + increaseTail + stay.length);
+                        }
+                        displayed = head.concat(displayed, stay, tail);
+                        this.MasterTable.DataHolder.DisplayedData = displayed;
+                        console.log(displayed.length);
+                        if (redraw) {
+                            //first, we remove all the related elements
+                            var ne = row.nextElementSibling;
+                            for (var i = 0; i < displayedHidden; i++) {
+                                var n = ne.nextElementSibling;
+                                this.MasterTable.Renderer.Modifier.destroyElement(ne);
+                                ne = n;
+                            }
+                            var rows = null;
+                            if (head.length > 0) {
+                                rows = this.MasterTable.Controller.produceRowsFromData(head);
+                                for (var k = rows.length - 1; k >= 0; k--) {
+                                    this.MasterTable.Renderer.Modifier.prependRow(rows[k]);
+                                }
+                            }
+                            if (tail.length > 0) {
+                                rows = this.MasterTable.Controller.produceRowsFromData(tail);
+                                for (var l = 0; l < rows.length; l++) {
+                                    this.MasterTable.Renderer.Modifier.appendRow(rows[l]);
+                                }
+                            }
+                            this.firePartitionChange(null, nskip);
+                        }
+                    };
+                    //#endregion
+                    //#region Refilter and reorder
+                    HierarchyPlugin.prototype.onFiltered_after = function () {
+                        var src = this.MasterTable.DataHolder.Filtered;
+                        var needSeparateHierarchy = true;
+                        if (src.length === this.MasterTable.DataHolder.StoredData.length) {
+                            this._currentHierarchy = this._globalHierarchy;
+                            needSeparateHierarchy = false;
+                            this.restoreHierarchyData(src);
+                        }
+                        var expandParents = this.Configuration.CollapsedNodeFilterBehavior ===
+                            Hierarchy.TreeCollapsedNodeFilterBehavior.IncludeCollapsed;
+                        if (expandParents) {
+                            this.expandParents(src);
+                        }
+                        //if (this.Configuration.CollapsedNodeFilterBehavior === TreeCollapsedNodeFilterBehavior.ExcludeCollapsed) {
+                        var cpy = [];
+                        for (var i = 0; i < src.length; i++) {
+                            if (src[i].__visible)
+                                cpy.push(src[i]);
+                        }
+                        src = cpy;
+                        //}
+                        if (needSeparateHierarchy)
+                            this.buildCurrentHierarchy(src);
+                        this.MasterTable.DataHolder.Filtered = src;
+                    };
+                    HierarchyPlugin.prototype.expandParents = function (src) {
+                        var addParents = {};
+                        for (var j = 0; j < src.length; j++) {
+                            this.addParents(src[j], addParents);
+                        }
+                        for (var l = 0; l < src.length; l++) {
+                            if (addParents[src[l]['__i']]) {
+                                delete addParents[src[l]['__i']];
+                            }
+                        }
+                        for (var k in addParents) {
+                            var obj = this.MasterTable.DataHolder.StoredCache[k];
+                            obj.IsExpanded = true;
+                            obj.__isExpanded = true;
+                            this.toggleVisibleChildren(obj, true);
+                            src.push(obj);
+                        }
+                    };
+                    HierarchyPlugin.prototype.restoreHierarchyData = function (d) {
+                        for (var k = 0; k < d.length; k++) {
+                            var o = d[k];
+                            o.__serverChildrenCount = o.ChildrenCount;
+                            o.LocalChildrenCount = this._globalHierarchy[o['__i']].length;
+                            o.__visible = this.visible(o);
+                        }
+                    };
+                    HierarchyPlugin.prototype.buildCurrentHierarchy = function (d) {
+                        this._currentHierarchy = {};
+                        for (var i = 0; i < d.length; i++) {
+                            var idx = d[i].__i;
+                            this._currentHierarchy[idx] = [];
+                            for (var j = 0; j < d.length; j++) {
+                                if (d[j].__parent === d[i].__key) {
+                                    this._currentHierarchy[idx].push(d[j].__i);
+                                }
+                            }
+                        }
+                        for (var k = 0; k < d.length; k++) {
+                            var o = d[k];
+                            o.LocalChildrenCount = this._currentHierarchy[o['__i']].length;
+                        }
+                    };
+                    HierarchyPlugin.prototype.addParents = function (o, existing) {
+                        if (o.__parent == null)
+                            return;
+                        while (o.__parent != null) {
+                            o = this.MasterTable.DataHolder.getByPrimaryKey(o.__parent);
+                            existing[o.__i] = true;
+                        }
+                    };
+                    HierarchyPlugin.prototype.onOrdered_after = function () {
+                        var src = this.MasterTable.DataHolder.Ordered;
+                        this.MasterTable.DataHolder.Ordered = this.orderHierarchy(src, 0);
+                    };
+                    HierarchyPlugin.prototype.orderHierarchy = function (src, minDeepness) {
+                        var filteredHierarchy = this.buildHierarchy(src, minDeepness);
+                        var target = [];
+                        for (var i = 0; i < filteredHierarchy.roots.length; i++) {
+                            this.appendChildren(target, filteredHierarchy.roots[i], filteredHierarchy.Hierarchy);
+                        }
+                        return target;
+                    };
+                    HierarchyPlugin.prototype.appendChildren = function (target, index, hierarchy) {
+                        var thisNode = this.MasterTable.DataHolder.StoredCache[index];
+                        target.push(thisNode);
+                        for (var i = 0; i < hierarchy[index].length; i++) {
+                            this.appendChildren(target, hierarchy[index][i], hierarchy);
+                        }
+                    };
+                    HierarchyPlugin.prototype.buildHierarchy = function (d, minDeepness) {
+                        var result = {};
+                        var roots = [];
+                        for (var i = 0; i < d.length; i++) {
+                            var idx = d[i].__i;
+                            result[idx] = [];
+                            if (d[i].Deepness === minDeepness)
+                                roots.push(d[i].__i);
+                            for (var j = 0; j < d.length; j++) {
+                                if (d[j].__parent === d[i].__key) {
+                                    result[idx].push(d[j].__i);
+                                }
+                            }
+                        }
+                        return {
+                            roots: roots,
+                            Hierarchy: result
+                        };
+                    };
+                    //#endregion
+                    //#region Initial cache
+                    HierarchyPlugin.prototype.isParentNull = function (dataObject) {
+                        for (var i = 0; i < this.Configuration.ParentKeyFields.length; i++) {
+                            if (dataObject[this.Configuration.ParentKeyFields[i]] != null)
+                                return false;
+                        }
+                        return true;
+                    };
+                    HierarchyPlugin.prototype.deepness = function (obj) {
+                        var result = 0;
+                        while (obj.__parent != null) {
+                            result++;
+                            obj = this.MasterTable.DataHolder.getByPrimaryKey(obj.__parent);
+                            if (!obj)
+                                throw new Error("Fields " + this.Configuration.ParentKeyFields
+                                    .concat(', ') + " must be all null in root nodes");
+                        }
+                        return result;
+                    };
+                    HierarchyPlugin.prototype.visible = function (obj) {
+                        var vis = this.MasterTable.DataHolder.satisfyCurrentFilters(obj);
+                        if (!vis)
+                            return false;
+                        while (obj.__parent != null) {
+                            obj = this.MasterTable.DataHolder.getByPrimaryKey(obj.__parent);
+                            if (!obj.__isExpanded)
+                                return false;
+                        }
+                        return true;
+                    };
+                    HierarchyPlugin.prototype.onDataReceived_after = function (e) {
+                        if (e.EventArgs.IsAdjustment)
+                            return;
+                        var d = this.MasterTable.DataHolder.StoredData;
+                        this._globalHierarchy = {};
+                        for (var i = 0; i < d.length; i++) {
+                            var idx = d[i].__i;
+                            this._globalHierarchy[idx] = [];
+                            d[i].__isExpanded = d[i].IsExpanded;
+                            for (var j = 0; j < d.length; j++) {
+                                if (!d[j].__parent) {
+                                    if (this.isParentNull(d[j]))
+                                        d[j].__parent = null;
+                                    else
+                                        d[j].__parent = this._parentKeyFunction(d[j]);
+                                }
+                                if (d[j].__parent === d[i].__key) {
+                                    this._globalHierarchy[idx].push(d[j].__i);
+                                }
+                            }
+                        }
+                        for (var k = 0; k < this.MasterTable.DataHolder.StoredData.length; k++) {
+                            var o = this.MasterTable.DataHolder.StoredData[k];
+                            o.__serverChildrenCount = o.ChildrenCount;
+                            o.LocalChildrenCount = this._globalHierarchy[o['__i']].length;
+                            o.Deepness = this.deepness(o);
+                            o.__visible = this.visible(o);
+                        }
+                    };
+                    //#endregion
+                    HierarchyPlugin.prototype.setServerChildrenCount = function (dataObject) {
+                        dataObject.ChildrenCount = dataObject.__serverChildrenCount;
+                    };
+                    HierarchyPlugin.prototype.setLocalChildrenCount = function (dataObject) {
+                        dataObject.ChildrenCount = dataObject.LocalChildrenCount;
+                    };
+                    HierarchyPlugin.prototype.setChildrenCount = function (dataObject, count) {
+                        dataObject.ChildrenCount = count;
+                    };
+                    //#region Processing adjustments
+                    HierarchyPlugin.prototype.proceedAddedData = function (added) {
+                        for (var i = 0; i < added.length; i++) {
+                            if (this.isParentNull(added[i]))
+                                added[i].__parent = null;
+                            else
+                                added[i].__parent = this._parentKeyFunction(added[i]);
+                            this._globalHierarchy[added[i]['__i']] = [];
+                        }
+                        for (var j = 0; j < added.length; j++) {
+                            if (added[j].__parent != null) {
+                                var parent = this.MasterTable.DataHolder.getByPrimaryKey(added[j].__parent);
+                                this._globalHierarchy[parent['__i']].push(added[j]['__i']);
+                            }
+                        }
+                        for (var k = 0; k < added.length; k++) {
+                            var o = added[k];
+                            o.__serverChildrenCount = o.ChildrenCount;
+                            o.LocalChildrenCount = this._globalHierarchy[o['__i']].length;
+                            o.Deepness = this.deepness(o);
+                            o.__visible = this.visible(o);
+                        }
+                    };
+                    HierarchyPlugin.prototype.proceedUpdatedData = function (d) {
+                        var obj = null;
+                        for (var i = 0; i < d.length; i++) {
+                            obj = d[i];
+                            var newParent = null;
+                            if (!this.isParentNull(d[i]))
+                                newParent = this._parentKeyFunction(obj);
+                            this.moveItem(obj, newParent);
+                        }
+                        for (var j = 0; j < d.length; j++) {
+                            obj = d[j];
+                            if (obj.__isExpanded !== obj.IsExpanded) {
+                                if (obj.IsExpanded) {
+                                    obj.__isExpanded = true;
+                                    this.toggleVisibleChildren(obj, true, this._globalHierarchy);
+                                }
+                                else {
+                                    obj.__isExpanded = false;
+                                    this.toggleVisibleChildren(obj, false, this._globalHierarchy);
+                                }
+                            }
+                        }
+                    };
+                    HierarchyPlugin.prototype.moveItems = function (items, newParent) {
+                        var newParentKey = (!newParent) ? null : newParent.__key;
+                        for (var i = 0; i < items.length; i++) {
+                            this.moveItem(items[i], newParentKey);
+                        }
+                        this.MasterTable.DataHolder.filterStoredDataWithPreviousQuery();
+                        this.MasterTable.Controller.redrawVisibleData();
+                    };
+                    HierarchyPlugin.prototype.moveItem = function (dataObject, newParentKey) {
+                        var oldParent = dataObject.__parent;
+                        // first, remove item from old parent
+                        if (oldParent != null) {
+                            var oldParentObj = this.MasterTable.DataHolder.getByPrimaryKey(oldParent);
+                            if (!oldParentObj) {
+                                // old parent is removed => item is out of hierarchy
+                                this.moveFromNotInHierarchy(dataObject.__key, newParentKey);
+                                return;
+                            }
+                            // if not => remove from global hierarchy
+                            var op = this._globalHierarchy[oldParentObj['__i']];
+                            var idx = op.indexOf(dataObject['__i']);
+                            if (idx > -1)
+                                op.splice(idx, 1);
+                        }
+                        if (newParentKey == null) {
+                            dataObject.__visible = this.MasterTable.DataHolder.satisfyCurrentFilters(dataObject);
+                            return;
+                        } // if we move it to root - no add. action required
+                        var newParentObj = this.MasterTable.DataHolder.getByPrimaryKey(newParentKey);
+                        if (!newParentObj)
+                            throw new Error("Cannot find parent " + newParentKey + " to move"); // oops
+                        dataObject.__parent = newParentObj['__i'];
+                        dataObject.__visible = newParentObj.__isExpanded && this.MasterTable.DataHolder.satisfyCurrentFilters(dataObject);
+                    };
+                    HierarchyPlugin.prototype.moveFromNotInHierarchy = function (key, newParentKey) {
+                        if (!this._notInHierarchy[key])
+                            return;
+                        var targetObj = this.MasterTable.DataHolder.getByPrimaryKey(key);
+                        if (!targetObj)
+                            return;
+                        var subtree = [];
+                        this._globalHierarchy[targetObj['__i']] = subtree;
+                        if (newParentKey == null) {
+                            targetObj['__parent'] = null;
+                        }
+                        else {
+                            var newParentObj = this.MasterTable.DataHolder.getByPrimaryKey(newParentKey);
+                            if (!newParentObj)
+                                throw new Error("Cannot find parent " + newParentKey + " to move from outside of tree"); // oops
+                            targetObj['__parent'] = newParentKey;
+                            var parentSubtree = this._globalHierarchy[newParentObj['__i']];
+                            parentSubtree.push(targetObj['__i']);
+                            targetObj.__visible = newParentObj.__isExpanded && this.MasterTable.DataHolder.satisfyCurrentFilters(targetObj);
+                        }
+                        var children = this._notInHierarchy[key];
+                        for (var i = 0; i < children.length; i++) {
+                            this.moveFromNotInHierarchy(children[i], targetObj.__key);
+                        }
+                        delete this._notInHierarchy[key];
+                    };
+                    HierarchyPlugin.prototype.cleanupNotInHierarchy = function () {
+                        for (var nk in this._notInHierarchy) {
+                            for (var i = 0; i < this._notInHierarchy[nk].length; i++) {
+                                this.MasterTable.DataHolder.detachByKey(this._notInHierarchy[nk][i]);
+                            }
+                            this.MasterTable.DataHolder.detachByKey(nk);
+                        }
+                        this._notInHierarchy = {};
+                    };
+                    HierarchyPlugin.prototype.onAdjustment_after = function (e) {
+                        var data = e.EventArgs;
+                        this.proceedAddedData(data.AddedData);
+                        this.proceedUpdatedData(data.TouchedData);
+                        this.cleanupNotInHierarchy();
+                        data.NeedRefilter = true;
+                    };
+                    HierarchyPlugin.prototype.onAdjustment_before = function (e) {
+                        var data = e.EventArgs;
+                        var rk = data.RemoveKeys;
+                        this._notInHierarchy = {};
+                        for (var i = 0; i < rk.length; i++) {
+                            var toRemove = this.MasterTable.DataHolder.getByPrimaryKey(rk[i]);
+                            this.removeFromHierarchySubtrees(toRemove, this._globalHierarchy);
+                            this.removeFromHierarchySubtrees(toRemove, this._currentHierarchy);
+                            this.moveToNotInHierarchy(toRemove['__i']);
+                        }
+                    };
+                    HierarchyPlugin.prototype.moveToNotInHierarchy = function (parent) {
+                        var subtree = this._globalHierarchy[parent];
+                        var parentObj = this.MasterTable.DataHolder.StoredCache[parent];
+                        if (!parentObj)
+                            return;
+                        var childKeys = [];
+                        this._notInHierarchy[parent['__key']] = childKeys;
+                        for (var i = 0; i < subtree.length; i++) {
+                            var subObj = this.MasterTable.DataHolder.StoredCache[subtree[i]];
+                            if (subObj) {
+                                childKeys.push(subObj['__key']);
+                            }
+                        }
+                        for (var j = 0; j < subtree.length; j++) {
+                            this.moveToNotInHierarchy(subtree[j]);
+                        }
+                    };
+                    HierarchyPlugin.prototype.removeFromHierarchySubtrees = function (toRemove, hierarchy) {
+                        if (toRemove.__parent != null) {
+                            var parent = this.MasterTable.DataHolder.getByPrimaryKey(toRemove.__parent);
+                            if (hierarchy[parent['__i']]) {
+                                var subtree = hierarchy[parent['__i']];
+                                var idx = subtree.indexOf(toRemove['__i']);
+                                if (idx > -1) {
+                                    subtree.splice(idx, 1);
+                                }
+                            }
+                        }
+                    };
+                    //#endregion
+                    HierarchyPlugin.prototype.subscribe = function (e) {
+                        e.DataReceived.subscribeAfter(this.onDataReceived_after.bind(this), 'hierarchy');
+                        e.Filtered.subscribeAfter(this.onFiltered_after.bind(this), 'hierarchy');
+                        e.Ordered.subscribeAfter(this.onOrdered_after.bind(this), 'hierarchy');
+                        e.Adjustment.subscribeAfter(this.onAdjustment_after.bind(this), 'hierarchy');
+                        e.Adjustment.subscribeBefore(this.onAdjustment_before.bind(this), 'hierarchy');
+                    };
+                    // we implement this only to assure DataHolder to refilter data
+                    // but actually we are refiltering it later
+                    HierarchyPlugin.prototype.filterPredicate = function (rowObject, query) {
+                        return true;
+                    };
+                    return HierarchyPlugin;
+                }(Reinforced.Lattice.Plugins.PluginBase));
+                Hierarchy.HierarchyPlugin = HierarchyPlugin;
+                Lattice.ComponentsContainer.registerComponent('Hierarchy', HierarchyPlugin);
+            })(Hierarchy = Plugins.Hierarchy || (Plugins.Hierarchy = {}));
         })(Plugins = Lattice.Plugins || (Lattice.Plugins = {}));
     })(Lattice = Reinforced.Lattice || (Reinforced.Lattice = {}));
 })(Reinforced || (Reinforced = {}));
@@ -8901,15 +9566,19 @@ var Reinforced;
                         else {
                             var prevIdx = this.displayedIndexes();
                             var rows = this._masterTable.Controller.produceRows();
-                            this.destroySpecialRows(rows);
+                            var specialCount = this.destroySpecialRows(rows);
                             this.cutDisplayed(this.Skip, take);
                             rows = this._masterTable.Controller.produceRows();
-                            if (take > rows.length) {
-                                take = rows.length;
+                            if (take > rows.length - specialCount) {
+                                take = rows.length - specialCount;
                                 ea.Take = take;
                             }
-                            for (var j = prevIdx.length; j < rows.length; j++) {
-                                this._masterTable.Renderer.Modifier.appendRow(rows[j]);
+                            if (take !== (rows.length - specialCount)) {
+                                for (var j = prevIdx.length; j < rows.length; j++) {
+                                    if (!rows[j].IsSpecial) {
+                                        this._masterTable.Renderer.Modifier.appendRow(rows[j]);
+                                    }
+                                }
                             }
                             this.restoreSpecialRows(rows);
                             this._masterTable.Events.DataRendered.invokeAfter(this, null);
@@ -8935,12 +9604,18 @@ var Reinforced;
                         }
                     };
                     ClientPartitionService.prototype.destroySpecialRows = function (rows) {
+                        var destroyed = 0;
                         for (var i = 0; i < rows.length / 2; i++) {
-                            if (rows[i].IsSpecial)
+                            if (rows[i].IsSpecial) {
                                 this._masterTable.Renderer.Modifier.destroyRowByIndex(rows[i].Index);
-                            if (rows[rows.length - i - 1].IsSpecial)
+                                destroyed++;
+                            }
+                            if (rows[rows.length - i - 1].IsSpecial) {
                                 this._masterTable.Renderer.Modifier.destroyRowByIndex(rows[rows.length - i - 1].Index);
+                                destroyed++;
+                            }
                         }
+                        return destroyed;
                     };
                     ClientPartitionService.prototype.partitionBeforeQuery = function (serverQuery, clientQuery, isServerQuery) {
                         serverQuery.Partition = {
@@ -9346,6 +10021,240 @@ var Reinforced;
                 Partition.SequentialPartitionService = SequentialPartitionService;
             })(Partition = Services.Partition || (Services.Partition = {}));
         })(Services = Lattice.Services || (Lattice.Services = {}));
+    })(Lattice = Reinforced.Lattice || (Reinforced.Lattice = {}));
+})(Reinforced || (Reinforced = {}));
+///<reference path="../Plugins/PluginBase.ts"/>
+var Reinforced;
+(function (Reinforced) {
+    var Lattice;
+    (function (Lattice) {
+        var Editing;
+        (function (Editing) {
+            var EditorBase = (function (_super) {
+                __extends(EditorBase, _super);
+                function EditorBase() {
+                    _super.apply(this, arguments);
+                    /**
+                     * Collection with editor's recent validation messages
+                     */
+                    this.ValidationMessages = [];
+                }
+                EditorBase.prototype.renderedValidationMessages = function () {
+                    return this.MasterTable.Renderer.renderToString(this.Configuration.ValidationMessagesTemplateId, {
+                        Messages: this.ValidationMessages,
+                        IsRowEdit: this.IsRowEdit,
+                        IsFormEdit: this.IsFormEdit
+                    });
+                };
+                /**
+                 * Retrieves original value for this particular cell editor
+                 *
+                 * @returns {Any} Original, unchanged value
+                 */
+                EditorBase.prototype.getThisOriginalValue = function () {
+                    return this.DataObject[this.Column.RawName];
+                };
+                /**
+                 * Resets editor value to initial settings
+                 */
+                EditorBase.prototype.reset = function () {
+                    this.setValue(this.getThisOriginalValue());
+                };
+                /**
+                 * Returns entered editor value
+                 *
+                 * @returns {}
+                 */
+                EditorBase.prototype.getValue = function (errors) { throw new Error("Not implemented"); };
+                /**
+                 * Sets editor value from the outside
+                 */
+                EditorBase.prototype.setValue = function (value) { throw new Error("Not implemented"); };
+                /**
+                 * Template-bound event raising on changing this editor's value
+                 */
+                EditorBase.prototype.changedHandler = function (e) {
+                    if (this.IsInitialValueSetting)
+                        return;
+                    this.Row.notifyChanged(this);
+                };
+                /**
+                 * Event handler for commit (save edited, ok, submit etc) event raised from inside of CellEditor
+                 * Commit leads to validation. Cell editor should be notified
+                 */
+                EditorBase.prototype.commitHandler = function (e) {
+                    if (this.IsInitialValueSetting)
+                        return;
+                    this.Row.commit(this);
+                };
+                /**
+                 * Event handler for reject (cancel editing) event raised from inside of CellEditor
+                 * Cell editor should be notified
+                 */
+                EditorBase.prototype.rejectHandler = function (e) {
+                    if (this.IsInitialValueSetting)
+                        return;
+                    this.Row.reject(this);
+                };
+                /**
+                 * Called when cell editor has been drawn
+                 *
+                 * @param e HTML element where editor is rendered
+                 * @returns {}
+                 */
+                EditorBase.prototype.onAfterRender = function (e) { };
+                /**
+                 * Needed by editor in some cases
+                 *
+                 * @returns {}
+                 */
+                EditorBase.prototype.focus = function () { };
+                EditorBase.prototype.OriginalContent = function (p) {
+                    Reinforced.Lattice.Templating.Driver.cellContent(this, p);
+                };
+                EditorBase.prototype.notifyObjectChanged = function () { };
+                EditorBase.prototype.defineMessages = function () {
+                    return {};
+                };
+                EditorBase.prototype.getErrorMessage = function (key) {
+                    if (!this._errorMessages.hasOwnProperty(key))
+                        return 'Error';
+                    return this._errorMessages[key];
+                };
+                EditorBase.prototype.init = function (masterTable) {
+                    _super.prototype.init.call(this, masterTable);
+                    this._errorMessages = this.defineMessages();
+                    for (var k in this.Configuration.ValidationMessagesOverride) {
+                        this._errorMessages[k] = this.Configuration.ValidationMessagesOverride[k];
+                    }
+                };
+                return EditorBase;
+            }(Reinforced.Lattice.Plugins.PluginBase));
+            Editing.EditorBase = EditorBase;
+        })(Editing = Lattice.Editing || (Lattice.Editing = {}));
+    })(Lattice = Reinforced.Lattice || (Reinforced.Lattice = {}));
+})(Reinforced || (Reinforced = {}));
+///<reference path="../Plugins/PluginBase.ts"/>
+var Reinforced;
+(function (Reinforced) {
+    var Lattice;
+    (function (Lattice) {
+        var Editing;
+        (function (Editing) {
+            var EditHandlerBase = (function (_super) {
+                __extends(EditHandlerBase, _super);
+                function EditHandlerBase() {
+                    _super.apply(this, arguments);
+                    //#region IRow members
+                    this.Cells = {};
+                    this.IsSpecial = false;
+                    this.ValidationMessages = [];
+                    this.EditorConfigurations = {};
+                }
+                EditHandlerBase.prototype.commit = function (editor) {
+                    throw Error("Not implemented");
+                };
+                EditHandlerBase.prototype.notifyChanged = function (editor) {
+                    throw Error("Not implemented");
+                };
+                EditHandlerBase.prototype.reject = function (editor) {
+                    throw Error("Not implemented");
+                };
+                EditHandlerBase.prototype.dispatchEditResponse = function (editResponse, then) {
+                    if (then)
+                        then();
+                };
+                EditHandlerBase.prototype.isEditable = function (column) {
+                    return this.EditorConfigurations.hasOwnProperty(column.RawName);
+                };
+                EditHandlerBase.prototype.sendDataObjectToServer = function (then) {
+                    var _this = this;
+                    this.MasterTable.Loader.command('Edit', function (r) { return _this.dispatchEditResponse(r, then); }, function (q) {
+                        q.AdditionalData['Edit'] = JSON.stringify(_this.CurrentDataObjectModified);
+                        return q;
+                    });
+                };
+                EditHandlerBase.prototype.hasChanges = function () {
+                    for (var k in this.DataObject) {
+                        if (this.DataObject[k] !== this.CurrentDataObjectModified[k])
+                            return true;
+                    }
+                    return false;
+                };
+                EditHandlerBase.prototype.setEditorValue = function (editor) {
+                    editor.IsInitialValueSetting = true;
+                    editor.setValue(this.CurrentDataObjectModified[editor.FieldName]);
+                    editor.IsInitialValueSetting = false;
+                };
+                EditHandlerBase.prototype.createEditor = function (fieldName, column, canComplete, editorType) {
+                    var editorConf = this.EditorConfigurations[fieldName];
+                    var editor = Lattice.ComponentsContainer.resolveComponent(editorConf.PluginId);
+                    editor.DataObject = this.DataObject;
+                    editor.ModifiedDataObject = this.CurrentDataObjectModified;
+                    editor.Data = this.DataObject[fieldName];
+                    editor.FieldName = fieldName;
+                    editor.Column = column;
+                    editor.CanComplete = canComplete;
+                    editor.IsFormEdit = editorType === EditorMode.Form;
+                    editor.IsRowEdit = editorType === EditorMode.Row;
+                    editor.IsCellEdit = !(editor.IsFormEdit || editor.IsRowEdit);
+                    editor.Row = this;
+                    editor.RawConfig = {
+                        Configuration: editorConf,
+                        Order: 0,
+                        PluginId: editorConf.PluginId,
+                        Placement: '', TemplateId: editorConf.TemplateId
+                    };
+                    editor.init(this.MasterTable);
+                    return editor;
+                };
+                EditHandlerBase.prototype.retrieveEditorData = function (editor, errors) {
+                    var errorsArrayPresent = (!(!errors));
+                    errors = errors || [];
+                    var thisErrors = [];
+                    this.CurrentDataObjectModified[editor.FieldName] = editor.getValue(thisErrors);
+                    for (var j = 0; j < thisErrors.length; j++) {
+                        thisErrors[j].Message = editor.getErrorMessage(thisErrors[j].Code);
+                    }
+                    editor.Data = this.CurrentDataObjectModified[editor.FieldName];
+                    editor.ValidationMessages = thisErrors;
+                    for (var i = 0; i < thisErrors.length; i++) {
+                        errors.push(thisErrors[i]);
+                    }
+                    if (thisErrors.length > 0) {
+                        editor.IsValid = false;
+                        if (editor.VisualStates != null)
+                            editor.VisualStates.changeState('invalid');
+                    }
+                    else {
+                        editor.IsValid = true;
+                        if (editor.VisualStates != null)
+                            editor.VisualStates.normalState();
+                    }
+                    if (!errorsArrayPresent) {
+                        this.ValidationMessages.concat(errors);
+                    }
+                };
+                EditHandlerBase.prototype.init = function (masterTable) {
+                    _super.prototype.init.call(this, masterTable);
+                    for (var i = 0; i < this.Configuration.Fields.length; i++) {
+                        this.EditorConfigurations[this.Configuration.Fields[i].FieldName] = this.Configuration.Fields[i];
+                    }
+                };
+                EditHandlerBase.prototype.subscribe = function (e) {
+                    _super.prototype.subscribe.call(this, e);
+                    e.Adjustment.subscribeAfter(this.onAdjustment.bind(this), 'EditHandler');
+                };
+                return EditHandlerBase;
+            }(Reinforced.Lattice.Plugins.PluginBase));
+            Editing.EditHandlerBase = EditHandlerBase;
+            (function (EditorMode) {
+                EditorMode[EditorMode["Cell"] = 0] = "Cell";
+                EditorMode[EditorMode["Row"] = 1] = "Row";
+                EditorMode[EditorMode["Form"] = 2] = "Form";
+            })(Editing.EditorMode || (Editing.EditorMode = {}));
+            var EditorMode = Editing.EditorMode;
+        })(Editing = Lattice.Editing || (Lattice.Editing = {}));
     })(Lattice = Reinforced.Lattice || (Reinforced.Lattice = {}));
 })(Reinforced || (Reinforced = {}));
 ///<reference path="PluginBase.ts"/>
@@ -9763,891 +10672,6 @@ var Reinforced;
                 Lattice.ComponentsContainer.registerComponent('Loading', LoadingPlugin);
             })(Loading = Plugins.Loading || (Plugins.Loading = {}));
         })(Plugins = Lattice.Plugins || (Lattice.Plugins = {}));
-    })(Lattice = Reinforced.Lattice || (Reinforced.Lattice = {}));
-})(Reinforced || (Reinforced = {}));
-///<reference path="PluginBase.ts"/>
-var Reinforced;
-(function (Reinforced) {
-    var Lattice;
-    (function (Lattice) {
-        var Plugins;
-        (function (Plugins) {
-            var Hierarchy;
-            (function (Hierarchy) {
-                var HierarchyPlugin = (function (_super) {
-                    __extends(HierarchyPlugin, _super);
-                    function HierarchyPlugin() {
-                        _super.apply(this, arguments);
-                        this._globalHierarchy = {};
-                        this._currentHierarchy = {};
-                        this._notInHierarchy = {};
-                    }
-                    HierarchyPlugin.prototype.init = function (masterTable) {
-                        _super.prototype.init.call(this, masterTable);
-                        this._parentKeyFunction = this.MasterTable.DataHolder
-                            .compileKeyFunction(this.Configuration.ParentKeyFields);
-                        //this.MasterTable.DataHolder.registerClientOrdering("TreeOrder", this.hierarchicalOrder.bind(this));
-                        this.MasterTable.DataHolder.registerClientFilter(this);
-                    };
-                    //#region Event catchers
-                    HierarchyPlugin.prototype.expandRow = function (args) {
-                        this.toggleSubtreeByObject(this.MasterTable.DataHolder.StoredCache[args.Row], true);
-                    };
-                    HierarchyPlugin.prototype.expandLoadRow = function (args) {
-                        this.loadRow(this.MasterTable.DataHolder.StoredCache[args.Row]);
-                    };
-                    HierarchyPlugin.prototype.toggleLoadRow = function (args) {
-                        this.toggleSubtreeOrLoad(this.MasterTable.DataHolder.StoredCache[args.Row], null);
-                    };
-                    HierarchyPlugin.prototype.collapseRow = function (args) {
-                        this.toggleSubtreeByObject(this.MasterTable.DataHolder.StoredCache[args.Row], false);
-                    };
-                    HierarchyPlugin.prototype.toggleRow = function (args) {
-                        this.toggleSubtreeByObject(this.MasterTable.DataHolder.StoredCache[args.Row], null);
-                    };
-                    //#endregion
-                    HierarchyPlugin.prototype.toggleSubtreeOrLoad = function (dataObject, turnOpen) {
-                        if (dataObject == null || dataObject == undefined)
-                            return;
-                        if (turnOpen == null || turnOpen == undefined)
-                            turnOpen = !dataObject.__isExpanded;
-                        if (dataObject.__isExpanded === turnOpen)
-                            return;
-                        if (turnOpen) {
-                            if (dataObject.__isLoaded)
-                                this.expand(dataObject);
-                            else
-                                this.loadRow(dataObject);
-                        }
-                        else
-                            this.collapse(dataObject, true);
-                    };
-                    HierarchyPlugin.prototype.toggleSubtreeByObject = function (dataObject, turnOpen) {
-                        if (dataObject == null || dataObject == undefined)
-                            return;
-                        if (turnOpen == null || turnOpen == undefined)
-                            turnOpen = !dataObject.__isExpanded;
-                        if (dataObject.__isExpanded === turnOpen)
-                            return;
-                        if (turnOpen)
-                            this.expand(dataObject);
-                        else
-                            this.collapse(dataObject, true);
-                    };
-                    HierarchyPlugin.prototype.loadRow = function (dataObject) {
-                        var _this = this;
-                        dataObject.IsLoading = true;
-                        dataObject.IsExpanded = true;
-                        dataObject.__isExpanded = true;
-                        this.MasterTable.Controller.redrawVisibleDataObject(dataObject);
-                        this.MasterTable.Commands.triggerCommand('_Children', dataObject, function () {
-                            dataObject.IsLoading = false;
-                            dataObject.__isLoaded = true;
-                            _this.MasterTable.Controller.redrawVisibleDataObject(dataObject);
-                        });
-                        return;
-                    };
-                    HierarchyPlugin.prototype.isParentExpanded = function (dataObject) {
-                        if (dataObject.__parent == null)
-                            return true;
-                        var parent = this.MasterTable.DataHolder.getByPrimaryKey(dataObject.__parent);
-                        return parent.__isExpanded;
-                    };
-                    //#region Expand
-                    HierarchyPlugin.prototype.expand = function (dataObject) {
-                        dataObject.IsExpanded = true;
-                        dataObject.__isExpanded = true;
-                        if (!this.isParentExpanded(dataObject))
-                            return;
-                        var toggled = this.toggleVisibleChildren(dataObject, true);
-                        var st = this.MasterTable.DataHolder.StoredCache;
-                        this.MasterTable.Controller.redrawVisibleDataObject(dataObject);
-                        var src = [];
-                        for (var i = 0; i < toggled.length; i++) {
-                            src.push(st[toggled[i]]);
-                        }
-                        src = this.MasterTable.DataHolder.orderWithCurrentOrderings(src);
-                        src = this.orderHierarchy(src, dataObject.Deepness + 1);
-                        var ordered = this.MasterTable.DataHolder.Ordered;
-                        var displayed = this.MasterTable.DataHolder.DisplayedData;
-                        var orderedIdx = ordered.indexOf(dataObject);
-                        this.MasterTable.DataHolder.Ordered.splice.apply(this.MasterTable.DataHolder.Ordered, [orderedIdx + 1, 0].concat(src));
-                        var pos = displayed.indexOf(dataObject);
-                        var newNodes = src;
-                        // if we added more rows and partition's take was enabled
-                        // then we must cut it to prevent redundant nodes
-                        // creation
-                        var existingDisplayed = this.MasterTable.DataHolder.DisplayedData.length;
-                        var head = displayed.slice(0, pos + 1), tail = displayed.slice(pos + 1);
-                        var rows = null;
-                        if (this.MasterTable.Partition.Take > 0) {
-                            if (pos === existingDisplayed - 1) {
-                                // if we expanded last row then it is nothing to add
-                                // we can just fire PartitionChanged event and quit
-                                this.firePartitionChange();
-                                return;
-                            }
-                            // head and tail are displaying
-                            var totallength = head.length + newNodes.length + tail.length;
-                            // if we will add all nodes right after original, removing last nodes
-                            // - will there be enough space?
-                            if (totallength > this.MasterTable.Partition.Take) {
-                                // ok, doesnt fit, lets cut
-                                var needToCut = totallength - this.MasterTable.Partition.Take;
-                                // first, we cut tail
-                                if (needToCut < tail.length) {
-                                    // if it is enough to cut tail - ok
-                                    this.removeNLastRows(needToCut);
-                                    tail = tail.slice(0, tail.length - needToCut);
-                                    this.appendNodes(newNodes, tail);
-                                }
-                                else {
-                                    // else we remove whole tail
-                                    this.removeNLastRows(tail.length);
-                                    needToCut -= tail.length;
-                                    tail = [];
-                                    if (needToCut > 0) {
-                                        // and cut off some new nodes
-                                        newNodes = newNodes.slice(0, newNodes.length - needToCut);
-                                    }
-                                    rows = this.MasterTable.Controller.produceRowsFromData(newNodes);
-                                    for (var j = 0; j < rows.length; j++) {
-                                        this.MasterTable.Renderer.Modifier.appendRow(rows[j]);
-                                    }
-                                }
-                            }
-                            else {
-                                // otherwise - we do not have to cut anything
-                                this.appendNodes(newNodes, tail);
-                            }
-                        }
-                        else {
-                            // if take is set to all - we simply add new rows at needed index
-                            this.appendNodes(newNodes, tail);
-                        }
-                        this.MasterTable.DataHolder.DisplayedData = head.concat(newNodes, tail);
-                        this.firePartitionChange();
-                    };
-                    HierarchyPlugin.prototype.appendNodes = function (newNodes, tail) {
-                        var beforeIdx = tail.length === 0 ? null : tail[0]['__i'];
-                        var rows = this.MasterTable.Controller.produceRowsFromData(newNodes);
-                        for (var j = 0; j < rows.length; j++) {
-                            this.MasterTable.Renderer.Modifier.appendRow(rows[j], beforeIdx);
-                        }
-                    };
-                    HierarchyPlugin.prototype.firePartitionChange = function (tk, sk) {
-                        tk = tk == null ? this.MasterTable.Partition.Take : tk;
-                        sk = sk == null ? this.MasterTable.Partition.Skip : sk;
-                        var prevTk = this.MasterTable.Partition.Take;
-                        var prevSk = this.MasterTable.Partition.Skip;
-                        this.MasterTable.Partition.Take = tk;
-                        this.MasterTable.Partition.Skip = sk;
-                        this.MasterTable.Events.PartitionChanged.invokeAfter(this, {
-                            Take: tk, PreviousTake: prevTk, Skip: sk, PreviousSkip: prevSk
-                        });
-                    };
-                    HierarchyPlugin.prototype.removeNLastRows = function (n) {
-                        var last = this.MasterTable.DataHolder
-                            .DisplayedData[this.MasterTable.DataHolder.DisplayedData.length - 1];
-                        var lastRow = this.MasterTable.Renderer.Locator.getRowElementByObject(last);
-                        for (var i = 0; i < n; i++) {
-                            var lr = lastRow.previousElementSibling;
-                            this.MasterTable.Renderer.Modifier.destroyElement(lastRow);
-                            lastRow = lr;
-                        }
-                    };
-                    HierarchyPlugin.prototype.toggleVisibleChildren = function (dataObject, visible, hierarchy) {
-                        if (!hierarchy)
-                            hierarchy = this._currentHierarchy;
-                        var subtree = hierarchy[dataObject.__i];
-                        if (!subtree)
-                            return [];
-                        var result = [];
-                        for (var i = 0; i < subtree.length; i++) {
-                            var child = this.MasterTable.DataHolder.StoredCache[subtree[i]];
-                            var nodeToggled = this.toggleVisible(child, visible);
-                            result = result.concat(nodeToggled);
-                        }
-                        return result;
-                    };
-                    HierarchyPlugin.prototype.toggleVisible = function (dataObject, visible, hierarchy) {
-                        if (!hierarchy)
-                            hierarchy = this._currentHierarchy;
-                        var result = [dataObject.__i];
-                        dataObject.__visible = visible;
-                        if (!dataObject.__isExpanded)
-                            return result;
-                        var subtree = hierarchy[dataObject.__i];
-                        for (var j = 0; j < subtree.length; j++) {
-                            var obj = this.MasterTable.DataHolder.StoredCache[subtree[j]];
-                            obj.__visible = visible;
-                            result = result.concat(this.toggleVisible(obj, visible));
-                        }
-                        return result;
-                    };
-                    //#endregion
-                    //#region Collapse
-                    HierarchyPlugin.prototype.collapse = function (dataObject, redraw) {
-                        dataObject.IsExpanded = false;
-                        dataObject.__isExpanded = false;
-                        if (!this.isParentExpanded(dataObject))
-                            return;
-                        var displayed = this.MasterTable.DataHolder.DisplayedData;
-                        var ordered = this.MasterTable.DataHolder.Ordered;
-                        var hidden = this.toggleVisibleChildren(dataObject, false);
-                        var hiddenCount = hidden.length;
-                        this.MasterTable.Controller.redrawVisibleDataObject(dataObject);
-                        var row = this.MasterTable.Renderer.Locator.getRowElementByIndex(dataObject.__i);
-                        var orIdx = ordered.indexOf(dataObject);
-                        var dIdx = displayed.indexOf(dataObject);
-                        ordered.splice(orIdx + 1, hiddenCount);
-                        var oldDisplayedLength = displayed.length;
-                        var displayedHidden = displayed.splice(dIdx + 1, hiddenCount).length;
-                        var head = [];
-                        var stay = displayed.splice(dIdx + 1);
-                        var tail = ordered.slice(orIdx + 1 + stay.length, orIdx + 1 + stay.length + displayedHidden);
-                        var increaseTail = 0;
-                        var nskip = null;
-                        var totalLength = displayed.length + stay.length + tail.length;
-                        if (totalLength < oldDisplayedLength && this.MasterTable.Partition.Skip > 0) {
-                            nskip = this.MasterTable.Partition.Skip;
-                            nskip -= (oldDisplayedLength - totalLength);
-                            if (nskip < 0) {
-                                increaseTail = -nskip;
-                                nskip = 0;
-                            }
-                            head = ordered.slice(nskip, this.MasterTable.Partition.Skip);
-                        }
-                        if (increaseTail > 0) {
-                            tail = ordered.slice(orIdx + 1 + stay.length, orIdx + 1 + displayedHidden + increaseTail + stay.length);
-                        }
-                        displayed = head.concat(displayed, stay, tail);
-                        this.MasterTable.DataHolder.DisplayedData = displayed;
-                        console.log(displayed.length);
-                        if (redraw) {
-                            //first, we remove all the related elements
-                            var ne = row.nextElementSibling;
-                            for (var i = 0; i < displayedHidden; i++) {
-                                var n = ne.nextElementSibling;
-                                this.MasterTable.Renderer.Modifier.destroyElement(ne);
-                                ne = n;
-                            }
-                            var rows = null;
-                            if (head.length > 0) {
-                                rows = this.MasterTable.Controller.produceRowsFromData(head);
-                                for (var k = rows.length - 1; k >= 0; k--) {
-                                    this.MasterTable.Renderer.Modifier.prependRow(rows[k]);
-                                }
-                            }
-                            if (tail.length > 0) {
-                                rows = this.MasterTable.Controller.produceRowsFromData(tail);
-                                for (var l = 0; l < rows.length; l++) {
-                                    this.MasterTable.Renderer.Modifier.appendRow(rows[l]);
-                                }
-                            }
-                            this.firePartitionChange(null, nskip);
-                        }
-                    };
-                    //#endregion
-                    //#region Refilter and reorder
-                    HierarchyPlugin.prototype.onFiltered_after = function () {
-                        var src = this.MasterTable.DataHolder.Filtered;
-                        var needSeparateHierarchy = true;
-                        if (src.length === this.MasterTable.DataHolder.StoredData.length) {
-                            this._currentHierarchy = this._globalHierarchy;
-                            needSeparateHierarchy = false;
-                            this.restoreHierarchyData(src);
-                        }
-                        var expandParents = this.Configuration.CollapsedNodeFilterBehavior ===
-                            Hierarchy.TreeCollapsedNodeFilterBehavior.IncludeCollapsed;
-                        if (expandParents) {
-                            this.expandParents(src);
-                        }
-                        //if (this.Configuration.CollapsedNodeFilterBehavior === TreeCollapsedNodeFilterBehavior.ExcludeCollapsed) {
-                        var cpy = [];
-                        for (var i = 0; i < src.length; i++) {
-                            if (src[i].__visible)
-                                cpy.push(src[i]);
-                        }
-                        src = cpy;
-                        //}
-                        if (needSeparateHierarchy)
-                            this.buildCurrentHierarchy(src);
-                        this.MasterTable.DataHolder.Filtered = src;
-                    };
-                    HierarchyPlugin.prototype.expandParents = function (src) {
-                        var addParents = {};
-                        for (var j = 0; j < src.length; j++) {
-                            this.addParents(src[j], addParents);
-                        }
-                        for (var l = 0; l < src.length; l++) {
-                            if (addParents[src[l]['__i']]) {
-                                delete addParents[src[l]['__i']];
-                            }
-                        }
-                        for (var k in addParents) {
-                            var obj = this.MasterTable.DataHolder.StoredCache[k];
-                            obj.IsExpanded = true;
-                            obj.__isExpanded = true;
-                            this.toggleVisibleChildren(obj, true);
-                            src.push(obj);
-                        }
-                    };
-                    HierarchyPlugin.prototype.restoreHierarchyData = function (d) {
-                        for (var k = 0; k < d.length; k++) {
-                            var o = d[k];
-                            o.__serverChildrenCount = o.ChildrenCount;
-                            o.LocalChildrenCount = this._globalHierarchy[o['__i']].length;
-                            o.__visible = this.visible(o);
-                        }
-                    };
-                    HierarchyPlugin.prototype.buildCurrentHierarchy = function (d) {
-                        this._currentHierarchy = {};
-                        for (var i = 0; i < d.length; i++) {
-                            var idx = d[i].__i;
-                            this._currentHierarchy[idx] = [];
-                            for (var j = 0; j < d.length; j++) {
-                                if (d[j].__parent === d[i].__key) {
-                                    this._currentHierarchy[idx].push(d[j].__i);
-                                }
-                            }
-                        }
-                        for (var k = 0; k < d.length; k++) {
-                            var o = d[k];
-                            o.LocalChildrenCount = this._currentHierarchy[o['__i']].length;
-                        }
-                    };
-                    HierarchyPlugin.prototype.addParents = function (o, existing) {
-                        if (o.__parent == null)
-                            return;
-                        while (o.__parent != null) {
-                            o = this.MasterTable.DataHolder.getByPrimaryKey(o.__parent);
-                            existing[o.__i] = true;
-                        }
-                    };
-                    HierarchyPlugin.prototype.onOrdered_after = function () {
-                        var src = this.MasterTable.DataHolder.Ordered;
-                        this.MasterTable.DataHolder.Ordered = this.orderHierarchy(src, 0);
-                    };
-                    HierarchyPlugin.prototype.orderHierarchy = function (src, minDeepness) {
-                        var filteredHierarchy = this.buildHierarchy(src, minDeepness);
-                        var target = [];
-                        for (var i = 0; i < filteredHierarchy.roots.length; i++) {
-                            this.appendChildren(target, filteredHierarchy.roots[i], filteredHierarchy.Hierarchy);
-                        }
-                        return target;
-                    };
-                    HierarchyPlugin.prototype.appendChildren = function (target, index, hierarchy) {
-                        var thisNode = this.MasterTable.DataHolder.StoredCache[index];
-                        target.push(thisNode);
-                        for (var i = 0; i < hierarchy[index].length; i++) {
-                            this.appendChildren(target, hierarchy[index][i], hierarchy);
-                        }
-                    };
-                    HierarchyPlugin.prototype.buildHierarchy = function (d, minDeepness) {
-                        var result = {};
-                        var roots = [];
-                        for (var i = 0; i < d.length; i++) {
-                            var idx = d[i].__i;
-                            result[idx] = [];
-                            if (d[i].Deepness === minDeepness)
-                                roots.push(d[i].__i);
-                            for (var j = 0; j < d.length; j++) {
-                                if (d[j].__parent === d[i].__key) {
-                                    result[idx].push(d[j].__i);
-                                }
-                            }
-                        }
-                        return {
-                            roots: roots,
-                            Hierarchy: result
-                        };
-                    };
-                    //#endregion
-                    //#region Initial cache
-                    HierarchyPlugin.prototype.isParentNull = function (dataObject) {
-                        for (var i = 0; i < this.Configuration.ParentKeyFields.length; i++) {
-                            if (dataObject[this.Configuration.ParentKeyFields[i]] != null)
-                                return false;
-                        }
-                        return true;
-                    };
-                    HierarchyPlugin.prototype.deepness = function (obj) {
-                        var result = 0;
-                        while (obj.__parent != null) {
-                            result++;
-                            obj = this.MasterTable.DataHolder.getByPrimaryKey(obj.__parent);
-                            if (!obj)
-                                throw new Error("Fields " + this.Configuration.ParentKeyFields
-                                    .concat(', ') + " must be all null in root nodes");
-                        }
-                        return result;
-                    };
-                    HierarchyPlugin.prototype.visible = function (obj) {
-                        var vis = this.MasterTable.DataHolder.satisfyCurrentFilters(obj);
-                        if (!vis)
-                            return false;
-                        while (obj.__parent != null) {
-                            obj = this.MasterTable.DataHolder.getByPrimaryKey(obj.__parent);
-                            if (!obj.__isExpanded)
-                                return false;
-                        }
-                        return true;
-                    };
-                    HierarchyPlugin.prototype.onDataReceived_after = function (e) {
-                        if (e.EventArgs.IsAdjustment)
-                            return;
-                        var d = this.MasterTable.DataHolder.StoredData;
-                        this._globalHierarchy = {};
-                        for (var i = 0; i < d.length; i++) {
-                            var idx = d[i].__i;
-                            this._globalHierarchy[idx] = [];
-                            d[i].__isExpanded = d[i].IsExpanded;
-                            for (var j = 0; j < d.length; j++) {
-                                if (!d[j].__parent) {
-                                    if (this.isParentNull(d[j]))
-                                        d[j].__parent = null;
-                                    else
-                                        d[j].__parent = this._parentKeyFunction(d[j]);
-                                }
-                                if (d[j].__parent === d[i].__key) {
-                                    this._globalHierarchy[idx].push(d[j].__i);
-                                }
-                            }
-                        }
-                        for (var k = 0; k < this.MasterTable.DataHolder.StoredData.length; k++) {
-                            var o = this.MasterTable.DataHolder.StoredData[k];
-                            o.__serverChildrenCount = o.ChildrenCount;
-                            o.LocalChildrenCount = this._globalHierarchy[o['__i']].length;
-                            o.Deepness = this.deepness(o);
-                            o.__visible = this.visible(o);
-                        }
-                    };
-                    //#endregion
-                    HierarchyPlugin.prototype.setServerChildrenCount = function (dataObject) {
-                        dataObject.ChildrenCount = dataObject.__serverChildrenCount;
-                    };
-                    HierarchyPlugin.prototype.setLocalChildrenCount = function (dataObject) {
-                        dataObject.ChildrenCount = dataObject.LocalChildrenCount;
-                    };
-                    HierarchyPlugin.prototype.setChildrenCount = function (dataObject, count) {
-                        dataObject.ChildrenCount = count;
-                    };
-                    //#region Processing adjustments
-                    HierarchyPlugin.prototype.proceedAddedData = function (added) {
-                        for (var i = 0; i < added.length; i++) {
-                            if (this.isParentNull(added[i]))
-                                added[i].__parent = null;
-                            else
-                                added[i].__parent = this._parentKeyFunction(added[i]);
-                            this._globalHierarchy[added[i]['__i']] = [];
-                        }
-                        for (var j = 0; j < added.length; j++) {
-                            if (added[j].__parent != null) {
-                                var parent = this.MasterTable.DataHolder.getByPrimaryKey(added[j].__parent);
-                                this._globalHierarchy[parent['__i']].push(added[j]['__i']);
-                            }
-                        }
-                        for (var k = 0; k < added.length; k++) {
-                            var o = added[k];
-                            o.__serverChildrenCount = o.ChildrenCount;
-                            o.LocalChildrenCount = this._globalHierarchy[o['__i']].length;
-                            o.Deepness = this.deepness(o);
-                            o.__visible = this.visible(o);
-                        }
-                    };
-                    HierarchyPlugin.prototype.proceedUpdatedData = function (d) {
-                        var obj = null;
-                        for (var i = 0; i < d.length; i++) {
-                            obj = d[i];
-                            var newParent = null;
-                            if (!this.isParentNull(d[i]))
-                                newParent = this._parentKeyFunction(obj);
-                            this.moveItem(obj, newParent);
-                        }
-                        for (var j = 0; j < d.length; j++) {
-                            obj = d[j];
-                            if (obj.__isExpanded !== obj.IsExpanded) {
-                                if (obj.IsExpanded) {
-                                    obj.__isExpanded = true;
-                                    this.toggleVisibleChildren(obj, true, this._globalHierarchy);
-                                }
-                                else {
-                                    obj.__isExpanded = false;
-                                    this.toggleVisibleChildren(obj, false, this._globalHierarchy);
-                                }
-                            }
-                        }
-                    };
-                    HierarchyPlugin.prototype.moveItems = function (items, newParent) {
-                        var newParentKey = (!newParent) ? null : newParent.__key;
-                        for (var i = 0; i < items.length; i++) {
-                            this.moveItem(items[i], newParentKey);
-                        }
-                        this.MasterTable.DataHolder.filterStoredDataWithPreviousQuery();
-                        this.MasterTable.Controller.redrawVisibleData();
-                    };
-                    HierarchyPlugin.prototype.moveItem = function (dataObject, newParentKey) {
-                        var oldParent = dataObject.__parent;
-                        // first, remove item from old parent
-                        if (oldParent != null) {
-                            var oldParentObj = this.MasterTable.DataHolder.getByPrimaryKey(oldParent);
-                            if (!oldParentObj) {
-                                // old parent is removed => item is out of hierarchy
-                                this.moveFromNotInHierarchy(dataObject.__key, newParentKey);
-                                return;
-                            }
-                            // if not => remove from global hierarchy
-                            var op = this._globalHierarchy[oldParentObj['__i']];
-                            var idx = op.indexOf(dataObject['__i']);
-                            if (idx > -1)
-                                op.splice(idx, 1);
-                        }
-                        if (newParentKey == null) {
-                            dataObject.__visible = this.MasterTable.DataHolder.satisfyCurrentFilters(dataObject);
-                            return;
-                        } // if we move it to root - no add. action required
-                        var newParentObj = this.MasterTable.DataHolder.getByPrimaryKey(newParentKey);
-                        if (!newParentObj)
-                            throw new Error("Cannot find parent " + newParentKey + " to move"); // oops
-                        dataObject.__parent = newParentObj['__i'];
-                        dataObject.__visible = newParentObj.__isExpanded && this.MasterTable.DataHolder.satisfyCurrentFilters(dataObject);
-                    };
-                    HierarchyPlugin.prototype.moveFromNotInHierarchy = function (key, newParentKey) {
-                        if (!this._notInHierarchy[key])
-                            return;
-                        var targetObj = this.MasterTable.DataHolder.getByPrimaryKey(key);
-                        if (!targetObj)
-                            return;
-                        var subtree = [];
-                        this._globalHierarchy[targetObj['__i']] = subtree;
-                        if (newParentKey == null) {
-                            targetObj['__parent'] = null;
-                        }
-                        else {
-                            var newParentObj = this.MasterTable.DataHolder.getByPrimaryKey(newParentKey);
-                            if (!newParentObj)
-                                throw new Error("Cannot find parent " + newParentKey + " to move from outside of tree"); // oops
-                            targetObj['__parent'] = newParentKey;
-                            var parentSubtree = this._globalHierarchy[newParentObj['__i']];
-                            parentSubtree.push(targetObj['__i']);
-                            targetObj.__visible = newParentObj.__isExpanded && this.MasterTable.DataHolder.satisfyCurrentFilters(targetObj);
-                        }
-                        var children = this._notInHierarchy[key];
-                        for (var i = 0; i < children.length; i++) {
-                            this.moveFromNotInHierarchy(children[i], targetObj.__key);
-                        }
-                        delete this._notInHierarchy[key];
-                    };
-                    HierarchyPlugin.prototype.cleanupNotInHierarchy = function () {
-                        for (var nk in this._notInHierarchy) {
-                            for (var i = 0; i < this._notInHierarchy[nk].length; i++) {
-                                this.MasterTable.DataHolder.detachByKey(this._notInHierarchy[nk][i]);
-                            }
-                            this.MasterTable.DataHolder.detachByKey(nk);
-                        }
-                        this._notInHierarchy = {};
-                    };
-                    HierarchyPlugin.prototype.onAdjustment_after = function (e) {
-                        var data = e.EventArgs;
-                        this.proceedAddedData(data.AddedData);
-                        this.proceedUpdatedData(data.TouchedData);
-                        this.cleanupNotInHierarchy();
-                        data.NeedRefilter = true;
-                    };
-                    HierarchyPlugin.prototype.onAdjustment_before = function (e) {
-                        var data = e.EventArgs;
-                        var rk = data.RemoveKeys;
-                        this._notInHierarchy = {};
-                        for (var i = 0; i < rk.length; i++) {
-                            var toRemove = this.MasterTable.DataHolder.getByPrimaryKey(rk[i]);
-                            this.removeFromHierarchySubtrees(toRemove, this._globalHierarchy);
-                            this.removeFromHierarchySubtrees(toRemove, this._currentHierarchy);
-                            this.moveToNotInHierarchy(toRemove['__i']);
-                        }
-                    };
-                    HierarchyPlugin.prototype.moveToNotInHierarchy = function (parent) {
-                        var subtree = this._globalHierarchy[parent];
-                        var parentObj = this.MasterTable.DataHolder.StoredCache[parent];
-                        if (!parentObj)
-                            return;
-                        var childKeys = [];
-                        this._notInHierarchy[parent['__key']] = childKeys;
-                        for (var i = 0; i < subtree.length; i++) {
-                            var subObj = this.MasterTable.DataHolder.StoredCache[subtree[i]];
-                            if (subObj) {
-                                childKeys.push(subObj['__key']);
-                            }
-                        }
-                        for (var j = 0; j < subtree.length; j++) {
-                            this.moveToNotInHierarchy(subtree[j]);
-                        }
-                    };
-                    HierarchyPlugin.prototype.removeFromHierarchySubtrees = function (toRemove, hierarchy) {
-                        if (toRemove.__parent != null) {
-                            var parent = this.MasterTable.DataHolder.getByPrimaryKey(toRemove.__parent);
-                            if (hierarchy[parent['__i']]) {
-                                var subtree = hierarchy[parent['__i']];
-                                var idx = subtree.indexOf(toRemove['__i']);
-                                if (idx > -1) {
-                                    subtree.splice(idx, 1);
-                                }
-                            }
-                        }
-                    };
-                    //#endregion
-                    HierarchyPlugin.prototype.subscribe = function (e) {
-                        e.DataReceived.subscribeAfter(this.onDataReceived_after.bind(this), 'hierarchy');
-                        e.Filtered.subscribeAfter(this.onFiltered_after.bind(this), 'hierarchy');
-                        e.Ordered.subscribeAfter(this.onOrdered_after.bind(this), 'hierarchy');
-                        e.Adjustment.subscribeAfter(this.onAdjustment_after.bind(this), 'hierarchy');
-                        e.Adjustment.subscribeBefore(this.onAdjustment_before.bind(this), 'hierarchy');
-                    };
-                    // we implement this only to assure DataHolder to refilter data
-                    // but actually we are refiltering it later
-                    HierarchyPlugin.prototype.filterPredicate = function (rowObject, query) {
-                        return true;
-                    };
-                    return HierarchyPlugin;
-                }(Reinforced.Lattice.Plugins.PluginBase));
-                Hierarchy.HierarchyPlugin = HierarchyPlugin;
-                Lattice.ComponentsContainer.registerComponent('Hierarchy', HierarchyPlugin);
-            })(Hierarchy = Plugins.Hierarchy || (Plugins.Hierarchy = {}));
-        })(Plugins = Lattice.Plugins || (Lattice.Plugins = {}));
-    })(Lattice = Reinforced.Lattice || (Reinforced.Lattice = {}));
-})(Reinforced || (Reinforced = {}));
-///<reference path="../Plugins/PluginBase.ts"/>
-var Reinforced;
-(function (Reinforced) {
-    var Lattice;
-    (function (Lattice) {
-        var Editing;
-        (function (Editing) {
-            var EditorBase = (function (_super) {
-                __extends(EditorBase, _super);
-                function EditorBase() {
-                    _super.apply(this, arguments);
-                    /**
-                     * Collection with editor's recent validation messages
-                     */
-                    this.ValidationMessages = [];
-                }
-                EditorBase.prototype.renderedValidationMessages = function () {
-                    return this.MasterTable.Renderer.renderToString(this.Configuration.ValidationMessagesTemplateId, {
-                        Messages: this.ValidationMessages,
-                        IsRowEdit: this.IsRowEdit,
-                        IsFormEdit: this.IsFormEdit
-                    });
-                };
-                /**
-                 * Retrieves original value for this particular cell editor
-                 *
-                 * @returns {Any} Original, unchanged value
-                 */
-                EditorBase.prototype.getThisOriginalValue = function () {
-                    return this.DataObject[this.Column.RawName];
-                };
-                /**
-                 * Resets editor value to initial settings
-                 */
-                EditorBase.prototype.reset = function () {
-                    this.setValue(this.getThisOriginalValue());
-                };
-                /**
-                 * Returns entered editor value
-                 *
-                 * @returns {}
-                 */
-                EditorBase.prototype.getValue = function (errors) { throw new Error("Not implemented"); };
-                /**
-                 * Sets editor value from the outside
-                 */
-                EditorBase.prototype.setValue = function (value) { throw new Error("Not implemented"); };
-                /**
-                 * Template-bound event raising on changing this editor's value
-                 */
-                EditorBase.prototype.changedHandler = function (e) {
-                    if (this.IsInitialValueSetting)
-                        return;
-                    this.Row.notifyChanged(this);
-                };
-                /**
-                 * Event handler for commit (save edited, ok, submit etc) event raised from inside of CellEditor
-                 * Commit leads to validation. Cell editor should be notified
-                 */
-                EditorBase.prototype.commitHandler = function (e) {
-                    if (this.IsInitialValueSetting)
-                        return;
-                    this.Row.commit(this);
-                };
-                /**
-                 * Event handler for reject (cancel editing) event raised from inside of CellEditor
-                 * Cell editor should be notified
-                 */
-                EditorBase.prototype.rejectHandler = function (e) {
-                    if (this.IsInitialValueSetting)
-                        return;
-                    this.Row.reject(this);
-                };
-                /**
-                 * Called when cell editor has been drawn
-                 *
-                 * @param e HTML element where editor is rendered
-                 * @returns {}
-                 */
-                EditorBase.prototype.onAfterRender = function (e) { };
-                /**
-                 * Needed by editor in some cases
-                 *
-                 * @returns {}
-                 */
-                EditorBase.prototype.focus = function () { };
-                EditorBase.prototype.OriginalContent = function (p) {
-                    Reinforced.Lattice.Templating.Driver.cellContent(this, p);
-                };
-                EditorBase.prototype.notifyObjectChanged = function () { };
-                EditorBase.prototype.defineMessages = function () {
-                    return {};
-                };
-                EditorBase.prototype.getErrorMessage = function (key) {
-                    if (!this._errorMessages.hasOwnProperty(key))
-                        return 'Error';
-                    return this._errorMessages[key];
-                };
-                EditorBase.prototype.init = function (masterTable) {
-                    _super.prototype.init.call(this, masterTable);
-                    this._errorMessages = this.defineMessages();
-                    for (var k in this.Configuration.ValidationMessagesOverride) {
-                        this._errorMessages[k] = this.Configuration.ValidationMessagesOverride[k];
-                    }
-                };
-                return EditorBase;
-            }(Reinforced.Lattice.Plugins.PluginBase));
-            Editing.EditorBase = EditorBase;
-        })(Editing = Lattice.Editing || (Lattice.Editing = {}));
-    })(Lattice = Reinforced.Lattice || (Reinforced.Lattice = {}));
-})(Reinforced || (Reinforced = {}));
-///<reference path="../Plugins/PluginBase.ts"/>
-var Reinforced;
-(function (Reinforced) {
-    var Lattice;
-    (function (Lattice) {
-        var Editing;
-        (function (Editing) {
-            var EditHandlerBase = (function (_super) {
-                __extends(EditHandlerBase, _super);
-                function EditHandlerBase() {
-                    _super.apply(this, arguments);
-                    //#region IRow members
-                    this.Cells = {};
-                    this.IsSpecial = false;
-                    this.ValidationMessages = [];
-                    this.EditorConfigurations = {};
-                }
-                EditHandlerBase.prototype.commit = function (editor) {
-                    throw Error("Not implemented");
-                };
-                EditHandlerBase.prototype.notifyChanged = function (editor) {
-                    throw Error("Not implemented");
-                };
-                EditHandlerBase.prototype.reject = function (editor) {
-                    throw Error("Not implemented");
-                };
-                EditHandlerBase.prototype.dispatchEditResponse = function (editResponse, then) {
-                    if (then)
-                        then();
-                };
-                EditHandlerBase.prototype.isEditable = function (column) {
-                    return this.EditorConfigurations.hasOwnProperty(column.RawName);
-                };
-                EditHandlerBase.prototype.sendDataObjectToServer = function (then) {
-                    var _this = this;
-                    this.MasterTable.Loader.command('Edit', function (r) { return _this.dispatchEditResponse(r, then); }, function (q) {
-                        q.AdditionalData['Edit'] = JSON.stringify(_this.CurrentDataObjectModified);
-                        return q;
-                    });
-                };
-                EditHandlerBase.prototype.hasChanges = function () {
-                    for (var k in this.DataObject) {
-                        if (this.DataObject[k] !== this.CurrentDataObjectModified[k])
-                            return true;
-                    }
-                    return false;
-                };
-                EditHandlerBase.prototype.setEditorValue = function (editor) {
-                    editor.IsInitialValueSetting = true;
-                    editor.setValue(this.CurrentDataObjectModified[editor.FieldName]);
-                    editor.IsInitialValueSetting = false;
-                };
-                EditHandlerBase.prototype.createEditor = function (fieldName, column, canComplete, editorType) {
-                    var editorConf = this.EditorConfigurations[fieldName];
-                    var editor = Lattice.ComponentsContainer.resolveComponent(editorConf.PluginId);
-                    editor.DataObject = this.DataObject;
-                    editor.ModifiedDataObject = this.CurrentDataObjectModified;
-                    editor.Data = this.DataObject[fieldName];
-                    editor.FieldName = fieldName;
-                    editor.Column = column;
-                    editor.CanComplete = canComplete;
-                    editor.IsFormEdit = editorType === EditorMode.Form;
-                    editor.IsRowEdit = editorType === EditorMode.Row;
-                    editor.IsCellEdit = !(editor.IsFormEdit || editor.IsRowEdit);
-                    editor.Row = this;
-                    editor.RawConfig = {
-                        Configuration: editorConf,
-                        Order: 0,
-                        PluginId: editorConf.PluginId,
-                        Placement: '', TemplateId: editorConf.TemplateId
-                    };
-                    editor.init(this.MasterTable);
-                    return editor;
-                };
-                EditHandlerBase.prototype.retrieveEditorData = function (editor, errors) {
-                    var errorsArrayPresent = (!(!errors));
-                    errors = errors || [];
-                    var thisErrors = [];
-                    this.CurrentDataObjectModified[editor.FieldName] = editor.getValue(thisErrors);
-                    for (var j = 0; j < thisErrors.length; j++) {
-                        thisErrors[j].Message = editor.getErrorMessage(thisErrors[j].Code);
-                    }
-                    editor.Data = this.CurrentDataObjectModified[editor.FieldName];
-                    editor.ValidationMessages = thisErrors;
-                    for (var i = 0; i < thisErrors.length; i++) {
-                        errors.push(thisErrors[i]);
-                    }
-                    if (thisErrors.length > 0) {
-                        editor.IsValid = false;
-                        if (editor.VisualStates != null)
-                            editor.VisualStates.changeState('invalid');
-                    }
-                    else {
-                        editor.IsValid = true;
-                        if (editor.VisualStates != null)
-                            editor.VisualStates.normalState();
-                    }
-                    if (!errorsArrayPresent) {
-                        this.ValidationMessages.concat(errors);
-                    }
-                };
-                EditHandlerBase.prototype.init = function (masterTable) {
-                    _super.prototype.init.call(this, masterTable);
-                    for (var i = 0; i < this.Configuration.Fields.length; i++) {
-                        this.EditorConfigurations[this.Configuration.Fields[i].FieldName] = this.Configuration.Fields[i];
-                    }
-                };
-                EditHandlerBase.prototype.subscribe = function (e) {
-                    _super.prototype.subscribe.call(this, e);
-                    e.Adjustment.subscribeAfter(this.onAdjustment.bind(this), 'EditHandler');
-                };
-                return EditHandlerBase;
-            }(Reinforced.Lattice.Plugins.PluginBase));
-            Editing.EditHandlerBase = EditHandlerBase;
-            (function (EditorMode) {
-                EditorMode[EditorMode["Cell"] = 0] = "Cell";
-                EditorMode[EditorMode["Row"] = 1] = "Row";
-                EditorMode[EditorMode["Form"] = 2] = "Form";
-            })(Editing.EditorMode || (Editing.EditorMode = {}));
-            var EditorMode = Editing.EditorMode;
-        })(Editing = Lattice.Editing || (Lattice.Editing = {}));
     })(Lattice = Reinforced.Lattice || (Reinforced.Lattice = {}));
 })(Reinforced || (Reinforced = {}));
 ///<reference path="../EditHandlerBase.ts"/>
@@ -11197,6 +11221,8 @@ var Reinforced;
                     };
                     FormEditFormModel.prototype.Editor = function (p, fieldName) {
                         var editor = this.EditorsSet[fieldName];
+                        if (editor == null || editor == undefined)
+                            return;
                         this.editor(p, editor);
                     };
                     FormEditFormModel.prototype.commit = function () {

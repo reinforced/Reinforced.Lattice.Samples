@@ -6,6 +6,8 @@
     <h2>Solution</h2>
     <p>
         Ordering functionality is exposed by <code>.Orderable</code>/<code>.OrderableUi</code>/<code>.OrderableNoUi</code> methods available on column configurator.
+        Please note that orderings are applied from left to right column. It means that if you choose several orderings by columns, then resulting table will be ordered by 
+        left-column criteria, then each group with equal values of 1st column will be sorted by 2nd column etc until last right column. In current version this behavior cannot be overriden.
     </p>
     <h3>How to use server ordering</h3>
     <p>
@@ -58,8 +60,22 @@
     <p>
         Ordering JS function is function that receives 2 objects (<code>A</code> and <code>B</code>) and calculates difference among them. Positive difference means that object <code>A</code> is <i>greater</i>
         than object <code>B</code> and will be placed <i>lower</i> in case of ascending ordering or higher in case of descending one. Actually, Reinforced.Lattice uses 
-        standard <a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Array/sort" target="_blank">Array.sort</a> to sort array of objects. Name of function being consumed by <code>.UseClientOrdering</code> is similar to <code>Array.sort</code>'s first parameter:
+        standard <a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Array/sort" target="_blank">Array.sort</a> to sort array of objects. <span class="tip" data-tip="spec_fn">Function</span> being consumed by <code>.UseClientOrdering</code> is similar to <code>Array.sort</code>'s first parameter:
     </p>
 </div>
 <pre class="language-js wrap-code" data-src="#doc#/ordering-js-function.ts"></pre>
+<div class="text">
+    <h3>How to hide ordering UI bu leave ordering</h3>
+    <p>
+        Use <code>.Hide</code> method if column ordering UI configurator:
+    </p>
+</div>
+<pre class="language-csharp wrap-code" data-src="#doc#/ordering-hide.cs"></pre>
 
+<div class="text tiptext" data-tiptext="spec_fn" data-caption="Specifying function">
+    <p>
+        Here and further when you pass function to Reinforced.Lattice configuration - you can pass either function name or inline function with body (<code>"function (a) { return 'A';}"</code>).
+        If you pass function name, please make sure that it is declared <b>BEFORE</b> calling of <code>@Table.InitializationScript(...)</code>. Other wise you will get 
+        javascript "Undefined variable" error.
+    </p>
+</div>

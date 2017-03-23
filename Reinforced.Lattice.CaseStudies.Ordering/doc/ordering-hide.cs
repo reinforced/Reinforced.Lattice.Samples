@@ -1,0 +1,1 @@
+conf.Column(c => c.RegistrationDate).OrderableUi(c => c.DefaultOrdering(Ordering.Descending).Hide());

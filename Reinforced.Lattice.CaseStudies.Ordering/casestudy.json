@@ -15,9 +15,18 @@
   "LiveDemos": [
     {
       "Id": "Basic",
-      "Title": "Basic",
+      "Title": "Multi ordering",
       "Description": "Basic ordered data demo",
       "Controller": "HomeController",
+      "Action": "Index",
+      "View": "Index",
+      "Data": "data.json"
+    },
+    {
+      "Id": "Radio",
+      "Title": "Radio ordering",
+      "Description": "Data ordered with radio ordering",
+      "Controller": "RadioOrderingController",
       "Action": "Index",
       "View": "Index",
       "Data": "data.json"

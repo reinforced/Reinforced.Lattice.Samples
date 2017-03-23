@@ -13,7 +13,10 @@
     conf.Column(c => c.FirstName)
         .Title("First Name <br/> <span class='subscript'>All Janets to top</span>")
         .OrderableUi(c => c.UseClientOrderingNumericExpression("({FirstName}=='Janet'?1:0)"));
-    conf.Column(c => c.RegistrationDate).Format("`moment({@}).fromNow()`");
+    conf.Column(c => c.RegistrationDate)
+        .Title("Registered <br/> <span class='subscript'>Descending ordering, hidden UI</span>")
+        .Format("`moment({@}).fromNow()`")
+        .OrderableUi(c => c.DefaultOrdering(Ordering.Descending).Hide());
 
     conf.Column(c => c.Email)
 .Title("Email <br/> <span class='subscript'>Client ordering, by email domain</span>")

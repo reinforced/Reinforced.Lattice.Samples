@@ -17,7 +17,7 @@ namespace Reinforced.Lattice.CaseStudies.Ordering.Models
 
             conf.Column(c => c.RegistrationDate) // client ordering, but server one also persisted
                 .Orderable(c => c.RegistrationDate, ui => ui.UseClientOrdering());
-            
+
             return conf;
         }
 
@@ -25,10 +25,7 @@ namespace Reinforced.Lattice.CaseStudies.Ordering.Models
         {
             conf.Column(c => c.Id).DataOnly();
             conf.Column(c => c.LastName).Orderable(c => c.LastName);
-            conf.Column(c => c.UserType).Orderable(c => c.UserType == UserType.Admin ? -1 : (int)c.UserType);
-
-            conf.Column(c => c.RegistrationDate)
-                .Orderable(c => c.RegistrationDate, ui => ui.UseClientOrdering());
+           
 
             conf.Ordering(c => c.Radio()); //enable radio ordering
             return conf;
