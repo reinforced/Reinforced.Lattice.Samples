@@ -6437,7 +6437,8 @@ var Reinforced;
                         }
                     };
                     OrderingPlugin.prototype.isClient = function (columnName) {
-                        return this.Configuration.OrderingsForColumns.hasOwnProperty(columnName);
+                        return this.Configuration.OrderingsForColumns.hasOwnProperty(columnName)
+                            && this.Configuration.OrderingsForColumns[columnName].IsClient;
                     };
                     OrderingPlugin.prototype.switchOrderingForColumn = function (columnName) {
                         if (this.Configuration.OrderingsForColumns[columnName] == null || this.Configuration.OrderingsForColumns[columnName] == undefined)

@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Threading;
 using System.Web;
 using System.Web.Mvc;
 using Reinforced.Lattice.CaseStudies.Ordering.Data;
@@ -29,6 +30,7 @@ namespace Reinforced.Lattice.CaseStudies.Ordering.Controllers
 
         public ActionResult HandleTable()
         {
+            Thread.Sleep(500);
             var conf = new Configurator<User, UserRow>().ConfigureRadio();
             var handler = conf.CreateMvcHandler(ControllerContext);
             var q = DataService.GetAllData();

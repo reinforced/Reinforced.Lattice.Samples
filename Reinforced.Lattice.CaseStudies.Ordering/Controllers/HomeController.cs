@@ -1,4 +1,5 @@
-﻿using System.Web.Mvc;
+﻿using System.Threading;
+using System.Web.Mvc;
 using System.Web.Routing;
 using Reinforced.Lattice.CaseStudies.Ordering.Data;
 using Reinforced.Lattice.CaseStudies.Ordering.Models;
@@ -26,6 +27,7 @@ namespace Reinforced.Lattice.CaseStudies.Ordering.Controllers
 
         public ActionResult HandleTable()
         {
+            Thread.Sleep(500);
             var conf = new Configurator<User,UserRow>().Configure();
             var handler = conf.CreateMvcHandler(ControllerContext);
             var q = DataService.GetAllData();

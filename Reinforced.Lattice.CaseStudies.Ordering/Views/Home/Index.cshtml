@@ -10,7 +10,7 @@
 @model Reinforced.Lattice.CaseStudies.Ordering.Models.HomeIndexViewModel
 @{
     var conf = Model.Table;
-    conf.LoadingIndicator(); // to see when data retrieved from server
+    conf.LoadingIndicator(where:"lt"); // to see when data retrieved from server
     conf.Column(c => c.RegistrationDate)
         .Title("Registered <br/> <span class='subscript'>Client ordering, but server one also persisted</span>")
         .Format("`moment({@}).fromNow()`");
