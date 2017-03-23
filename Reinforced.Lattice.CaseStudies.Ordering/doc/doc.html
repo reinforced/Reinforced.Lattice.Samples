@@ -9,12 +9,38 @@
     </p>
     <h3>How to use server ordering</h3>
     <p>
-        
+        Select column you want to be ordered and call <code>.Orderable</code> method. As 1st parameter pass <code>TSource</code> column or custom expression you want to filter result set by. This expression
+        will be passed withot changes to <code>.OrderBy</code>/<code>.ThenBy</code> call when processing request. As 2nd parameter, <code>.Orderable</code> method
+        optionally consumes fluent configurator for client-side behavior. There you can specify default ordering direction and some other parameters.
     </p>
 </div>
-<pre class="pm-console">
-    PM > Install-Package Reinforced.Lattice.Bundle.Mvc5
-    </pre>
+<pre class="language-csharp wrap-code" data-src="#doc#/server-ordering.cs"></pre>
+<div class="text">
+    <p>
+        You can change UI parameters of ordering in <code>.cshtml</code> by calling <code>.OrderableUi</code> method. It consumes fluent UI configurator only.
+    </p>
+    <h3>How to use client ordering</h3>
+    <p>
+        To enable client-side ordering call <code>.UseClientOrdering</code> of ordering UI configurator:
+    </p>
+</div>
+<pre class="language-csharp wrap-code" data-src="#doc#/client-ordering.cs"></pre>
+<div class="text">
+    <ul>
+        <li>
+            You <b>CAN</b> use client ordered and server-ordered columns at the same table. Reinforced.Lattice supports such behavior. Yes, it is allowed. 
+            For columns that are not configured to use client ordering - server request will be performed. For columns that are configured to support client ordering - 
+            server request will not be performed.
+        </li>
+        <li>
+            After calling <code>.Orderable</code> once, you can override UI properties specified there by calling <code>.OrderableUi</code> method.
+        </li>
+        <li>
+            After calling <code>.Orderable</code> once, you can override server ordering expression by calling <code>.OrderableNoUi</code> method without touching UI properties.
+        </li>
+    </ul>
+</div>
+
 <div class="text">
     <p>
         Or you can use Visual Studio NuGet's Ui if you like it. <br />
@@ -32,9 +58,7 @@
     <p>Now go to your master page (usually, <code>_Layout.cshtml</code>) and paste following lines to your <code>&lt;head&gt;</code>  tag:</p>
 </div>
 
-<pre class="language-cshtml wrap-code" data-src="#doc#/connect-script.cshtml">
 
-</pre>
 <div class="text">
     <p>
         Compare with <a href="#code__Layout_cshtml" data-inpage>my one</a> if you're not sure. We will need this "scripts" section later. It is critically important for
@@ -69,7 +93,6 @@
     </ol>
 </div>
 <pre class="language-cshtml" data-src="#doc#/table-init.cshtml">
-
 </pre>
 <div class="text">
     <p>Basically that's how we use configurator to pass necessary data to our client script. <a href="#code_Index_cshtml">Check full page + ViewModel configuration</a>. </p>
@@ -81,7 +104,7 @@
     </p>
     <h3>And we are done here</h3>
     <p>
-        After changing controller code you can press <kbd>F5</kbd> or <code>Run</code> button in your Visual Studio, or run local IIS and navigate to <code>/Home/Index</code> page. <br/>
+        After changing controller code you can press <kbd>F5</kbd> or <code>Run</code> button in your Visual Studio, or run local IIS and navigate to <code>/Home/Index</code> page. <br />
         Also you can launch live demo on all documentation pages using green "Live Demo" button.
     </p>
 </div>
