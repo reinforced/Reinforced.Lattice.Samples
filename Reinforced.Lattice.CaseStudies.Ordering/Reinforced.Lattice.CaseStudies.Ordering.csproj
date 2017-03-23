@@ -53,20 +53,20 @@
       <HintPath>..\packages\Newtonsoft.Json.9.0.1\lib\net45\Newtonsoft.Json.dll</HintPath>
       <Private>True</Private>
     </Reference>
-    <Reference Include="Reinforced.Lattice, Version=1.0.5.0, Culture=neutral, processorArchitecture=MSIL">
-      <HintPath>..\packages\Reinforced.Lattice.Bundle.Mvc5.1.0.5\lib\net45\Reinforced.Lattice.dll</HintPath>
+    <Reference Include="Reinforced.Lattice, Version=1.0.7.0, Culture=neutral, processorArchitecture=MSIL">
+      <HintPath>..\packages\Reinforced.Lattice.Bundle.Mvc5.1.0.7\lib\net45\Reinforced.Lattice.dll</HintPath>
       <Private>True</Private>
     </Reference>
-    <Reference Include="Reinforced.Lattice.Mvc5, Version=1.0.5.0, Culture=neutral, processorArchitecture=MSIL">
-      <HintPath>..\packages\Reinforced.Lattice.Bundle.Mvc5.1.0.5\lib\net45\Reinforced.Lattice.Mvc5.dll</HintPath>
+    <Reference Include="Reinforced.Lattice.Mvc5, Version=1.0.7.0, Culture=neutral, processorArchitecture=MSIL">
+      <HintPath>..\packages\Reinforced.Lattice.Bundle.Mvc5.1.0.7\lib\net45\Reinforced.Lattice.Mvc5.dll</HintPath>
       <Private>True</Private>
     </Reference>
-    <Reference Include="Reinforced.Lattice.Mvc5.Razor, Version=1.0.5.0, Culture=neutral, processorArchitecture=MSIL">
-      <HintPath>..\packages\Reinforced.Lattice.Bundle.Mvc5.1.0.5\lib\net45\Reinforced.Lattice.Mvc5.Razor.dll</HintPath>
+    <Reference Include="Reinforced.Lattice.Mvc5.Razor, Version=1.0.7.0, Culture=neutral, processorArchitecture=MSIL">
+      <HintPath>..\packages\Reinforced.Lattice.Bundle.Mvc5.1.0.7\lib\net45\Reinforced.Lattice.Mvc5.Razor.dll</HintPath>
       <Private>True</Private>
     </Reference>
     <Reference Include="Reinforced.Lattice.Templates.Mvc5, Version=0.0.0.0, Culture=neutral, processorArchitecture=MSIL">
-      <HintPath>..\packages\Reinforced.Lattice.Bundle.Mvc5.1.0.5\lib\net45\Reinforced.Lattice.Templates.Mvc5.dll</HintPath>
+      <HintPath>..\packages\Reinforced.Lattice.Bundle.Mvc5.1.0.7\lib\net45\Reinforced.Lattice.Templates.Mvc5.dll</HintPath>
       <Private>True</Private>
     </Reference>
     <Reference Include="System" />
@@ -183,6 +183,7 @@
     <Compile Include="App_Start\FilterConfig.cs" />
     <Compile Include="App_Start\RouteConfig.cs" />
     <Compile Include="Controllers\HomeController.cs" />
+    <Compile Include="Controllers\RadioOrderingController.cs" />
     <Compile Include="Data\DataService.cs" />
     <Compile Include="Global.asax.cs">
       <DependentUpon>Global.asax</DependentUpon>
@@ -225,6 +226,7 @@
     <Content Include="Views\Home\Index.cshtml" />
     <Content Include="Views\Shared\Lattice_Templates_Bootstrap.cshtml" />
     <Content Include="Scripts\Reinforced.Lattice\reinforced.lattice.js.map" />
+    <Content Include="Views\RadioOrdering\Index.cshtml" />
   </ItemGroup>
   <ItemGroup>
     <Content Include="fonts\glyphicons-halflings-regular.woff" />

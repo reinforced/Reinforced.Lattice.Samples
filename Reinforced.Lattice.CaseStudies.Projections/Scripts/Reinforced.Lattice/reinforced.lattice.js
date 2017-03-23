@@ -10,24 +10,14 @@ var Reinforced;
 (function (Reinforced) {
     var Lattice;
     (function (Lattice) {
-        /** Message type enum */
         (function (MessageType) {
-            /**
-            * UserMessage is shown using specified custom functions for
-            *             messages showing
-            */
             MessageType[MessageType["UserMessage"] = 0] = "UserMessage";
-            /** Banner message is displayed among whole table instead of data */
             MessageType[MessageType["Banner"] = 1] = "Banner";
         })(Lattice.MessageType || (Lattice.MessageType = {}));
         var MessageType = Lattice.MessageType;
-        /** Ordering */
         (function (Ordering) {
-            /** Ascending */
             Ordering[Ordering["Ascending"] = 0] = "Ascending";
-            /** Descending */
             Ordering[Ordering["Descending"] = 1] = "Descending";
-            /** Ordering is not applied */
             Ordering[Ordering["Neutral"] = 2] = "Neutral";
         })(Lattice.Ordering || (Lattice.Ordering = {}));
         var Ordering = Lattice.Ordering;
@@ -78,22 +68,13 @@ var Reinforced;
         (function (Plugins) {
             var Hierarchy;
             (function (Hierarchy) {
-                /** Controls policy of nodes collapsing and expanding */
                 (function (NodeExpandBehavior) {
-                    /** This option will not fetch subtree nodes when locally loaded data available */
                     NodeExpandBehavior[NodeExpandBehavior["LoadFromCacheWhenPossible"] = 0] = "LoadFromCacheWhenPossible";
-                    /**
-                    * This option will make hierarchy plugin always fetch subtree from
-                    *             server-side even if local data available
-                    */
                     NodeExpandBehavior[NodeExpandBehavior["AlwaysLoadRemotely"] = 1] = "AlwaysLoadRemotely";
                 })(Hierarchy.NodeExpandBehavior || (Hierarchy.NodeExpandBehavior = {}));
                 var NodeExpandBehavior = Hierarchy.NodeExpandBehavior;
-                /** This option controls client filtering policy related to collapsed nodes */
                 (function (TreeCollapsedNodeFilterBehavior) {
-                    /** In this case, even collapsed nodes will be included to filter results */
                     TreeCollapsedNodeFilterBehavior[TreeCollapsedNodeFilterBehavior["IncludeCollapsed"] = 0] = "IncludeCollapsed";
-                    /** In this case, even collapsed nodes will be excluded from filter results */
                     TreeCollapsedNodeFilterBehavior[TreeCollapsedNodeFilterBehavior["ExcludeCollapsed"] = 1] = "ExcludeCollapsed";
                 })(Hierarchy.TreeCollapsedNodeFilterBehavior || (Hierarchy.TreeCollapsedNodeFilterBehavior = {}));
                 var TreeCollapsedNodeFilterBehavior = Hierarchy.TreeCollapsedNodeFilterBehavior;
@@ -2194,7 +2175,7 @@ var Reinforced;
              */
             var DataHolderService = (function () {
                 function DataHolderService(masterTable) {
-                    this._comparators = {};
+                    this._orderings = {};
                     this._filters = [];
                     this._anyClientFiltration = false;
                     this._clientValueFunction = {};
@@ -2302,12 +2283,18 @@ var Reinforced;
                  *
                  * @param dataField Field for which this comparator is applicable
                  * @param comparator Comparator fn that should return 0 if entries are equal, -1 if a<b, +1 if a>b
+                 * @param priority Defines order of ordering applying
+                 * @param mandatory When true, ordering will be applied regardless of request
                  * @returns {}
                  */
-                DataHolderService.prototype.registerClientOrdering = function (dataField, comparator, mandatory) {
+                DataHolderService.prototype.registerClientOrdering = function (dataField, comparator, mandatory, priority) {
                     if (mandatory === void 0) { mandatory = false; }
+                    if (priority === void 0) { priority = 0; }
                     this._anyClientFiltration = true;
-                    this._comparators[dataField] = comparator;
+                    this._orderings[dataField] = {
+                        Comparator: comparator,
+                        Priority: priority
+                    };
                     if (mandatory)
                         this._manadatoryOrderings.push(dataField);
                 };
@@ -2466,29 +2453,44 @@ var Reinforced;
                 */
                 DataHolderService.prototype.orderSet = function (objects, query) {
                     if (query.Orderings) {
-                        var sortFn = '';
-                        var comparersArg = '';
-                        var orderFns = [];
+                        var plan = [];
+                        var needsSort = false;
                         for (var i = 0; i < this._rawColumnNames.length; i++) {
                             var orderingKey = this._rawColumnNames[i];
                             if (query.Orderings.hasOwnProperty(orderingKey) || (this._manadatoryOrderings.indexOf(orderingKey) >= 0)) {
                                 var orderingDirection = query.Orderings[orderingKey];
                                 if (orderingDirection === Lattice.Ordering.Neutral)
                                     continue;
-                                if (!this._comparators[orderingKey])
+                                if (!this._orderings[orderingKey])
                                     continue;
                                 var negate = orderingDirection === Lattice.Ordering.Descending;
-                                sortFn += "cc=f" + orderFns.length + "(a,b); ";
-                                comparersArg += "f" + orderFns.length + ",";
-                                orderFns.push(this._comparators[orderingKey]);
-                                sortFn += "if (cc!==0) return " + (negate ? '-cc' : 'cc') + "; ";
+                                plan.push({
+                                    Comparator: this._orderings[orderingKey].Comparator,
+                                    Negate: negate,
+                                    Priority: this._orderings[orderingKey].Priority
+                                });
+                                if (!needsSort) {
+                                    needsSort = this._orderings[orderingKey].Priority != 0;
+                                }
                             }
                         }
-                        if (sortFn.length === 0)
+                        if (plan.length === 0)
                             return objects;
+                        if (needsSort) {
+                            plan = plan.sort(function (x, y) { return x.Priority - y.Priority; });
+                        }
+                        var funArray = [];
+                        var sortFn = '';
+                        var comparersArg = '';
+                        for (var j = 0; j < plan.length; j++) {
+                            funArray.push(plan[j].Comparator);
+                            sortFn += "cc=f" + j + "(a,b); ";
+                            comparersArg += "f" + j + ",";
+                            sortFn += "if (cc!==0) return " + (plan[j].Negate ? '-cc' : 'cc') + "; ";
+                        }
                         comparersArg = comparersArg.substr(0, comparersArg.length - 1);
                         sortFn = "(function(" + comparersArg + "){ return (function (a,b) { var cc = 0; " + sortFn + " return 0; }); })";
-                        var sortFunction = eval(sortFn).apply(null, orderFns);
+                        var sortFunction = eval(sortFn).apply(null, funArray);
                         var ordered = objects.sort(sortFunction);
                         return ordered;
                     }
@@ -3188,6 +3190,7 @@ var Reinforced;
                     this._dataHolder.storeResponse({
                         Data: data
                     }, clientQuery);
+                    this._dataHolder.filterStoredDataWithPreviousQuery();
                     this._previousQueryString = JSON.stringify(clientQuery);
                     this._masterTable.Events.DataReceived.invokeAfter(this, arg);
                 };
@@ -3524,11 +3527,20 @@ var Reinforced;
     (function (Lattice) {
         var Services;
         (function (Services) {
+            /**
+             * Service responsible for commands handling
+             */
             var CommandsService = (function () {
                 function CommandsService(masterTable) {
                     this._masterTable = masterTable;
                     this._commandsCache = this._masterTable.Configuration.Commands;
                 }
+                /**
+                 * Determines whether it is possible to execute specified command
+                 *
+                 * @param commandName Command name
+                 * @param subject Command subject
+                 */
                 CommandsService.prototype.canExecute = function (commandName, subject) {
                     if (subject === void 0) { subject = null; }
                     if (!this._commandsCache.hasOwnProperty(commandName))
@@ -3539,10 +3551,24 @@ var Reinforced;
                     }
                     return true;
                 };
+                /**
+                 * Triggers command
+                 *
+                 * @param commandName Command name
+                 * @param rowIndex Loaded object index to be used as subject
+                 * @param callback Callback to be executed after invokation of command
+                 */
                 CommandsService.prototype.triggerCommandOnRow = function (commandName, rowIndex, callback) {
                     if (callback === void 0) { callback = null; }
                     this.triggerCommand(commandName, this._masterTable.DataHolder.StoredCache[rowIndex], callback);
                 };
+                /**
+                 * Triggers command
+                 *
+                 * @param commandName Command name
+                 * @param subject Command subject
+                 * @param callback Callback to be executed after invokation of command
+                 */
                 CommandsService.prototype.triggerCommand = function (commandName, subject, callback) {
                     if (callback === void 0) { callback = null; }
                     var command = this._commandsCache[commandName];
@@ -3593,6 +3619,14 @@ var Reinforced;
                         this._masterTable.Controller.redrawVisibleDataObject(subject);
                     }
                 };
+                /**
+                 * Trigger command with supplied confirmation data
+                 *
+                 * @param commandName Command name
+                 * @param subject Command subject
+                 * @param confirmation Confirmation object
+                 * @param callback Callback to be executed after command completed
+                 */
                 CommandsService.prototype.triggerCommandWithConfirmation = function (commandName, subject, confirmation, callback) {
                     var _this = this;
                     if (callback === void 0) { callback = null; }
@@ -3671,13 +3705,33 @@ var Reinforced;
                 return CommandsService;
             }());
             Services.CommandsService = CommandsService;
+            /**
+             * ViewModel behind command confirmation window
+             */
             var ConfirmationWindowViewModel = (function () {
                 function ConfirmationWindowViewModel(masterTable, commandDescription, subject, originalCallback) {
+                    //#region Public fields
+                    /**
+                     * Confirmation form root HTML element
+                     */
                     this.RootElement = null;
+                    /**
+                     * HTML element where loaded content will be rendered to
+                     */
                     this.ContentPlaceholder = null;
+                    /**
+                     * HTML element where details will be rendered to
+                     */
                     this.DetailsPlaceholder = null;
+                    /**
+                     * Compiled template pieces associated with confirmation form
+                     */
                     this.TemplatePieces = {};
+                    /**
+                     * Recently loaded command details
+                     */
                     this.RecentDetails = { Data: null };
+                    //#endregion
                     this._detailsLoaded = false;
                     this._editorColumn = {};
                     this._originalCallback = null;
@@ -6271,6 +6325,7 @@ var Reinforced;
         })(Plugins = Lattice.Plugins || (Lattice.Plugins = {}));
     })(Lattice = Reinforced.Lattice || (Reinforced.Lattice = {}));
 })(Reinforced || (Reinforced = {}));
+///<reference path="../Plugins/PluginBase.ts"/>
 var Reinforced;
 (function (Reinforced) {
     var Lattice;
@@ -6304,6 +6359,7 @@ var Reinforced;
         })(Filters = Lattice.Filters || (Lattice.Filters = {}));
     })(Lattice = Reinforced.Lattice || (Reinforced.Lattice = {}));
 })(Reinforced || (Reinforced = {}));
+///<reference path="PluginBase.ts"/>
 var Reinforced;
 (function (Reinforced) {
     var Lattice;
@@ -6379,11 +6435,21 @@ var Reinforced;
                         var next = this.nextOrdering(orderingsCollection[columnName]);
                         this.setOrderingForColumn(columnName, next);
                     };
-                    OrderingPlugin.prototype.setOrderingForColumn = function (columnName, ordering) {
+                    OrderingPlugin.prototype.updateOrderingWithUi = function (columnName, ordering) {
                         var coolHeader = this.MasterTable.InstanceManager.Columns[columnName].Header;
                         this.specifyOrdering(coolHeader, ordering);
                         this.updateOrdering(columnName, ordering);
                         this.MasterTable.Renderer.Modifier.redrawHeader(coolHeader.Column);
+                    };
+                    OrderingPlugin.prototype.setOrderingForColumn = function (columnName, ordering) {
+                        this.updateOrderingWithUi(columnName, ordering);
+                        if (this.Configuration.RadioOrdering) {
+                            for (var ck in this.Configuration.DefaultOrderingsForColumns) {
+                                if ((ck !== columnName) && (!this.MasterTable.InstanceManager.Columns[ck].Configuration.IsDataOnly)) {
+                                    this.updateOrderingWithUi(ck, Reinforced.Lattice.Ordering.Neutral);
+                                }
+                            }
+                        }
                         this.MasterTable.Controller.reload();
                     };
                     OrderingPlugin.prototype.nextOrdering = function (currentOrdering) {
@@ -6459,6 +6525,7 @@ var Reinforced;
         })(Plugins = Lattice.Plugins || (Lattice.Plugins = {}));
     })(Lattice = Reinforced.Lattice || (Reinforced.Lattice = {}));
 })(Reinforced || (Reinforced = {}));
+///<reference path="PluginBase.ts"/>
 var Reinforced;
 (function (Reinforced) {
     var Lattice;
@@ -6550,6 +6617,7 @@ var Reinforced;
         })(Plugins = Lattice.Plugins || (Lattice.Plugins = {}));
     })(Lattice = Reinforced.Lattice || (Reinforced.Lattice = {}));
 })(Reinforced || (Reinforced = {}));
+///<reference path="PluginBase.ts"/>
 var Reinforced;
 (function (Reinforced) {
     var Lattice;
@@ -6682,6 +6750,7 @@ var Reinforced;
         })(Plugins = Lattice.Plugins || (Lattice.Plugins = {}));
     })(Lattice = Reinforced.Lattice || (Reinforced.Lattice = {}));
 })(Reinforced || (Reinforced = {}));
+///<reference path="FilterBase.ts"/>
 var Reinforced;
 (function (Reinforced) {
     var Lattice;
@@ -6853,6 +6922,7 @@ var Reinforced;
         })(Filters = Lattice.Filters || (Lattice.Filters = {}));
     })(Lattice = Reinforced.Lattice || (Reinforced.Lattice = {}));
 })(Reinforced || (Reinforced = {}));
+///<reference path="FilterBase.ts"/>
 var Reinforced;
 (function (Reinforced) {
     var Lattice;
@@ -7014,6 +7084,7 @@ var Reinforced;
         })(Filters = Lattice.Filters || (Lattice.Filters = {}));
     })(Lattice = Reinforced.Lattice || (Reinforced.Lattice = {}));
 })(Reinforced || (Reinforced = {}));
+///<reference path="FilterBase.ts"/>
 var Reinforced;
 (function (Reinforced) {
     var Lattice;
@@ -7178,6 +7249,7 @@ var Reinforced;
         })(Filters = Lattice.Filters || (Lattice.Filters = {}));
     })(Lattice = Reinforced.Lattice || (Reinforced.Lattice = {}));
 })(Reinforced || (Reinforced = {}));
+///<reference path="PluginBase.ts"/>
 var Reinforced;
 (function (Reinforced) {
     var Lattice;
@@ -7359,13 +7431,14 @@ var Reinforced;
                         return visible;
                     };
                     return HideoutPlugin;
-                }(Plugins.PluginBase));
+                }(Reinforced.Lattice.Plugins.PluginBase));
                 Hideout.HideoutPlugin = HideoutPlugin;
                 Lattice.ComponentsContainer.registerComponent('Hideout', HideoutPlugin);
             })(Hideout = Plugins.Hideout || (Plugins.Hideout = {}));
         })(Plugins = Lattice.Plugins || (Lattice.Plugins = {}));
     })(Lattice = Reinforced.Lattice || (Reinforced.Lattice = {}));
 })(Reinforced || (Reinforced = {}));
+///<reference path="PluginBase.ts"/>
 var Reinforced;
 (function (Reinforced) {
     var Lattice;
@@ -7438,13 +7511,14 @@ var Reinforced;
                         this.MasterTable.Renderer.Modifier.redrawPlugin(this);
                     };
                     return ResponseInfoPlugin;
-                }(Plugins.PluginBase));
+                }(Reinforced.Lattice.Plugins.PluginBase));
                 ResponseInfo.ResponseInfoPlugin = ResponseInfoPlugin;
                 Lattice.ComponentsContainer.registerComponent('ResponseInfo', ResponseInfoPlugin);
             })(ResponseInfo = Plugins.ResponseInfo || (Plugins.ResponseInfo = {}));
         })(Plugins = Lattice.Plugins || (Lattice.Plugins = {}));
     })(Lattice = Reinforced.Lattice || (Reinforced.Lattice = {}));
 })(Reinforced || (Reinforced = {}));
+///<reference path="PluginBase.ts"/>
 var Reinforced;
 (function (Reinforced) {
     var Lattice;
@@ -7551,13 +7625,14 @@ var Reinforced;
                         }
                     };
                     return TotalsPlugin;
-                }(Plugins.PluginBase));
+                }(Reinforced.Lattice.Plugins.PluginBase));
                 Total.TotalsPlugin = TotalsPlugin;
                 Lattice.ComponentsContainer.registerComponent('Total', TotalsPlugin);
             })(Total = Plugins.Total || (Plugins.Total = {}));
         })(Plugins = Lattice.Plugins || (Lattice.Plugins = {}));
     })(Lattice = Reinforced.Lattice || (Reinforced.Lattice = {}));
 })(Reinforced || (Reinforced = {}));
+///<reference path="PluginBase.ts"/>
 var Reinforced;
 (function (Reinforced) {
     var Lattice;
@@ -7604,6 +7679,7 @@ var Reinforced;
         })(Plugins = Lattice.Plugins || (Lattice.Plugins = {}));
     })(Lattice = Reinforced.Lattice || (Reinforced.Lattice = {}));
 })(Reinforced || (Reinforced = {}));
+///<reference path="PluginBase.ts"/>
 var Reinforced;
 (function (Reinforced) {
     var Lattice;
@@ -7705,13 +7781,14 @@ var Reinforced;
                         this.MasterTable.Events.SelectionChanged.subscribe(this.onSelectionChanged.bind(this), 'toolbar');
                     };
                     return ToolbarPlugin;
-                }(Plugins.PluginBase));
+                }(Reinforced.Lattice.Plugins.PluginBase));
                 Toolbar.ToolbarPlugin = ToolbarPlugin;
                 Lattice.ComponentsContainer.registerComponent('Toolbar', ToolbarPlugin);
             })(Toolbar = Plugins.Toolbar || (Plugins.Toolbar = {}));
         })(Plugins = Lattice.Plugins || (Lattice.Plugins = {}));
     })(Lattice = Reinforced.Lattice || (Reinforced.Lattice = {}));
 })(Reinforced || (Reinforced = {}));
+///<reference path="PluginBase.ts"/>
 var Reinforced;
 (function (Reinforced) {
     var Lattice;
@@ -8256,6 +8333,7 @@ var Reinforced;
         })(Plugins = Lattice.Plugins || (Lattice.Plugins = {}));
     })(Lattice = Reinforced.Lattice || (Reinforced.Lattice = {}));
 })(Reinforced || (Reinforced = {}));
+///<reference path="PluginBase.ts"/>
 var Reinforced;
 (function (Reinforced) {
     var Lattice;
@@ -8492,7 +8570,7 @@ var Reinforced;
                         this.MasterTable.Loader.registerQueryPartProvider(this);
                     };
                     return FormwatchPlugin;
-                }(Plugins.PluginBase));
+                }(Reinforced.Lattice.Plugins.PluginBase));
                 Formwatch.FormwatchPlugin = FormwatchPlugin;
                 Lattice.ComponentsContainer.registerComponent('Formwatch', FormwatchPlugin);
             })(Formwatch = Plugins.Formwatch || (Plugins.Formwatch = {}));
@@ -9270,6 +9348,7 @@ var Reinforced;
         })(Services = Lattice.Services || (Lattice.Services = {}));
     })(Lattice = Reinforced.Lattice || (Reinforced.Lattice = {}));
 })(Reinforced || (Reinforced = {}));
+///<reference path="PluginBase.ts"/>
 var Reinforced;
 (function (Reinforced) {
     var Lattice;
@@ -9372,13 +9451,14 @@ var Reinforced;
                         this.overlapAll();
                     };
                     return LoadingOverlapPlugin;
-                }(Plugins.PluginBase));
+                }(Reinforced.Lattice.Plugins.PluginBase));
                 LoadingOverlap.LoadingOverlapPlugin = LoadingOverlapPlugin;
                 Lattice.ComponentsContainer.registerComponent('LoadingOverlap', LoadingOverlapPlugin);
             })(LoadingOverlap = Plugins.LoadingOverlap || (Plugins.LoadingOverlap = {}));
         })(Plugins = Lattice.Plugins || (Lattice.Plugins = {}));
     })(Lattice = Reinforced.Lattice || (Reinforced.Lattice = {}));
 })(Reinforced || (Reinforced = {}));
+///<reference path="PluginBase.ts"/>
 var Reinforced;
 (function (Reinforced) {
     var Lattice;
@@ -9560,6 +9640,7 @@ var Reinforced;
         })(Services = Lattice.Services || (Lattice.Services = {}));
     })(Lattice = Reinforced.Lattice || (Reinforced.Lattice = {}));
 })(Reinforced || (Reinforced = {}));
+///<reference path="PluginBase.ts"/>
 var Reinforced;
 (function (Reinforced) {
     var Lattice;
@@ -9644,6 +9725,7 @@ var Reinforced;
         })(Plugins = Lattice.Plugins || (Lattice.Plugins = {}));
     })(Lattice = Reinforced.Lattice || (Reinforced.Lattice = {}));
 })(Reinforced || (Reinforced = {}));
+///<reference path="PluginBase.ts"/>
 var Reinforced;
 (function (Reinforced) {
     var Lattice;
@@ -9676,13 +9758,14 @@ var Reinforced;
                     };
                     LoadingPlugin.Id = 'Loading';
                     return LoadingPlugin;
-                }(Plugins.PluginBase));
+                }(Reinforced.Lattice.Plugins.PluginBase));
                 Loading.LoadingPlugin = LoadingPlugin;
                 Lattice.ComponentsContainer.registerComponent('Loading', LoadingPlugin);
             })(Loading = Plugins.Loading || (Plugins.Loading = {}));
         })(Plugins = Lattice.Plugins || (Lattice.Plugins = {}));
     })(Lattice = Reinforced.Lattice || (Reinforced.Lattice = {}));
 })(Reinforced || (Reinforced = {}));
+///<reference path="PluginBase.ts"/>
 var Reinforced;
 (function (Reinforced) {
     var Lattice;
@@ -10326,13 +10409,14 @@ var Reinforced;
                         return true;
                     };
                     return HierarchyPlugin;
-                }(Plugins.PluginBase));
+                }(Reinforced.Lattice.Plugins.PluginBase));
                 Hierarchy.HierarchyPlugin = HierarchyPlugin;
                 Lattice.ComponentsContainer.registerComponent('Hierarchy', HierarchyPlugin);
             })(Hierarchy = Plugins.Hierarchy || (Plugins.Hierarchy = {}));
         })(Plugins = Lattice.Plugins || (Lattice.Plugins = {}));
     })(Lattice = Reinforced.Lattice || (Reinforced.Lattice = {}));
 })(Reinforced || (Reinforced = {}));
+///<reference path="../Plugins/PluginBase.ts"/>
 var Reinforced;
 (function (Reinforced) {
     var Lattice;
@@ -10443,6 +10527,7 @@ var Reinforced;
         })(Editing = Lattice.Editing || (Lattice.Editing = {}));
     })(Lattice = Reinforced.Lattice || (Reinforced.Lattice = {}));
 })(Reinforced || (Reinforced = {}));
+///<reference path="../Plugins/PluginBase.ts"/>
 var Reinforced;
 (function (Reinforced) {
     var Lattice;
@@ -10549,6 +10634,10 @@ var Reinforced;
                         this.EditorConfigurations[this.Configuration.Fields[i].FieldName] = this.Configuration.Fields[i];
                     }
                 };
+                EditHandlerBase.prototype.subscribe = function (e) {
+                    _super.prototype.subscribe.call(this, e);
+                    e.Adjustment.subscribeAfter(this.onAdjustment.bind(this), 'EditHandler');
+                };
                 return EditHandlerBase;
             }(Reinforced.Lattice.Plugins.PluginBase));
             Editing.EditHandlerBase = EditHandlerBase;
@@ -10561,6 +10650,7 @@ var Reinforced;
         })(Editing = Lattice.Editing || (Lattice.Editing = {}));
     })(Lattice = Reinforced.Lattice || (Reinforced.Lattice = {}));
 })(Reinforced || (Reinforced = {}));
+///<reference path="../EditHandlerBase.ts"/>
 var Reinforced;
 (function (Reinforced) {
     var Lattice;
@@ -10580,6 +10670,7 @@ var Reinforced;
                             this.afterDrawn = function (e) {
                                 _this.MasterTable.Events.DataRendered.subscribeAfter(_this.onAfterRender.bind(_this), 'editor');
                             };
+                            this._isRedrawnByAdjustment = false;
                         }
                         CellsEditHandler.prototype.ensureEditing = function (loadIndex) {
                             if (this._isEditing)
@@ -10640,9 +10731,14 @@ var Reinforced;
                             if (editor.VisualStates != null)
                                 editor.VisualStates.changeState('saving');
                             this.finishEditing(editor, false);
+                            this._isRedrawnByAdjustment = false;
                             this.sendDataObjectToServer(function () {
                                 if (!_this._isEditing) {
                                     _this.MasterTable.Events.Edit.invokeAfter(_this, _this.CurrentDataObjectModified);
+                                    if (!_this._isRedrawnByAdjustment) {
+                                        var obj = _this.MasterTable.DataHolder.getByPrimaryKey(_this.CurrentDataObjectModified['__key']);
+                                        _this.MasterTable.Controller.redrawVisibleDataObject(obj);
+                                    }
                                     _this.CurrentDataObjectModified = null;
                                 }
                             });
@@ -10661,6 +10757,14 @@ var Reinforced;
                             this._isEditing = false;
                             this._activeEditor = null;
                             this.Cells = {};
+                        };
+                        CellsEditHandler.prototype.onAdjustment = function (e) {
+                            if (!this._isEditing)
+                                return;
+                            var obj = this.MasterTable.DataHolder.getByPrimaryKey(this.CurrentDataObjectModified['__key']);
+                            var isAdded = e.EventArgs.AddedData.indexOf(obj) > -1;
+                            var isUpdated = e.EventArgs.TouchedData.indexOf(obj) > -1;
+                            this._isRedrawnByAdjustment = isAdded || isUpdated;
                         };
                         CellsEditHandler.prototype.notifyChanged = function (editor) {
                             this.retrieveEditorData(editor);
@@ -10711,6 +10815,7 @@ var Reinforced;
                             this.afterDrawn = function (e) {
                                 _this.MasterTable.Events.DataRendered.subscribeAfter(_this.onAfterRender.bind(_this), 'roweditor');
                             };
+                            this._isRedrawnByAdjustment = false;
                         }
                         RowsEditHandler.prototype.onAfterRender = function (e) {
                             if (!this._isEditing)
@@ -10805,9 +10910,14 @@ var Reinforced;
                             }
                             this._isEditing = false;
                             this._activeEditors = [];
+                            this._isRedrawnByAdjustment = false;
                             this.sendDataObjectToServer(function () {
                                 if (!_this._isEditing) {
                                     _this.MasterTable.Events.Edit.invokeAfter(_this, _this.CurrentDataObjectModified);
+                                    if (!_this._isRedrawnByAdjustment) {
+                                        var obj = _this.MasterTable.DataHolder.getByPrimaryKey(_this.CurrentDataObjectModified['__key']);
+                                        _this.MasterTable.Controller.redrawVisibleDataObject(obj);
+                                    }
                                     _this.CurrentDataObjectModified = null;
                                 }
                             });
@@ -10880,6 +10990,14 @@ var Reinforced;
                                     rows[i] = this;
                                 }
                             }
+                        };
+                        RowsEditHandler.prototype.onAdjustment = function (e) {
+                            if (!this._isEditing)
+                                return;
+                            var obj = this.MasterTable.DataHolder.getByPrimaryKey(this.CurrentDataObjectModified['__key']);
+                            var isAdded = e.EventArgs.AddedData.indexOf(obj) > -1;
+                            var isUpdated = e.EventArgs.TouchedData.indexOf(obj) > -1;
+                            this._isRedrawnByAdjustment = isAdded || isUpdated;
                         };
                         RowsEditHandler.prototype.init = function (masterTable) {
                             _super.prototype.init.call(this, masterTable);
@@ -11055,6 +11173,7 @@ var Reinforced;
                                 this._activeEditors[idx].focus();
                         }
                     };
+                    FormEditHandler.prototype.onAdjustment = function (e) { };
                     FormEditHandler.prototype.reject = function (editor) {
                         this.CurrentDataObjectModified[editor.FieldName] = this.DataObject[editor.FieldName];
                         this.setEditorValue(editor);
@@ -11564,6 +11683,7 @@ var Reinforced;
         })(Editing = Lattice.Editing || (Lattice.Editing = {}));
     })(Lattice = Reinforced.Lattice || (Reinforced.Lattice = {}));
 })(Reinforced || (Reinforced = {}));
+///<reference path="PluginBase.ts"/>
 var Reinforced;
 (function (Reinforced) {
     var Lattice;
