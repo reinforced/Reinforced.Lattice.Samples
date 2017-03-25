@@ -1,9 +1,12 @@
 ﻿@{ ViewBag.Title = "Filtering"; }
 
+@using Reinforced.Lattice
+@using Reinforced.Lattice.CaseStudies.Filtering.Models
 @using Reinforced.Lattice.CellTemplating
 @using Reinforced.Lattice.Configuration
 @using Reinforced.Lattice.Filters
 @using Reinforced.Lattice.Filters.Range
+@using Reinforced.Lattice.Filters.Select
 @using Reinforced.Lattice.Filters.Value
 @using Reinforced.Lattice.Mvc
 @using Reinforced.Lattice.Templates
@@ -17,7 +20,26 @@
         "ltcDestroyDatepicker"
         ));
 
-    conf.Column(c => c.FirstName).FilterValue(x => x.FirstName);
+    conf.Column(c => c.FirstName).Title("First name");
+    conf.Column(c => c.UserType2).FilterSelect(c => c.UserType,
+        ui => ui
+        .SelectAny()
+        .SelectNotPresent()
+        .SelectItems(new UiListItem[]
+        {
+            new UiListItem() {Text = "Admin",Value = "0"},
+            new UiListItem() {Text = "Customer",Value = "1"},
+        }));
+
+    conf.Column(c => c.UserType2).FilterSelect(c => c.UserType,
+        ui => ui
+            .SelectItems(new UiListItem[]
+            {
+                new UiListItem() {Text = "Admin",Value = "0"},
+                new UiListItem() {Text = "Customer",Value = "1"},
+            })
+            .SelectAny()
+            .SelectNotPresent());
 }
 <div id="table"></div>
 

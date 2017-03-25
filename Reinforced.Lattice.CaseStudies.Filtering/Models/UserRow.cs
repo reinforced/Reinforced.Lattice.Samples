@@ -16,5 +16,6 @@ namespace Reinforced.Lattice.CaseStudies.Filtering.Models
         public DateTime RegistrationDate { get; set; }
         public bool IsActive { get; set; }
         public UserType UserType { get; set; }
+        public UserType? UserType2 { get; set; }
     }
 }

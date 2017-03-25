@@ -1,4 +1,5 @@
 ﻿using Reinforced.Lattice.Configuration;
+using Reinforced.Lattice.Filters.Value;
 
 namespace Reinforced.Lattice.CaseStudies.Filtering.Models
 {
@@ -10,7 +11,7 @@ namespace Reinforced.Lattice.CaseStudies.Filtering.Models
             conf.Column(c => c.UserType).Title("Type");
             conf.Column(c => c.RegistrationDate).Title("Registered at");
             conf.Column(c => c.IsActive).Title("Active?");
-
+            conf.Column(c => c.FirstName).FilterValueNoUi(x => x.FirstName);
             return conf;
         }
     }

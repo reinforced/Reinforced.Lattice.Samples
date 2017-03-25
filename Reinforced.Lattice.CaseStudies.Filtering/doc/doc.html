@@ -13,17 +13,17 @@
     </p>
     <ul>
         <li>
-            <b>Value filter</b>: exact filter. Being placed to particular column, filters out (removes) all rows that have corresponding column's value not equal to value put to filter.
+            <b>Value filter</b> - by default exposed as textbox allowind user to input any value that he/she is looking for. It is exact filter. Being placed to particular column, filters out (removes) all rows that have corresponding column's value not equal to value put to filter.
             Actually it works in little bit different way for strings and dates
         </li>
         <li>
-            <b>Select filter</b>: technically the same as value filter, but its UI allows to choose one of several predefined options to filter by
+            <b>Select filter</b> - by default exposed as select list allowing user to select one of predefined values. Technically it is the same as value filter, but its UI allows to choose one of several predefined options to filter by
         </li>
         <li>
-            <b>Multi-select filter</b>: almost the same as select filter, but allows to change several possible values values. Row will satisfy this filter in case if corresponding column's value matches one of selected values
+            <b>Multi-select filter</b> - by default exposed as multi-select list allowing user to select <i>multiple</i> of predefined values. Almost the same as select filter, but allows to change several possible values values. Row will satisfy this filter in case if corresponding column's value matches one of selected values
         </li>
         <li>
-            <b>Range filter</b>: allows to filter out (hide) all the rows if their corresponding column's value is not in specified range.
+            <b>Range filter</b> - by default exposed as two textboxes placed under each others. Allows to filter out (hide) all the rows if their corresponding column's value is not in specified range.
         </li>
     </ul>
     <p>
@@ -87,7 +87,7 @@
         <div class="col-sm-6">
             <p class="text-center"><span style="color:#c91818"><span class="glyphicon glyphicon-remove"></span></span> Without <code>.AppendEmptyFilters</code></p>
             <div class="text-center">
-                <img style="width: 100%" src="#doc#/without-appendempty.png" alt="Table with filters without AppendEmptyFilters called"/>
+                <img style="width: 100%" src="#doc#/without-appendempty.png" alt="Table with filters without AppendEmptyFilters called" />
             </div>
         </div>
         <div class="col-sm-6">
@@ -108,83 +108,82 @@
     </p>
 </div>
 <pre class="language-csharp wrap-code" data-src="#doc#/filter-value.cs"></pre>
-
-<pre class="language-cshtml wrap-code" data-src="#doc#/connect-script.cshtml"></pre>
 <div class="text">
+    <h3>How to add select filter to column</h3>
     <p>
-        Compare with <a href="#code__Layout_cshtml" data-inpage>my one</a> if you're not sure. We will need this "scripts" section later. It is critically important for
-        it to follow <b>after</b> Reinforced.Lattice script connection.
+        Use <code>.FilterSelect</code> method:
     </p>
-    <h3>Step 3 - Prepare your ViewModel</h3>
-    <ol>
-        <li>Go to your page's ViewModel</li>
-        <li>Add <code>using</code> to <code>Reinforced.Lattice.Configuration</code> namespace</li>
-        <li><span class="tip" data-tip="parametrization">Put a property</span> of type <code>Configurator&lt;User,UserRow&gt;</code> called Table to your ViewModel (<a href="#code_Index_cshtml">verify with my one if you aren't sure</a>)</li>
-        <li>Create somewhere a <code>static</code> class - we will use it to store our table's configuration</li>
-        <li>
-            Navigate to static class created at previous step and create there <span class="tip" data-tip="extension">
-                static method
-            </span> consuming configurator as <code>this</code>-parameter and returning itself.
-            Put some code using configurator into it. <a href="#code_UsersTable_cs">See how I do that</a>.
-        </li>
-
-    </ol>
-    <p>
-        <code>Configurator&lt;,&gt;</code> is key class exposing Reinforced.Lattice functionality. It is being used to produce piece of JSON code for client side as well as for
-        maintaining upcoming requests to server side. And we have to keep it in the same (well, almost same) state both in our controller and in our ViewModel. That's why we use
-        extension method for configuration.
-    </p>
-    <h3>Step 4 - Prepare your page</h3>
-    <ol>
-        <li>Go to your page that you want to put table to</li>
-        <li>Pick a <code>&lt;div&gt;</code> or another tag you wish to display table in and assign <code>id="table"</code> to it</li>
-        <li>
-            Go to the bottom of the page and set up following code around your <code>scripts</code> section:
-        </li>
-    </ol>
 </div>
-<pre class="language-cshtml" data-src="#doc#/table-init.cshtml">
-</pre>
+<pre class="language-csharp wrap-code" data-src="#doc#/filter-select.cs"></pre>
 <div class="text">
-    <p>Basically that's how we use configurator to pass necessary data to our client script. <a href="#code_Index_cshtml">Check full page + ViewModel configuration</a>. </p>
-
-    <h3>Step 5 - Prepare your controller</h3>
+    <h3>How to customize select filter items</h3>
     <p>
-        Now you have to make table crunch your <code>IQueryable&lt;TSource&gt;</code> and produce results. To do that you have to implement so-called "handle method" within your controller. Also add necessary initializations of your ViewModel with empty configurator, calling configuration method on it that you've created before. <br />
-        <a href="#code_HomeController_cs" data-inpage>Please refer to controller class explained with comments</a> as it is too senseless to reveal it to step-by-step process.
+        Select filter's Ui configuration has several extension methods to fullfill it with items:
     </p>
-    <h3>And we are done here</h3>
-    <p>
-        After changing controller code you can press <kbd>F5</kbd> or <code>Run</code> button in your Visual Studio, or run local IIS and navigate to <code>/Home/Index</code> page. <br />
-        Also you can launch live demo on all documentation pages using green "Live Demo" button.
-    </p>
-</div>
-<div class="text tiptext" data-tiptext="vm" data-caption="About ViewModels">
-    <p>
-        Reinforced.Lattice ViewModels are of course are little bit different than regular MVC forms ViewModels.
-        E.g. you do not have to put arrays of <code>SelectListItem</code>s to it. Also complex nested types are not allowed there.
-        Optimal way is to keep you ViewModel for Lattice as <b>flat</b> and as plain-est as possible. Try to put actually all the fields
-        that you are displaying to there. Of course, Lattice works with nested types, but it <i>may</i> reduce performance.
-    </p>
-</div>
-<div class="text tiptext" data-tiptext="parametrization" data-caption="About Configurator parametrization">
-
-    <b>NB! <code>Configurator&lt;,&gt;</code> type parameters. Learn them clearly.</b>
     <ul>
         <li>
-            <code>TSource</code> - first one. Is actually type of data from your ORM. It is safe to put entities from DataContext/DbContext here.
-            Also may be referred as "first", "left", "source", "from".
+            <code>.SelectItems(items, bool replaceItems = false)</code> - appends items list for select filter. It consumes <code>IEnumerable</code> of instances of special Reinforced.Lattice's internal type: <code>UiListItem</code>.
+            It is almost the same as default <a href="https://msdn.microsoft.com/en-us/library/system.web.mvc.selectlistitem(v=vs.118).aspx" target="_blank">MVC's SelectListItem</a>. It is only made to make Reinforced.Lattice core
+            library does not depend on MVC. <br />
+            <ul>
+                <li>If you are using <code>Reinforced.Lattice.Bundle.Mvc4/5</code> or <code>Reinforced.Lattice.Mvc5.Razor</code> package then there will be second overload for <code>.SelectItems</code>
+                    consuming <code>IEnumerable</code> of MVC's SelectListItem so you can use both. Consider also using <code>.ToUi</code> method provided in <code>Reinforced.Lattice.Mvc5.Razor</code> to convert MVC select list items to Reinforced.Lattice's ones.</li>
+                <li>Second parameter - <code>replaceItems</code> by default is <code>false</code>. When it is set to <code>true</code> then if list that you configure already has some items specified - they will be discarded and <i>replaced</i> with items passed by the first parameter.
+                    So, when <code>replaceItems</code> is <code>false</code> - items will be <i>appended</i>, when <code>true</code> - items will be <i>replaced</i>.</li>
+            </ul>
         </li>
         <li>
-            <code>TRow</code> - second one. Is actually type of your ViewModel for <i>single row in table</i>.
-            Also may be referred as "second", "right", "target", "to"
+            <code>.SelectAny(bool allowAny = true,string anyText = "Any")</code> - appends "Any" item to select list options list. When user selects this item in filter's select list, it will basically disable this filter, leaving all the records from initial set.
+            E.g. filter users by "any" user type will display users of all available types. <br />
+            <ul>
+                <li>You can specify text for "any" option using <code>anyText</code> parameter. <br /></li>
+                <li>Setting <code>allowAny</code> to <code>false</code> will remove all "any" options from select list items list. <br /></li>
+                <li>
+                    Please also note that every option (<code>UiListItem</code>/<code>SelectListItme</code>) with <code>Value</code> set to empty string are considered as "Any" options.        
+                </li>
+            </ul>
+        </li>
+        <li>
+            <code>.SelectNotPresent(bool allowNotPresent = true,string notPresentText = "Not present")</code> - only available on select UI configuration for nullable or reference-typed columns.
+            Basically this option will match all the rows that have <code>null</code> value in particular column. <br />
+            <ul>
+                <li>"Not present" option technically equals to regular options with <code>Value</code> set to <code>Reinforced.Lattice.ValueConverter.NotPresentValue</code> that by default is equal to <code>"$$lattice_not_present$$"</code>. <br /></li>
+                <li>You can specify text for "Not present" option using <code>notPresentText</code> parameter. <br /></li>
+                <li>Setting <code>allowNotPresent</code> to <code>false</code> will remove all "Not present" options from select list items list. <br /></li>
+            </ul>
         </li>
     </ul>
     <p>
-        Do not mess them - there 2 types are your best friends. It is important to understand what is applicable to <code>TSource</code> and what is applicable to <code>TRow</code>
+        Invokation of several of these methods preserves order of options:
     </p>
 </div>
-
+<pre class="language-csharp wrap-code" data-src="#doc#/filter-select-options.cs"></pre>
+<div class="text">
+    <div class="row">
+        <div class="col-sm-6">
+            <p>
+                In case 1 list options will be
+            </p>
+            <ul>
+                <li>"Any"</li>
+                <li>"Not present"</li>
+                <li>"Admin"</li>
+                <li>"Customer"</li>
+            </ul>
+        </div>
+        <div class="col-sm-6">
+            <p>
+                In case 2 list options will be
+            </p>
+            <ul>
+                <li>"Admin"</li>
+                <li>"Customer"</li>
+                <li>"Any"</li>
+                <li>"Not present"</li>
+            </ul>
+        </div>
+    </div>
+</div>
 <div class="text tiptext" data-tiptext="extension" data-caption="About Configuration extensions">
     <p>
         In Reinforced.Lattice table configurations are maintained as C# <a href="https://msdn.microsoft.com/en-us/library/bb383977.aspx" target="_blank">extension methods</a> implementing <a href="https://en.wikipedia.org/wiki/Fluent_interface" target="_blank">fluent interface configuration</a>.
