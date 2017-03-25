@@ -1,0 +1,118 @@
+{
+  "Id": "Filtering",
+  "Title": "Getting It Working",
+  "Subtitle": "For ones who've just started",
+  "Link": "https://github.com/reinforced/Reinforced.Lattice.Samples/tree/master/Reinforced.Lattice.CaseStudies.Filtering",
+  "Keywords": [],
+  "Downloads": [
+    {
+      "Url": "/App_Data/data.json",
+      "Title": "Source data",
+      "Description": "Source data file that is used in this sample",
+      "IsRelative": true
+    }
+  ],
+  "LiveDemos": [
+    {
+      "Id": "Basic",
+      "Title": "Basic",
+      "Description": "Basic datagrid setup demo",
+      "Controller": "HomeController",
+      "Action": "Index",
+      "View": "Index",
+      "Data": "data.json"
+    }
+  ],
+  "CodePieces": [
+    {
+      "Id": "_Layout.cshtml",
+      "Title": "_Layout.cshtml",
+      "Description": "MVC Layout file for this test case",
+      "Files": [
+        {
+          "Path": "/Views/Shared/_Layout.cshtml",
+          "Language": "cshtml",
+          "Comment": null,
+          "Title": "_Layout.cshtml"
+        }
+      ]
+    },
+    {
+      "Id": "Index.cshtml",
+      "Title": "Index.cshtml and its ViewModel",
+      "Description": "MVC view for page containing our table and its ViewModel",
+      "Files": [
+        {
+          "Path": "/Views/Home/Index.cshtml",
+          "Language": "cshtml",
+          "Comment": null,
+          "Title": "Index.cshtml"
+        },
+        {
+          "Path": "/Models/HomeIndexViewModel.cs",
+          "Language": "csharp",
+          "Comment": null,
+          "Title": "HomeIndexViewModel.cs"
+        }
+      ]
+    },
+    {
+      "Id": "DataClasses",
+      "Title": "Data Classes",
+      "Description": "Definitions of Source Data and row ViewModel",
+      "Files": [
+        {
+          "Path": "/Models/User.cs",
+          "Language": "csharp",
+          "Comment": "Data from data source",
+          "Title": "User.cs"
+        },
+        {
+          "Path": "/Models/UserRow.cs",
+          "Language": "csharp",
+          "Comment": "ViewModel of table's row",
+          "Title": "UserRow.cs"
+        }
+      ]
+    },
+    {
+      "Id": "UsersTable.cs",
+      "Title": "Configuration extension class",
+      "Description": "Class holding our configuration extension method",
+      "Files": [
+        {
+          "Path": "/Models/UsersTable.cs",
+          "Language": "csharp",
+          "Comment": null,
+          "Title": "UsersTable.cs"
+        }
+      ]
+    },
+    {
+      "Id": "HomeController.cs",
+      "Title": "Controller",
+      "Description": "Implementation of MVC controller handling table on server side",
+      "Files": [
+        {
+          "Path": "/Controllers/HomeController.cs",
+          "Language": "csharp",
+          "Comment": null,
+          "Title": "HomeController.cs"
+        }
+      ]
+    },
+    {
+      "Id": "DataService.cs",
+      "Title": "Data service implementation",
+      "Description": "Sample implementation of data service",
+      "Files": [
+        {
+          "Path": "/Data/DataService.cs",
+          "Language": "csharp",
+          "Comment": null,
+          "Title": "DataService.cs"
+        }
+      ]
+    }
+  ]
+}

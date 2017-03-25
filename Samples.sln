@@ -15,6 +15,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Reinforced.Lattice.CaseStud
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Reinforced.Lattice.CaseStudies.Ordering", "Reinforced.Lattice.CaseStudies.Ordering\Reinforced.Lattice.CaseStudies.Ordering.csproj", "{C2864E3D-BAC0-4BEA-B518-1694718827A1}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Reinforced.Lattice.CaseStudies.Filtering", "Reinforced.Lattice.CaseStudies.Filtering\Reinforced.Lattice.CaseStudies.Filtering.csproj", "{395542F4-235D-4BE4-A1C8-6A42C4C2F4C4}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -45,6 +47,10 @@ Global
 		{C2864E3D-BAC0-4BEA-B518-1694718827A1}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{C2864E3D-BAC0-4BEA-B518-1694718827A1}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{C2864E3D-BAC0-4BEA-B518-1694718827A1}.Release|Any CPU.Build.0 = Release|Any CPU
+		{395542F4-235D-4BE4-A1C8-6A42C4C2F4C4}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{395542F4-235D-4BE4-A1C8-6A42C4C2F4C4}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{395542F4-235D-4BE4-A1C8-6A42C4C2F4C4}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{395542F4-235D-4BE4-A1C8-6A42C4C2F4C4}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
