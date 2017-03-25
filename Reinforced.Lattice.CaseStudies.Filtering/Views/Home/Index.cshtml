@@ -1,8 +1,10 @@
 ﻿@{ ViewBag.Title = "Filtering"; }
 
+@using Reinforced.Lattice.CellTemplating
 @using Reinforced.Lattice.Configuration
 @using Reinforced.Lattice.Filters
 @using Reinforced.Lattice.Filters.Range
+@using Reinforced.Lattice.Filters.Value
 @using Reinforced.Lattice.Mvc
 @using Reinforced.Lattice.Templates
 @model Reinforced.Lattice.CaseStudies.Filtering.Models.HomeIndexViewModel
@@ -15,15 +17,19 @@
         "ltcDestroyDatepicker"
         ));
 
-    conf.AppendEmptyFilters().Column(c=>c.RegistrationDate)
-        .FilterRangeUi(c=>c.ClientFiltering());
+    conf.AppendEmptyFilters();
+    conf.Column(c => c.RegistrationDate).Title("Registered").Format("`moment({@}).fromNow()`")
+        .FilterValueUi(c => c.ClientFiltering());
+
+    conf.Column(c => c.Email).FilterValueUi(c => c.ClientFiltering());
+    conf.Column(c => c.IsActive).FilterBooleanUi("Yes", "No", "Any");
 }
 <div id="table"></div>
 
 @section scripts {
-    
+    <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/moment.js/2.17.1/moment.min.js"></script>
     <script type='text/javascript' src='https://cdnjs.cloudflare.com/ajax/libs/bootstrap-datepicker/1.6.4/js/bootstrap-datepicker.min.js'></script>
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-datepicker/1.6.4/css/bootstrap-datepicker3.min.css"/>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-datepicker/1.6.4/css/bootstrap-datepicker3.min.css" />
 
     <script type='text/javascript'>
         var ltcCreateDatePicker = function (element) {
