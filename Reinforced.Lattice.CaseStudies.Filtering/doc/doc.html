@@ -87,16 +87,20 @@
         <div class="col-sm-6">
             <p class="text-center"><span style="color:#c91818"><span class="glyphicon glyphicon-remove"></span></span> Without <code>.AppendEmptyFilters</code></p>
             <div class="text-center">
-                <img src="#doc#/without-appendempty.png" alt="Table with filters without AppendEmptyFilters called"/>
+                <img style="width: 100%" src="#doc#/without-appendempty.png" alt="Table with filters without AppendEmptyFilters called"/>
             </div>
         </div>
         <div class="col-sm-6">
             <p class="text-center"><span style="color:#669026"><span class="glyphicon glyphicon-ok"></span></span> With <code>.AppendEmptyFilters</code></p>
             <div class="text-center">
-                <img src="#doc#/with-appendempty.png" alt="Table with filters without AppendEmptyFilters called" />
+                <img style="width: 100%" src="#doc#/with-appendempty.png" alt="Table with filters without AppendEmptyFilters called" />
             </div>
         </div>
     </div>
+    <p>
+        We will avoid call to <code>.AppendEmptyFilters()</code> method in "Core templating" case study when we will change table layout. But for now we will use this method
+        to achieve pretty UI. If you are using built-in Bootstrap template then call this method too.
+    </p>
     <h2>Solution</h2>
     <h3>How to add value filter to column</h3>
     <p>

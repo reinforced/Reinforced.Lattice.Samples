@@ -17,12 +17,7 @@
         "ltcDestroyDatepicker"
         ));
 
-    conf.AppendEmptyFilters();
-    conf.Column(c => c.RegistrationDate).Title("Registered").Format("`moment({@}).fromNow()`")
-        .FilterValueUi(c => c.ClientFiltering());
-
-    conf.Column(c => c.Email).FilterValueUi(c => c.ClientFiltering());
-    conf.Column(c => c.IsActive).FilterBooleanUi("Yes", "No", "Any");
+    conf.Column(c => c.FirstName).FilterValue(x => x.FirstName);
 }
 <div id="table"></div>
 
