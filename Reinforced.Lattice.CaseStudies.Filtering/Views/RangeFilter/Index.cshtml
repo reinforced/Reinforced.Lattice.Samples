@@ -22,6 +22,14 @@
 
     conf.Column(c => c.EndDate)
         .FilterRangeUi(ui => ui.ClientFiltering().CompareOnlyDates());
+    conf.Column(c => c.Price)
+        .Title("Price <br/> <span class='subscript'>Server filtering</span>");
+    conf.Column(c => c.Tax)
+        .Title("Tax <br/> <span class='subscript'>Server filtering, 0.9 trick</span>");
+    conf.Column(c => c.StartDate)
+        .Title("Start Date <br/> <span class='subscript'>Server filtering, dates only</span>");
+    conf.Column(c => c.EndDate)
+        .Title("End Date <br/> <span class='subscript'>Client filtering, dates only</span>");
 }
 <div id="table"></div>
 

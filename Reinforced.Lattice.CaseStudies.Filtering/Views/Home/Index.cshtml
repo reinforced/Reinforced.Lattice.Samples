@@ -19,7 +19,22 @@
         x.RazorIf("{@}==4", @<span style="color: #e89a0c"><span class="glyphicon glyphicon-exclamation-sign"></span> Major</span>);
         x.RazorIf("{@}==5", @<span style="color: #dc0000"><span class="glyphicon glyphicon-fire"></span> Critical</span>);
     });
-    conf.Column(c => c.Supplier).FilterValueUi(ui => ui.ClientFiltering());
+    conf.Column(c => c.Title)
+        .Title("Title <br/> <span class='subscript'>Server filtering, exact match</span>");
+    conf.Column(c => c.Supplier)
+        .Title("Supplier <br/> <span class='subscript'>Client filtering, matches partial words</span>");
+    conf.Column(c => c.Price)
+        .Title("Price <br/> <span class='subscript'>Client filter w. overriden filter function</span>");
+    conf.Column(c => c.Tax)
+        .Title("Tax <br/> <span class='subscript'>Server filter w. overriden .Value function (type 90)</span>");
+
+    conf.Column(c => c.StartDate)
+        .Title("Start Date <br/> <span class='subscript'>Server filter, dates only</span>");
+
+    conf.Column(c => c.EndDate)
+        .Title("End Date <br/> <span class='subscript'>Client filter, dates only</span>");
+
+    conf.Column(c => c.Supplier).FilterValueUi(ui => ui.Placeholder("Supplier").ClientFiltering());
     conf.Column(c => c.EndDate).FilterValueUi(c => c.CompareOnlyDates().Inputdelay(10).ClientFiltering());
     conf.Column(c => c.Price).FilterValueUi(c => c.Placeholder("Max. Price").Inputdelay(10).ClientFilteringExpression("{@} < x"));
 }
@@ -28,10 +43,10 @@
 @section scripts {
     <style type="text/css">
         [data-track='h-Tax'] {
-            width: 150px;
+            width: 200px;
         }
         [data-track='h-Price'] {
-            width: 120px;
+            width: 200px;
         }
         [data-track='h-StartDate'] {
             width: 120px;
@@ -42,4 +57,6 @@
     </style>
     @{ Html.RenderTemplates("lt", "Lattice_Templates_Bootstrap"); }
     @Model.Table.OnInitialized("fixColumnWidths").InitializationScript("table", "window.$$table")
+
+
 }

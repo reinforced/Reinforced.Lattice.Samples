@@ -35,6 +35,16 @@
 
     conf.Column(c => c.Priority)
         .FilterSelectUi(ui => ui.SelectAny().SelectItems(EnumHelper.GetSelectList(typeof(Priority))).ClientFiltering());
+
+    conf.Column(c => c.Price)
+        .Title("Price <br/> <span class='subscript'>Server filtering, w. overriden filter delegate</span>");
+
+    conf.Column(c => c.Rating)
+        .Title("Rating <br/> <span class='subscript'>Server filtering</span>");
+    conf.Column(c => c.Priority)
+        .Title("Priority <br/> <span class='subscript'>Client filtering</span>");
+    conf.Column(c => c.Scope)
+        .Title("Scope <br/> <span class='subscript'>Client filtering</span>");
 }
 <div id="table"></div>
 
@@ -45,7 +55,7 @@
         }
 
         [data-track='h-Price'] {
-            width: 120px;
+            width: 220px;
         }
 
         [data-track='h-StartDate'] {

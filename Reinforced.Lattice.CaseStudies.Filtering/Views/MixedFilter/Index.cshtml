@@ -27,6 +27,24 @@
     conf.Column(c => c.Priority)
         .FilterMultiSelectUi(ui => ui.SelectAny().SelectItems(EnumHelper.GetSelectList(typeof(Priority))).ClientFiltering());
 
+    conf.Column(c => c.Title)
+        .Title("Title <br/> <span class='subscript'>Server filtering, exact match</span>");
+    conf.Column(c => c.Supplier)
+        .Title("Supplier <br/> <span class='subscript'>Client filtering, matches partial words</span>");
+    conf.Column(c => c.Price)
+        .Title("Price <br/> <span class='subscript'>Server</span>");
+    conf.Column(c => c.Tax)
+        .Title("Tax <br/> <span class='subscript'>Server, 90 trick</span>");
+    conf.Column(c => c.Rating)
+        .Title("Rating <br/> <span class='subscript'>Server filtering</span>");
+    conf.Column(c => c.Priority)
+        .Title("Priority <br/> <span class='subscript'>Client</span>");
+    conf.Column(c => c.StartDate)
+        .Title("Start Date <br/> <span class='subscript'>Server filtering</span>");
+    conf.Column(c => c.EndDate)
+        .Title("End Date <br/> <span class='subscript'>Client filtering</span>");
+    conf.Column(c => c.Scope)
+        .Title("Scope <br/> <span class='subscript'>Client</span>");
 }
 <div id="table"></div>
 
