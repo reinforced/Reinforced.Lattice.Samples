@@ -27,7 +27,7 @@
         </li>
     </ul>
     <p>
-        Using core templating, you can easily change supplied filter's UI without changing their logic. <br/>
+        Using core templating, you can easily change supplied filter's UI without changing their logic. <br />
         To configure filter you have to select column and call filter configuration method. Filters configuration in almost all cases exposed by 5 methods:
     </p>
     <ul>
@@ -134,10 +134,14 @@
             It is almost the same as default <a href="https://msdn.microsoft.com/en-us/library/system.web.mvc.selectlistitem(v=vs.118).aspx" target="_blank">MVC's SelectListItem</a>. It is only made to make Reinforced.Lattice core
             library does not depend on MVC. <br />
             <ul>
-                <li>If you are using <code>Reinforced.Lattice.Bundle.Mvc4/5</code> or <code>Reinforced.Lattice.Mvc5.Razor</code> package then there will be second overload for <code>.SelectItems</code>
-                    consuming <code>IEnumerable</code> of MVC's SelectListItem so you can use both. Consider also using <code>.ToUi</code> method provided in <code>Reinforced.Lattice.Mvc5.Razor</code> to convert MVC select list items to Reinforced.Lattice's ones.</li>
-                <li>Second parameter - <code>replaceItems</code> by default is <code>false</code>. When it is set to <code>true</code> then if list that you configure already has some items specified - they will be discarded and <i>replaced</i> with items passed by the first parameter.
-                    So, when <code>replaceItems</code> is <code>false</code> - items will be <i>appended</i>, when <code>true</code> - items will be <i>replaced</i>.</li>
+                <li>
+                    If you are using <code>Reinforced.Lattice.Bundle.Mvc4/5</code> or <code>Reinforced.Lattice.Mvc5.Razor</code> package then there will be second overload for <code>.SelectItems</code>
+                    consuming <code>IEnumerable</code> of MVC's SelectListItem so you can use both. Consider also using <code>.ToUi</code> method provided in <code>Reinforced.Lattice.Mvc5.Razor</code> to convert MVC select list items to Reinforced.Lattice's ones.
+                </li>
+                <li>
+                    Second parameter - <code>replaceItems</code> by default is <code>false</code>. When it is set to <code>true</code> then if list that you configure already has some items specified - they will be discarded and <i>replaced</i> with items passed by the first parameter.
+                    So, when <code>replaceItems</code> is <code>false</code> - items will be <i>appended</i>, when <code>true</code> - items will be <i>replaced</i>.
+                </li>
             </ul>
         </li>
         <li>
@@ -147,7 +151,7 @@
                 <li>You can specify text for "any" option using <code>anyText</code> parameter. <br /></li>
                 <li>Setting <code>allowAny</code> to <code>false</code> will remove all "any" options from select list items list. <br /></li>
                 <li>
-                    Please also note that every option (<code>UiListItem</code>/<code>SelectListItme</code>) with <code>Value</code> set to empty string are considered as "Any" options.        
+                    Please also note that every option (<code>UiListItem</code>/<code>SelectListItme</code>) with <code>Value</code> set to empty string are considered as "Any" options.
                 </li>
             </ul>
         </li>
@@ -218,15 +222,52 @@
 <pre class="language-csharp wrap-code" data-src="#doc#/filter-client.cs"></pre>
 <div class="text">
     <p>
-        You <b>CAN</b> use both client and server filters within single table. Please keep in mind that if column has client filter configured then 
-        <b>it will not be filtered on server</b>! It means that all objects that were not filtered out by server filter will be returned to client-side 
+        You <b>CAN</b> use both client and server filters within single table. Please keep in mind that if column has client filter configured then
+        <b>it will not be filtered on server</b>! It means that all objects that were not filtered out by server filter will be returned to client-side
         for futher filtering. Beware of significant volumes of data transmitted and do balance load between client and server.
     </p>
     <h3>How to override server filtering function (filtering delegates)</h3>
     <p>
-        
+        You can customize behavior of server filter using filtering delegates. <code>.Filter*</code> and <code>.Filter*NoUi</code> methods return
+        core filter configurator. You can use method <code>.By</code> on them to customize filtering behavior. By its single paramter it consumes <i>filtering delegate</i>.
+        Filtering delegate receives 2 parameters as input:
+    </p>
+    <ul>
+        <li><code>IQueryable&lt;TSource&gt;</code> - source data set that you have to filter</li>
+        <li><code>filtering key</code> - criteria to filter source data set by. Its type depends on particular filter. </li>
+    </ul>
+    <p>
+        You must return <code>IQueryable&lt;TSource&gt;</code> from filtering delegate. It has to be source set filtered according to <code>filtering key</code>. <br />
+        Filtering key type depends on filter type:
+    </p>
+    <ul>
+        <li>For <b>Value filter</b> - filtering key is instance of corresponding <code>TSource</code> property that you specify by 1st parameter of preceding <code>.FilterValue</code>/<code>.FilterValueNoUi</code> call </li>
+        <li>For <b>Select filter</b> - same behavior as for value filter </li>
+        <li>For <b>Multi-select filter</b> - filtering key is <code>IEnumerable&lt;T&gt;</code> where <code>T</code> is type of property that you specify by 1st parameter of preceding <code>.FilterMultiSelect</code>/<code>.FilterMultiSelectNoUi</code> call</li>
+        <li>For <b>Range filter</b> - filtering key is <code>RangeTuple&lt;T&gt;</code> where <code>T</code> is type of property that you specify by 1st parameter of preceding <code>.FilterRange</code>/<code>.FilterRangeNoUi</code> call</li>
+    </ul>
+    <p>
+        <code>RangeTuple&lt;T&gt;</code> has 4 properties:
+    </p>
+    <ul>
+        <li><code>From</code> - left edge value of filter.Use it to specify as left filter condition. E.g.: <code>.Where(x =&gt; x.Something &gt;= key.From)</code>. If <code>From</code> is not supplied then it will be <code>null</code> for reference types and <code>default(T)</code> for value types. </li>
+        <li><code>To</code> - exactly the same, but for right edge </li>
+        <li><code>HasFrom</code> - indicates presence of <code>From</code> value. When <code>HasFrom</code> is false then filtering of values greater that left edge must not be applied </li>
+        <li><code>HasTo</code> - exactly the same, but for right edge </li>
+    </ul>
+    <p>
+        Consider following examples of usage:
     </p>
 </div>
+<pre class="language-csharp wrap-code" data-src="#doc#/filter-by-method.cs"></pre>
+<div class="text">
+    <p>
+        When you do not have any property from <code>TSource</code> to filter then you can use <code>.Filter*By</code>/<code>.Filter*NoUiBy</code>. These methods consume <i>filtering delegate</i> 
+        as their first parameter, allowing you to avoid specification of <code>TSource</code>'s filtering. The difference is that all filtering keys are being parametrized with column type, not
+        <code>TSource</code> property:
+    </p>
+</div>
+<pre class="language-csharp wrap-code" data-src="#doc#/filter-by-method-wo-prop.cs"></pre>
 
 <div class="text">
     <h3>How to override placeholder texts for filters</h3>
@@ -238,12 +279,12 @@
 
 <div class="text tiptext" data-tiptext="multiselect" data-caption="Select and multiselect filters">
     <p>
-        Actually there is no multi-select filter on client side. There is select filter with enabled multi-selection feature. <br/>
-        At the same time, there is no select filter on server side - there is value filter only. <br/>
-        But! On server-side multi-select filter has its own implementation.<br/>
+        Actually there is no multi-select filter on client side. There is select filter with enabled multi-selection feature. <br />
+        At the same time, there is no select filter on server side - there is value filter only. <br />
+        But! On server-side multi-select filter has its own implementation.<br />
         So <b>multi-select</b> and <b>select</b> filters do share client side, but have different server side implementations.
-        And both <b>select</b> and <b>value</b> filters do share server side, but have different client side implementations.<br/>
-        That seems weird, but actually it is correct approach. <br/>
+        And both <b>select</b> and <b>value</b> filters do share server side, but have different client side implementations.<br />
+        That seems weird, but actually it is correct approach. <br />
         Only range filter has its own dedicated server-side and client-side implementations.
     </p>
 </div>

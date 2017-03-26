@@ -2,6 +2,8 @@
 using Reinforced.Lattice.CellTemplating;
 using Reinforced.Lattice.Configuration;
 using Reinforced.Lattice.Filters;
+using Reinforced.Lattice.Filters.Multi;
+using Reinforced.Lattice.Filters.Range;
 using Reinforced.Lattice.Filters.Value;
 using Reinforced.Lattice.Mvc;
 using Reinforced.Lattice.Plugins.Scrollbar;
