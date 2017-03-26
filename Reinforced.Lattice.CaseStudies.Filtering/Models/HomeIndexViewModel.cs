@@ -5,6 +5,6 @@ namespace Reinforced.Lattice.CaseStudies.Filtering.Models
 
     public class HomeIndexViewModel
     {
-        public Configurator<User,UserRow> Table { get; set; }
+        public Configurator<Contract,ContractRow> Table { get; set; }
     }
 }

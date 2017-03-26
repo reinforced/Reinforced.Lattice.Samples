@@ -2532,12 +2532,17 @@ var Reinforced;
                 DataHolderService.prototype.filterSet = function (objects, query) {
                     var result = [];
                     if (this._filters.length !== 0) {
+                        var context = {};
+                        for (var k = 0; k < this._filters.length; k++) {
+                            var flt = this._filters[k];
+                            flt.precompute(query, context);
+                        }
                         for (var i = 0; i < objects.length; i++) {
                             var obj = objects[i];
                             var acceptable = true;
                             for (var j = 0; j < this._filters.length; j++) {
                                 var filter = this._filters[j];
-                                acceptable = filter.filterPredicate(obj, query);
+                                acceptable = filter.filterPredicate(obj, context, query);
                                 if (!acceptable)
                                     break;
                             }
@@ -2558,9 +2563,14 @@ var Reinforced;
                     if (this._filters.length === 0)
                         return true;
                     var acceptable = true;
+                    var context = {};
+                    for (var k = 0; k < this._filters.length; k++) {
+                        var flt = this._filters[k];
+                        flt.precompute(query, context);
+                    }
                     for (var j = 0; j < this._filters.length; j++) {
                         var filter = this._filters[j];
-                        acceptable = filter.filterPredicate(obj, query);
+                        acceptable = filter.filterPredicate(obj, context, query);
                         if (!acceptable)
                             break;
                     }
@@ -6364,6 +6374,9 @@ var Reinforced;
                 function FilterBase() {
                     _super.apply(this, arguments);
                 }
+                FilterBase.prototype.precompute = function (query, context) {
+                    throw new Error('Please override this method');
+                };
                 FilterBase.prototype.modifyQuery = function (query, scope) { };
                 FilterBase.prototype.init = function (masterTable) {
                     _super.prototype.init.call(this, masterTable);
@@ -6376,7 +6389,7 @@ var Reinforced;
                 FilterBase.prototype.itIsClientFilter = function () {
                     this.MasterTable.DataHolder.registerClientFilter(this);
                 };
-                FilterBase.prototype.filterPredicate = function (rowObject, query) { throw new Error('Please override this method'); };
+                FilterBase.prototype.filterPredicate = function (rowObject, context, query) { throw new Error('Please override this method'); };
                 return FilterBase;
             }(Reinforced.Lattice.Plugins.PluginBase));
             Filters.FilterBase = FilterBase;
@@ -6873,26 +6886,54 @@ var Reinforced;
                         }
                         this.AssociatedColumn = this.MasterTable.InstanceManager.Columns[this.Configuration.ColumnName];
                     };
+                    ValueFilterPlugin.prototype.precompute = function (query, context) {
+                        var fval = query.Filterings[this.AssociatedColumn.RawName];
+                        if (fval == null || fval == undefined)
+                            return;
+                        if (fval === '$$lattice_not_present$$' && this.AssociatedColumn.Configuration.IsNullable) {
+                            fval = null;
+                        }
+                        if (this.AssociatedColumn.IsString) {
+                            context[this.AssociatedColumn.RawName] = fval;
+                            if (fval != null) {
+                                context[this.AssociatedColumn.RawName + '$#_split'] = fval.split(/\s/);
+                            }
+                            return;
+                        }
+                        var val = fval;
+                        if (fval == null)
+                            val = null;
+                        else if (this.AssociatedColumn.IsFloat)
+                            val = parseFloat(fval);
+                        else if (this.AssociatedColumn.IsInteger || this.AssociatedColumn.IsEnum)
+                            val = parseInt(fval);
+                        else if (this.AssociatedColumn.IsBoolean) {
+                            var bv = fval.toLocaleUpperCase() === 'TRUE' ? true :
+                                fval.toLocaleUpperCase() === 'FALSE' ? false : null;
+                            if (bv == null) {
+                                bv = parseInt(fval) > 0;
+                            }
+                            val = bv;
+                        }
+                        else if (this.AssociatedColumn.IsDateTime)
+                            val = this.MasterTable.Date.parse(fval);
+                        context[this.AssociatedColumn.RawName] = val;
+                    };
                     /**
                     * @internal
                     */
-                    ValueFilterPlugin.prototype.filterPredicate = function (rowObject, query) {
-                        var fval = query.Filterings[this.AssociatedColumn.RawName];
-                        if (fval == null || fval == undefined)
+                    ValueFilterPlugin.prototype.filterPredicate = function (rowObject, context, query) {
+                        if (!context.hasOwnProperty(this.AssociatedColumn.RawName))
                             return true;
-                        if (fval === '$$lattice_not_present$$' && this.AssociatedColumn.Configuration.IsNullable)
-                            fval = null;
                         if (this.Configuration.ClientFilteringFunction) {
-                            return this.Configuration.ClientFilteringFunction(rowObject, fval, query);
+                            return this.Configuration.ClientFilteringFunction(rowObject, context[this.AssociatedColumn.RawName], query);
                         }
-                        if (!query.Filterings.hasOwnProperty(this.AssociatedColumn.RawName))
-                            return true;
                         var objVal = rowObject[this.AssociatedColumn.RawName];
                         if (objVal == null)
-                            return fval == null;
+                            return context[this.AssociatedColumn.RawName] == null;
                         if (this.AssociatedColumn.IsString) {
                             objVal = objVal.toString();
-                            var entries = fval.split(/\s/);
+                            var entries = context[this.AssociatedColumn.RawName + '$#_split'];
                             for (var i = 0; i < entries.length; i++) {
                                 var e = entries[i].trim();
                                 if (e.length > 0) {
@@ -6902,24 +6943,14 @@ var Reinforced;
                             }
                             return true;
                         }
-                        if (this.AssociatedColumn.IsFloat) {
-                            var f = parseFloat(fval);
-                            return objVal === f;
-                        }
-                        if (this.AssociatedColumn.IsInteger || this.AssociatedColumn.IsEnum) {
-                            var int = parseInt(fval);
-                            return objVal === int;
-                        }
-                        if (this.AssociatedColumn.IsBoolean) {
-                            var bv = fval.toLocaleUpperCase() === 'TRUE' ? true :
-                                fval.toLocaleUpperCase() === 'FALSE' ? false : null;
-                            if (bv == null) {
-                                bv = parseInt(fval) > 0;
-                            }
-                            return objVal === bv;
+                        if (this.AssociatedColumn.IsFloat
+                            || this.AssociatedColumn.IsInteger
+                            || this.AssociatedColumn.IsEnum
+                            || this.AssociatedColumn.IsBoolean) {
+                            return objVal === context[this.AssociatedColumn.RawName];
                         }
                         if (this.AssociatedColumn.IsDateTime) {
-                            var date = this.MasterTable.Date.parse(fval);
+                            var date = context[this.AssociatedColumn.RawName];
                             if (this.Configuration.CompareOnlyDates) {
                                 return date.getFullYear() === objVal.getFullYear()
                                     && date.getDate() === objVal.getDate()
@@ -7064,81 +7095,82 @@ var Reinforced;
                             return;
                         this.defaultRender(p);
                     };
-                    RangeFilterPlugin.prototype.filterPredicate = function (rowObject, query) {
+                    RangeFilterPlugin.prototype.precompute = function (query, context) {
                         var fval = query.Filterings[this.AssociatedColumn.RawName];
                         if (!fval)
-                            return true;
+                            return;
                         var args = fval.split('|');
                         var fromValue = args[0];
                         var toValue = args[1];
-                        if (this.Configuration.ClientFilteringFunction) {
-                            return this.Configuration.ClientFilteringFunction(rowObject, fromValue, toValue, query);
+                        var entry = {
+                            HasFrom: fromValue.trim().length !== 0,
+                            HasTo: toValue.trim().length !== 0,
+                            IncludeLeft: this.Configuration.InclusiveLeft,
+                            IncludeRight: this.Configuration.InclusiveRight,
+                            From: fromValue,
+                            To: toValue
+                        };
+                        if (!entry.HasFrom && !entry.HasTo)
+                            return;
+                        if (this.AssociatedColumn.IsFloat) {
+                            entry.From = entry.HasFrom ? parseFloat(entry.From) : null;
+                            entry.To = entry.HasTo ? parseFloat(entry.To) : null;
                         }
-                        var frmEmpty = fromValue.trim().length === 0;
-                        var toEmpty = toValue.trim().length === 0;
-                        if (frmEmpty && toEmpty)
+                        if (this.AssociatedColumn.IsInteger || this.AssociatedColumn.IsEnum) {
+                            entry.From = entry.HasFrom ? parseInt(entry.From) : null;
+                            entry.To = entry.HasTo ? parseInt(entry.To) : null;
+                        }
+                        if (this.AssociatedColumn.IsDateTime) {
+                            entry.From = entry.HasFrom ? this.MasterTable.Date.parse(entry.From) : null;
+                            entry.To = entry.HasTo ? this.MasterTable.Date.parse(entry.To) : null;
+                            if (this.Configuration.CompareOnlyDates) {
+                                if (entry.HasFrom) {
+                                    entry.From.setHours(0, 0, 0, 0);
+                                    if (!entry.IncludeLeft) {
+                                        entry.From.setDate(entry.From.getDate() + 1);
+                                        entry.IncludeLeft = true;
+                                    }
+                                }
+                                if (entry.HasTo) {
+                                    entry.To.setHours(0, 0, 0, 0);
+                                    if (entry.IncludeRight) {
+                                        entry.To.setDate(entry.To.getDate() + 1);
+                                        entry.IncludeRight = false;
+                                    }
+                                }
+                            }
+                        }
+                        context[this.AssociatedColumn.RawName] = entry;
+                    };
+                    RangeFilterPlugin.prototype.filterPredicate = function (rowObject, context, query) {
+                        if (!context.hasOwnProperty(this.AssociatedColumn.RawName))
                             return true;
-                        if (!query.Filterings.hasOwnProperty(this.AssociatedColumn.RawName))
-                            return true;
+                        var entry = context[this.AssociatedColumn.RawName];
+                        if (this.Configuration.ClientFilteringFunction) {
+                            return this.Configuration.ClientFilteringFunction(rowObject, entry, query);
+                        }
                         var objVal = rowObject[this.AssociatedColumn.RawName];
                         if (objVal == null)
                             return false;
                         if (this.AssociatedColumn.IsString) {
                             var str = objVal.toString();
-                            return ((frmEmpty) ||
-                                (this.Configuration.InclusiveLeft
-                                    ? (str.localeCompare(fromValue) >= 0)
-                                    : (str.localeCompare(fromValue) > 0)))
-                                && ((toEmpty) ||
-                                    (this.Configuration.InclusiveRight
-                                        ? (str.localeCompare(toValue) <= 0)
-                                        : (str.localeCompare(toValue) < 0)));
+                            return ((!entry.HasFrom) ||
+                                (entry.IncludeLeft
+                                    ? (str.localeCompare(entry.From) >= 0)
+                                    : (str.localeCompare(entry.From) > 0)))
+                                && ((!entry.HasTo) ||
+                                    (entry.IncludeRight
+                                        ? (str.localeCompare(entry.To) <= 0)
+                                        : (str.localeCompare(entry.To) < 0)));
                         }
-                        if (this.AssociatedColumn.IsFloat) {
-                            return ((frmEmpty) ||
-                                (this.Configuration.InclusiveLeft
-                                    ? (objVal >= parseFloat(fromValue))
-                                    : (objVal > parseFloat(fromValue))))
-                                && ((toEmpty) ||
-                                    (this.Configuration.InclusiveRight
-                                        ? (objVal <= parseFloat(toValue))
-                                        : (objVal < parseFloat(toValue))));
-                        }
-                        if (this.AssociatedColumn.IsInteger || this.AssociatedColumn.IsEnum) {
-                            return ((frmEmpty) ||
-                                (this.Configuration.InclusiveLeft
-                                    ? (objVal >= parseInt(fromValue))
-                                    : (objVal > parseInt(fromValue))))
-                                && ((toEmpty) ||
-                                    (this.Configuration.InclusiveRight
-                                        ? (objVal <= parseInt(toValue))
-                                        : (objVal < parseInt(toValue))));
-                        }
-                        if (this.AssociatedColumn.IsDateTime) {
-                            var incLeft = this.Configuration.InclusiveLeft;
-                            var incRight = this.Configuration.InclusiveRight;
-                            var toVal = toEmpty ? null : this.MasterTable.Date.parse(toValue);
-                            var fromVal = frmEmpty ? null : this.MasterTable.Date.parse(fromValue);
-                            if (this.Configuration.CompareOnlyDates) {
-                                if (!frmEmpty) {
-                                    fromVal.setHours(0, 0, 0, 0);
-                                    if (!incLeft) {
-                                        fromVal.setDate(fromVal.getDate() + 1);
-                                        incLeft = true;
-                                    }
-                                }
-                                if (!toEmpty) {
-                                    toVal.setHours(0, 0, 0, 0);
-                                    if (incRight) {
-                                        toVal.setDate(toVal.getDate() + 1);
-                                        incRight = false;
-                                    }
-                                }
-                            }
-                            return ((frmEmpty) || (incLeft ? (objVal >= fromVal) : (objVal > fromVal)))
-                                && ((toEmpty) || (incRight ? (objVal <= toVal) : (objVal < toVal)));
-                        }
-                        return true;
+                        return ((!entry.HasFrom) ||
+                            (entry.IncludeLeft
+                                ? (objVal >= entry.From)
+                                : (objVal > entry.From)))
+                            && ((!entry.HasTo) ||
+                                (this.Configuration.InclusiveRight
+                                    ? (objVal <= entry.To)
+                                    : (objVal < entry.To)));
                     };
                     return RangeFilterPlugin;
                 }(Reinforced.Lattice.Filters.FilterBase));
@@ -7246,13 +7278,10 @@ var Reinforced;
                             this.itIsClientFilter();
                         }
                     };
-                    /**
-                     * @internal
-                     */
-                    SelectFilterPlugin.prototype.filterPredicate = function (rowObject, query) {
+                    SelectFilterPlugin.prototype.precompute = function (query, context) {
                         var fval = query.Filterings[this.AssociatedColumn.RawName];
                         if (fval == null || fval == undefined)
-                            return true;
+                            return;
                         if (fval === '$$lattice_not_present$$' && this.AssociatedColumn.Configuration.IsNullable)
                             fval = null;
                         var arr = null;
@@ -7262,46 +7291,47 @@ var Reinforced;
                         else {
                             arr = [fval];
                         }
-                        if (this.Configuration.ClientFilteringFunction) {
-                            return this.Configuration.ClientFilteringFunction(rowObject, arr, query);
-                        }
-                        if (!query.Filterings.hasOwnProperty(this.AssociatedColumn.RawName))
-                            return true;
-                        var objVal = rowObject[this.AssociatedColumn.RawName];
-                        if (objVal == null)
-                            return arr.indexOf(null) > -1;
-                        if (this.AssociatedColumn.IsString) {
-                            return arr.indexOf(objVal) >= 0;
-                        }
-                        var single = false;
-                        if (this.AssociatedColumn.IsFloat) {
-                            arr.map(function (v) {
-                                if (parseFloat(v) === objVal)
-                                    single = true;
-                            });
-                            return single;
-                        }
-                        if (this.AssociatedColumn.IsInteger || this.AssociatedColumn.IsEnum) {
-                            single = false;
-                            arr.map(function (v) {
-                                if (parseInt(v) === objVal)
-                                    single = true;
-                            });
-                            return single;
-                        }
-                        if (this.AssociatedColumn.IsBoolean) {
-                            single = false;
-                            arr.map(function (v) {
+                        var result = [];
+                        for (var i = 0; i < arr.length; i++) {
+                            var v = arr[i];
+                            if (v === null && this.AssociatedColumn.Configuration.IsNullable)
+                                result.push(null);
+                            else if (this.AssociatedColumn.IsString)
+                                result.push(v);
+                            else if (this.AssociatedColumn.IsFloat)
+                                result.push(parseFloat(v));
+                            else if (this.AssociatedColumn.IsInteger || this.AssociatedColumn.IsEnum)
+                                result.push(parseInt(v));
+                            else if (this.AssociatedColumn.IsBoolean) {
                                 var bv = v.toLocaleUpperCase() === 'TRUE' ? true :
                                     v.toLocaleUpperCase() === 'FALSE' ? false : null;
                                 if (bv == null) {
-                                    bv = parseInt(fval) > 0;
+                                    bv = parseInt(v) > 0;
                                 }
-                                if (bv === objVal) {
-                                    single = true;
-                                }
-                            });
-                            return single;
+                                result.push(bv);
+                            }
+                        }
+                        context[this.AssociatedColumn.RawName] = result;
+                    };
+                    /**
+                     * @internal
+                     */
+                    SelectFilterPlugin.prototype.filterPredicate = function (rowObject, context, query) {
+                        if (!context.hasOwnProperty(this.AssociatedColumn.RawName))
+                            return true;
+                        if (this.Configuration.ClientFilteringFunction) {
+                            return this.Configuration.ClientFilteringFunction(rowObject, context[this.AssociatedColumn.RawName], query);
+                        }
+                        var arr = context[this.AssociatedColumn.RawName];
+                        var objVal = rowObject[this.AssociatedColumn.RawName];
+                        if (objVal == null)
+                            return arr.indexOf(null) > -1;
+                        if (this.AssociatedColumn.IsString
+                            || this.AssociatedColumn.IsFloat
+                            || this.AssociatedColumn.IsInteger
+                            || this.AssociatedColumn.IsEnum
+                            || this.AssociatedColumn.IsBoolean) {
+                            return arr.indexOf(objVal) >= 0;
                         }
                         return true;
                     };
@@ -8381,9 +8411,10 @@ var Reinforced;
                         e.Adjustment.subscribeAfter(this.onAdjustment_after.bind(this), 'hierarchy');
                         e.Adjustment.subscribeBefore(this.onAdjustment_before.bind(this), 'hierarchy');
                     };
+                    HierarchyPlugin.prototype.precompute = function (query, context) { };
                     // we implement this only to assure DataHolder to refilter data
                     // but actually we are refiltering it later
-                    HierarchyPlugin.prototype.filterPredicate = function (rowObject, query) {
+                    HierarchyPlugin.prototype.filterPredicate = function (rowObject, context, query) {
                         return true;
                     };
                     return HierarchyPlugin;

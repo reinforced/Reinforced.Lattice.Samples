@@ -220,8 +220,15 @@
     <p>
         You <b>CAN</b> use both client and server filters within single table. Please keep in mind that if column has client filter configured then 
         <b>it will not be filtered on server</b>! It means that all objects that were not filtered out by server filter will be returned to client-side 
-        for futher filtering. Beware of significant volumes of data and balance load between client and server.
+        for futher filtering. Beware of significant volumes of data transmitted and do balance load between client and server.
     </p>
+    <h3>How to override server filtering function (filtering delegates)</h3>
+    <p>
+        
+    </p>
+</div>
+
+<div class="text">
     <h3>How to override placeholder texts for filters</h3>
     <p>
         Use <code>.Placeholder</code> UI configurator method for value filter and <code>.Placeholders</code> method for range filter:

@@ -14,9 +14,9 @@
   ],
   "LiveDemos": [
     {
-      "Id": "Basic",
-      "Title": "Basic",
-      "Description": "Basic datagrid setup demo",
+      "Id": "Value",
+      "Title": "Value filters",
+      "Description": "Value filters demo",
       "Controller": "HomeController",
       "Action": "Index",
       "View": "Index",
@@ -25,34 +25,15 @@
   ],
   "CodePieces": [
     {
-      "Id": "_Layout.cshtml",
-      "Title": "_Layout.cshtml",
-      "Description": "MVC Layout file for this test case",
-      "Files": [
-        {
-          "Path": "/Views/Shared/_Layout.cshtml",
-          "Language": "cshtml",
-          "Comment": null,
-          "Title": "_Layout.cshtml"
-        }
-      ]
-    },
-    {
-      "Id": "Index.cshtml",
-      "Title": "Index.cshtml and its ViewModel",
-      "Description": "MVC view for page containing our table and its ViewModel",
+      "Id": "Value_Index.cshtml",
+      "Title": "Value filter - Index.cshtml",
+      "Description": "MVC view for page containing table with value filters",
       "Files": [
         {
           "Path": "/Views/Home/Index.cshtml",
           "Language": "cshtml",
           "Comment": null,
           "Title": "Index.cshtml"
-        },
-        {
-          "Path": "/Models/HomeIndexViewModel.cs",
-          "Language": "csharp",
-          "Comment": null,
-          "Title": "HomeIndexViewModel.cs"
         }
       ]
     },
@@ -62,55 +43,29 @@
       "Description": "Definitions of Source Data and row ViewModel",
       "Files": [
         {
-          "Path": "/Models/User.cs",
+          "Path": "/Models/Contract.cs",
           "Language": "csharp",
           "Comment": "Data from data source",
-          "Title": "User.cs"
+          "Title": "Contract.cs"
         },
         {
-          "Path": "/Models/UserRow.cs",
+          "Path": "/Models/ContractRow.cs",
           "Language": "csharp",
           "Comment": "ViewModel of table's row",
-          "Title": "UserRow.cs"
+          "Title": "ContractRow.cs"
         }
       ]
     },
     {
-      "Id": "UsersTable.cs",
+      "Id": "ContractTable.cs",
       "Title": "Configuration extension class",
       "Description": "Class holding our configuration extension method",
       "Files": [
         {
-          "Path": "/Models/UsersTable.cs",
+          "Path": "/Models/ContractTable.cs",
           "Language": "csharp",
           "Comment": null,
-          "Title": "UsersTable.cs"
-        }
-      ]
-    },
-    {
-      "Id": "HomeController.cs",
-      "Title": "Controller",
-      "Description": "Implementation of MVC controller handling table on server side",
-      "Files": [
-        {
-          "Path": "/Controllers/HomeController.cs",
-          "Language": "csharp",
-          "Comment": null,
-          "Title": "HomeController.cs"
-        }
-      ]
-    },
-    {
-      "Id": "DataService.cs",
-      "Title": "Data service implementation",
-      "Description": "Sample implementation of data service",
-      "Files": [
-        {
-          "Path": "/Data/DataService.cs",
-          "Language": "csharp",
-          "Comment": null,
-          "Title": "DataService.cs"
+          "Title": "ContractTable.cs"
         }
       ]
     }

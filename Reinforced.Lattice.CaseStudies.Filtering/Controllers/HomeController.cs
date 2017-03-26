@@ -19,25 +19,25 @@ namespace Reinforced.Lattice.CaseStudies.Filtering.Controllers
         {
             return new HomeIndexViewModel()
             {
-                Table = new Configurator<User, UserRow>()  
-                            .Configure()                   
+                Table = new Configurator<Contract, ContractRow>()  
+                            .ConfigureValueFilters()                   
                             .Url(Url.Action("HandleTable"))
             };
         }
 
         public ActionResult HandleTable()
         {
-            var conf = new Configurator<User,UserRow>().Configure();
+            var conf = new Configurator<Contract, ContractRow>().ConfigureValueFilters();
             var handler = conf.CreateMvcHandler(ControllerContext);
             var q = DataService.GetAllData();
             return handler.Handle(q);
         }
 
-        public DataService<User> DataService { get; private set; }
+        public DataService<Contract> DataService { get; private set; }
 
         public HomeController()
         {
-            DataService = new DataService<User>();
+            DataService = new DataService<Contract>();
             DataService.SetData(MvcApplication.Data);
         }
     }
