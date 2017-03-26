@@ -48,16 +48,77 @@
       "Action": "Index",
       "View": "Index",
       "Data": "data.json"
+    },
+    {
+      "Id": "Mixed",
+      "Title": "All-in-one filters",
+      "Description": "All filters in single table demo",
+      "Controller": "MixedFilterController",
+      "Action": "Index",
+      "View": "Index",
+      "Data": "data.json"
     }
   ],
   "CodePieces": [
     {
       "Id": "Value_Index.cshtml",
       "Title": "Value filter - Index.cshtml",
-      "Description": "MVC view for page containing table with value filters",
+      "Description": "MVC view for page containing table with Value filters",
       "Files": [
         {
           "Path": "/Views/Home/Index.cshtml",
+          "Language": "cshtml",
+          "Comment": null,
+          "Title": "Index.cshtml"
+        }
+      ]
+    },
+    {
+      "Id": "Range_Index.cshtml",
+      "Title": "Range filter - Index.cshtml",
+      "Description": "MVC view for page containing table with Range filters",
+      "Files": [
+        {
+          "Path": "/Views/RangeFilter/Index.cshtml",
+          "Language": "cshtml",
+          "Comment": null,
+          "Title": "Index.cshtml"
+        }
+      ]
+    },
+    {
+      "Id": "Select_Index.cshtml",
+      "Title": "Select filter - Index.cshtml",
+      "Description": "MVC view for page containing table with Select filters",
+      "Files": [
+        {
+          "Path": "/Views/SelectFilter/Index.cshtml",
+          "Language": "cshtml",
+          "Comment": null,
+          "Title": "Index.cshtml"
+        }
+      ]
+    },
+    {
+      "Id": "MultiSelect_Index.cshtml",
+      "Title": "MultiSelect filter - Index.cshtml",
+      "Description": "MVC view for page containing table with MultiSelect filters",
+      "Files": [
+        {
+          "Path": "/Views/MultiSelectFilter/Index.cshtml",
+          "Language": "cshtml",
+          "Comment": null,
+          "Title": "Index.cshtml"
+        }
+      ]
+    },
+    {
+      "Id": "Mixed_Index.cshtml",
+      "Title": "Mixed filters - Index.cshtml",
+      "Description": "MVC view for page containing table with Mixed filters",
+      "Files": [
+        {
+          "Path": "/Views/MixedFilter/Index.cshtml",
           "Language": "cshtml",
           "Comment": null,
           "Title": "Index.cshtml"
@@ -106,6 +167,58 @@
           "Language": "csharp",
           "Comment": null,
           "Title": "ValueFilterTable.cs"
+        }
+      ]
+    },
+    {
+      "Id": "SelectFilterTable.cs",
+      "Title": "Select filter config. method",
+      "Description": "Class holding table configuration applied to tables with Select filters",
+      "Files": [
+        {
+          "Path": "/Models/SelectFilterTable.cs",
+          "Language": "csharp",
+          "Comment": null,
+          "Title": "SelectFilterTable.cs"
+        }
+      ]
+    },
+    {
+      "Id": "MultiSelectFilterTable.cs",
+      "Title": "MultiSelect filter config. method",
+      "Description": "Class holding table configuration applied to tables with MultiSelect filters",
+      "Files": [
+        {
+          "Path": "/Models/MultiSelectFilterTable.cs",
+          "Language": "csharp",
+          "Comment": null,
+          "Title": "MultiSelectFilterTable.cs"
+        }
+      ]
+    },
+    {
+      "Id": "RangeFilterTable.cs",
+      "Title": "Range filter config. method",
+      "Description": "Class holding table configuration applied to tables with Range filters",
+      "Files": [
+        {
+          "Path": "/Models/RangeFilterTable.cs",
+          "Language": "csharp",
+          "Comment": null,
+          "Title": "RangeFilterTable.cs"
+        }
+      ]
+    },
+    {
+      "Id": "MixedFilterTable.cs",
+      "Title": "Mixed filter config. method",
+      "Description": "Class holding table configuration applied to tables with Mixed filters",
+      "Files": [
+        {
+          "Path": "/Models/MixedFilterTable.cs",
+          "Language": "csharp",
+          "Comment": null,
+          "Title": "MixedFilterTable.cs"
         }
       ]
     }
