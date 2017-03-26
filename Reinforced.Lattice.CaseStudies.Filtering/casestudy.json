@@ -21,6 +21,33 @@
       "Action": "Index",
       "View": "Index",
       "Data": "data.json"
+    },
+    {
+      "Id": "Select",
+      "Title": "Select filters",
+      "Description": "Select filters demo",
+      "Controller": "SelectFilterController",
+      "Action": "Index",
+      "View": "Index",
+      "Data": "data.json"
+    },
+    {
+      "Id": "MultiSelect",
+      "Title": "Multi-Select filters",
+      "Description": "Multi-Select filters demo",
+      "Controller": "MultiSelectFilterController",
+      "Action": "Index",
+      "View": "Index",
+      "Data": "data.json"
+    },
+    {
+      "Id": "Range",
+      "Title": "Range filters",
+      "Description": "Range filters demo",
+      "Controller": "RangeFilterController",
+      "Action": "Index",
+      "View": "Index",
+      "Data": "data.json"
     }
   ],
   "CodePieces": [

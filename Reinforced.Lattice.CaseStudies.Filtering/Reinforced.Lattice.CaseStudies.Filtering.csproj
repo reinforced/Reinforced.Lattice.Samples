@@ -184,6 +184,7 @@
     <Compile Include="App_Start\RouteConfig.cs" />
     <Compile Include="Controllers\HomeController.cs" />
     <Compile Include="Controllers\MultiSelectFilterController.cs" />
+    <Compile Include="Controllers\RangetFilterController.cs" />
     <Compile Include="Controllers\SelectFilterController.cs" />
     <Compile Include="Data\DataService.cs" />
     <Compile Include="Global.asax.cs">
@@ -194,6 +195,7 @@
     <Compile Include="Models\HomeIndexViewModel.cs" />
     <Compile Include="Models\ContractRow.cs" />
     <Compile Include="Models\MultiSelectFilterTable.cs" />
+    <Compile Include="Models\RangeFilterTable.cs" />
     <Compile Include="Models\SelectFilterTable.cs" />
     <Compile Include="Models\ValueFilterTable.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
@@ -232,6 +234,7 @@
     <Content Include="Views\MultiSelectFilter\Index.cshtml" />
     <Content Include="Views\Shared\Lattice_Templates_Bootstrap.cshtml" />
     <Content Include="Scripts\Reinforced.Lattice\reinforced.lattice.js.map" />
+    <Content Include="Views\RangeFilter\Index.cshtml" />
   </ItemGroup>
   <ItemGroup>
     <Content Include="fonts\glyphicons-halflings-regular.woff" />
