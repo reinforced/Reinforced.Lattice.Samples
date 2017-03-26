@@ -1,0 +1,122 @@
+﻿@{ ViewBag.Title = "Multi Select filter"; }
+
+@using Reinforced.Lattice
+@using Reinforced.Lattice.CaseStudies.Filtering.Models
+@using Reinforced.Lattice.CellTemplating
+@using Reinforced.Lattice.Configuration
+@using Reinforced.Lattice.Filters
+@using Reinforced.Lattice.Filters.Multi
+@using Reinforced.Lattice.Filters.Range
+@using Reinforced.Lattice.Filters.Select
+@using Reinforced.Lattice.Filters.Value
+@using Reinforced.Lattice.Mvc
+@using Reinforced.Lattice.Templates
+@model Reinforced.Lattice.CaseStudies.Filtering.Models.HomeIndexViewModel
+@{
+    var conf = Model.Table;
+    conf.Column(c => c.Priority).Template(x =>
+    {
+    x.RazorIf("{@}==0", @<span style="color: #c7c7c7"><span class="glyphicon glyphicon-unchecked"></span> Minor</span>);
+        x.RazorIf("{@}==1", @<span style="color: #049404"><span class="glyphicon glyphicon-arrow-down"></span> Low</span>);
+        x.RazorIf("{@}==2", @<span><span class="glyphicon glyphicon-tasks"></span> Normal</span>);
+        x.RazorIf("{@}==3", @<span style="color: #ff4489"><span class="glyphicon glyphicon-arrow-up"></span> High</span>);
+        x.RazorIf("{@}==4", @<span style="color: #e89a0c"><span class="glyphicon glyphicon-exclamation-sign"></span> Major</span>);
+        x.RazorIf("{@}==5", @<span style="color: #dc0000"><span class="glyphicon glyphicon-fire"></span> Critical</span>);
+    });
+
+    conf.Column(c => c.Price)
+        .FilterMultiSelectUi(c => c.SelectItems(new UiListItem[]
+        {
+            new UiListItem() {Text = "5k - 15k" , Value = "0"},
+            new UiListItem() {Text = "15k - 25k" , Value = "1"},
+            new UiListItem() {Text = "25k - 35k" , Value = "2"},
+            new UiListItem() {Text = "35k - 40k" , Value = "3"},
+            new UiListItem() {Text = "40k - 50k" , Value = "4"},
+        })
+    );
+
+    conf.Column(c => c.Priority)
+        .FilterMultiSelectUi(ui => ui.SelectAny().SelectItems(EnumHelper.GetSelectList(typeof(Priority))).ClientFiltering());
+}
+<div id="table"></div>
+
+@section scripts {
+    <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/moment.js/2.17.1/moment.min.js"></script>
+    <script type='text/javascript' src='https://cdnjs.cloudflare.com/ajax/libs/bootstrap-datepicker/1.6.4/js/bootstrap-datepicker.min.js'></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-datepicker/1.6.4/css/bootstrap-datepicker3.min.css" />
+
+    <script type='text/javascript'>
+        var ltcCreateDatePicker = function (element) {
+            var date = null;
+            $(element).css('cursor', 'pointer');
+            $(element).css('text-align', 'center');
+            if ($(element).val()) date = new Date($(element).val());
+            $(element).datepicker({ format: 'dd MM yyyy', weekStart: 1 });
+            if (date) $(element).datepicker('setDate', date);
+            $(element)
+                .on('changeDate', function () {
+                    Reinforced.Lattice.Master.fireDomEvent('keyup', element);
+                });
+        }
+
+        var ltcPutDateToDatepicker = function (element, date) {
+            $(element).datepicker('setDate', date);
+        }
+
+        var ltcGetDateFromDatepicker = function (element, date) {
+            var dt = $(element).datepicker('getDate');
+            if (dt == null || dt == undefined) return null;
+            if (!dt.getTime) return null;
+            dt.setHours(dt.getHours() - dt.getTimezoneOffset() / 60);
+            return dt;
+        }
+
+        var ltcDestroyDatepicker = function (element) {
+            $(element).datepicker('remove');
+        }
+
+        function formatRating(v) {
+            var s = "<div style='color:orange' class='text-center'>";
+            for (var i = 0; i < 5; i++) {
+                if (i < v.DataObject.Rating) s += "<span class='glyphicon glyphicon-star'></span>";
+                else s += "<span class='glyphicon glyphicon-star-empty'></span>";
+            }
+            s += "</div>";
+            return s;
+        }
+        function fixColumnWidths(e) {
+            $(e.Renderer.RootElement).find('th').each(function () {
+                var sx = $(this).width();
+                $(this).css('width', sx + 'px');
+            });
+        }
+    </script>
+    <style type="text/css">
+        [data-track='h-Tax'] {
+            width: 150px;
+        }
+
+        [data-track='h-Price'] {
+            width: 170px;
+        }
+
+        [data-track='h-StartDate'] {
+            width: 120px;
+        }
+
+        [data-track='h-EndDate'] {
+            width: 120px;
+        }
+        [data-track='h-Priority'] {
+            width: 170px;
+        }
+        [data-track='h-Scope'] {
+            width: 170px;
+        }
+        [data-track='h-Rating'] {
+            width: 170px;
+        }
+    </style>
+    @{ Html.RenderTemplates("lt", "Lattice_Templates_Bootstrap"); }
+    @Model.Table.OnInitialized("fixColumnWidths").InitializationScript("table", "window.$$table")
+}
