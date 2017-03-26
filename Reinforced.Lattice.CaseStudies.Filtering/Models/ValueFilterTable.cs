@@ -8,41 +8,8 @@ using Reinforced.Lattice.Plugins.Scrollbar;
 
 namespace Reinforced.Lattice.CaseStudies.Filtering.Models
 {
-    public static class ContractTable
+    public static class ValueFilterTable
     {
-        public static Configurator<Contract, ContractRow> Table(this Configurator<Contract, ContractRow> conf)
-        {
-            conf.AppendEmptyFilters().PrettifyTitles(true);
-            conf.Partition(c => c.InitialSkipTake(take: 10));
-            conf.Column(c => c.Id).DataOnly();
-            conf.DatePicker(new DatepickerOptions(
-                "ltcCreateDatePicker",
-                "ltcPutDateToDatepicker",
-                "ltcGetDateFromDatepicker",
-                "ltcDestroyDatepicker"
-            ));
-            conf.Column(c => c.StartDate).Format("`moment({@}).format('DD MMM YYYY');`");
-            conf.Column(c => c.EndDate)
-                .Template(x =>
-                {
-                    x.IfNotPresent("{@}", "<i>No date</i>");
-                    x.Returns("`moment({@}).format('DD MMM YYYY');`");
-                });
-            conf.Column(c => c.Tax).Template(x =>
-            {
-                x.IfNotPresent("{@}", "No tax");
-                x.Returns("`({@}*{Price}).toFixed(2)` ({@})");
-            });
-            conf.Column(c => c.Priority).FormatEnum();
-            conf.Column(c => c.Scope).FormatEnum();
-            conf.PrettifyTitles(true);
-            conf.Partition(c => c.InitialSkipTake(take: 20));
-            conf.Scrollbar(c => c.Vertical());
-            conf.Column(c => c.Tax).Title("Tax");
-            conf.Column(c => c.Rating).TemplateFunction("formatRating");
-            return conf;
-        }
-
         public static Configurator<Contract, ContractRow> ConfigureValueFilters(this Configurator<Contract, ContractRow> conf)
         {
             conf.Table();
@@ -81,5 +48,7 @@ namespace Reinforced.Lattice.CaseStudies.Filtering.Models
 
             return conf;
         }
+
+
     }
 }

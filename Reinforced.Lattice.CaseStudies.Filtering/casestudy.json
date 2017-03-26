@@ -57,15 +57,28 @@
       ]
     },
     {
-      "Id": "ContractTable.cs",
-      "Title": "Configuration extension class",
-      "Description": "Class holding our configuration extension method",
+      "Id": "CommonTableConfiguration.cs",
+      "Title": "Common tables configuration",
+      "Description": "Class holding table configuration applied to all tables",
       "Files": [
         {
-          "Path": "/Models/ContractTable.cs",
+          "Path": "/Models/CommonTableConfiguration.cs",
           "Language": "csharp",
           "Comment": null,
-          "Title": "ContractTable.cs"
+          "Title": "CommonTableConfiguration.cs"
+        }
+      ]
+    },
+    {
+      "Id": "ValueFilterTable.cs",
+      "Title": "Value filter config. method",
+      "Description": "Class holding table configuration applied to tables with value filters",
+      "Files": [
+        {
+          "Path": "/Models/ValueFilterTable.cs",
+          "Language": "csharp",
+          "Comment": null,
+          "Title": "ValueFilterTable.cs"
         }
       ]
     }

@@ -1,4 +1,4 @@
-﻿@{ ViewBag.Title = "Value filter"; }
+﻿@{ ViewBag.Title = "Select filter"; }
 
 @using Reinforced.Lattice
 @using Reinforced.Lattice.CaseStudies.Filtering.Models
@@ -16,16 +16,27 @@
     var conf = Model.Table;
     conf.Column(c => c.Priority).Template(x =>
     {
-        x.RazorIf("{@}==0", @<span style="color: #c7c7c7"><span class="glyphicon glyphicon-unchecked"></span> Minor</span>);
+    x.RazorIf("{@}==0", @<span style="color: #c7c7c7"><span class="glyphicon glyphicon-unchecked"></span> Minor</span>);
         x.RazorIf("{@}==1", @<span style="color: #049404"><span class="glyphicon glyphicon-arrow-down"></span> Low</span>);
         x.RazorIf("{@}==2", @<span><span class="glyphicon glyphicon-tasks"></span> Normal</span>);
         x.RazorIf("{@}==3", @<span style="color: #ff4489"><span class="glyphicon glyphicon-arrow-up"></span> High</span>);
         x.RazorIf("{@}==4", @<span style="color: #e89a0c"><span class="glyphicon glyphicon-exclamation-sign"></span> Major</span>);
         x.RazorIf("{@}==5", @<span style="color: #dc0000"><span class="glyphicon glyphicon-fire"></span> Critical</span>);
     });
-    conf.Column(c => c.Supplier).FilterValueUi(ui => ui.ClientFiltering());
-    conf.Column(c => c.EndDate).FilterValueUi(c => c.CompareOnlyDates().Inputdelay(10).ClientFiltering());
-    conf.Column(c => c.Price).FilterValueUi(c => c.Placeholder("Max. Price").Inputdelay(10).ClientFilteringExpression("{@} < x"));
+
+    conf.Column(c => c.Price)
+        .FilterSelectUi(c => c.SelectAny().SelectItems(new UiListItem[]
+        {
+            new UiListItem() {Text = "5k - 15k" , Value = "0"},
+            new UiListItem() {Text = "15k - 25k" , Value = "1"},
+            new UiListItem() {Text = "25k - 35k" , Value = "2"},
+            new UiListItem() {Text = "35k - 40k" , Value = "3"},
+            new UiListItem() {Text = "40k - 50k" , Value = "4"},
+        })
+    );
+
+    conf.Column(c => c.Priority)
+        .FilterSelectUi(ui => ui.SelectAny().SelectItems(EnumHelper.GetSelectList(typeof(Priority))).ClientFiltering());
 }
 <div id="table"></div>
 
@@ -84,14 +95,26 @@
         [data-track='h-Tax'] {
             width: 150px;
         }
+
         [data-track='h-Price'] {
             width: 120px;
         }
+
         [data-track='h-StartDate'] {
             width: 120px;
         }
+
         [data-track='h-EndDate'] {
             width: 120px;
+        }
+        [data-track='h-Priority'] {
+            width: 130px;
+        }
+        [data-track='h-Scope'] {
+            width: 140px;
+        }
+        [data-track='h-Rating'] {
+            width: 130px;
         }
     </style>
     @{ Html.RenderTemplates("lt", "Lattice_Templates_Bootstrap"); }

@@ -183,14 +183,17 @@
     <Compile Include="App_Start\FilterConfig.cs" />
     <Compile Include="App_Start\RouteConfig.cs" />
     <Compile Include="Controllers\HomeController.cs" />
+    <Compile Include="Controllers\SelectFilterController.cs" />
     <Compile Include="Data\DataService.cs" />
     <Compile Include="Global.asax.cs">
       <DependentUpon>Global.asax</DependentUpon>
     </Compile>
+    <Compile Include="Models\CommonTableConfiguration.cs" />
     <Compile Include="Models\Contract.cs" />
     <Compile Include="Models\HomeIndexViewModel.cs" />
     <Compile Include="Models\ContractRow.cs" />
-    <Compile Include="Models\ContractTable.cs" />
+    <Compile Include="Models\SelectFilterTable.cs" />
+    <Compile Include="Models\ValueFilterTable.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Startup.cs" />
   </ItemGroup>
@@ -225,6 +228,7 @@
     <Content Include="Views\Home\Index.cshtml" />
     <Content Include="Views\Shared\Lattice_Templates_Bootstrap.cshtml" />
     <Content Include="Scripts\Reinforced.Lattice\reinforced.lattice.js.map" />
+    <Content Include="Views\SelectFilter\Index.cshtml" />
   </ItemGroup>
   <ItemGroup>
     <Content Include="fonts\glyphicons-halflings-regular.woff" />
