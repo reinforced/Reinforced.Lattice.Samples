@@ -27,8 +27,16 @@
         </li>
     </ul>
     <p>
-        Using core templating, you can easily change supplied filter's UI without changing their logic.
+        Using core templating, you can easily change supplied filter's UI without changing their logic. <br/>
+        To configure filter you have to select column and call filter configuration method. Filters configuration in almost all cases exposed by 5 methods:
     </p>
+    <ul>
+        <li><code>.Filter*(source_prop,ui)</code> - configures filter that filters <code>source_prop</code> property of <code>TSource</code> on server side and has <code>ui</code> configuration for UI representation</li>
+        <li><code>.Filter*NoUi(source_prop)</code> - configures only server filter that filtres <code>source_prop</code> property of <code>TSource</code> without any UI representation</li>
+        <li><code>.Filter*Ui(ui)</code> - configures UI part for filter. This method is safe to be called in <code>cshtml</code>, as server part does not need UI configuration. Best practice is to use <code>.Filter*NoUi(source_prop)</code> in server configuration method and <code>.Filter*Ui(ui)</code> in <code>cshtml</code>. </li>
+        <li><code>.Filter*By(filter_delegate,ui)</code> - configures filter using filtering delegate instead of column. Second parameter optionally specifies UI</li>
+        <li><code>.Filter*NoUiBy(filter_delegate)</code> - configures filter using filtering delegate without UI</li>
+    </ul>
     <h3>Client and server filters</h3>
     <p>
         For each filter you can override server filtering criteria as well as client one.
@@ -184,12 +192,51 @@
         </div>
     </div>
 </div>
-<div class="text tiptext" data-tiptext="extension" data-caption="About Configuration extensions">
+<div class="text">
+    <h3>How to add multi-select filter to column</h3>
     <p>
-        In Reinforced.Lattice table configurations are maintained as C# <a href="https://msdn.microsoft.com/en-us/library/bb383977.aspx" target="_blank">extension methods</a> implementing <a href="https://en.wikipedia.org/wiki/Fluent_interface" target="_blank">fluent interface configuration</a>.
-        So you can chain your configurations methods and therefore combine configurations obtaining new configurations. <br />
-        No XML configuration, no <a href="https://datatables.net/" target="_blank">JSON configuration</a>, no <a href="https://demos.devexpress.com/MVCxGridViewDemos/" target="_blank">assigning properties</a>, even
-        no <a href="https://demos.telerik.com/aspnet-mvc/grid" target="_blank">creating separate web project to enable grids</a>! Just clear, precise, chainable and maintainable fluent configuration. <br />
-        Unfortunately you cannot chain configurations for cells templating, but you can do lot more other fun with them.
+        Use <code>.FilterMultiSelect</code> method:
+    </p>
+</div>
+<pre class="language-csharp wrap-code" data-src="#doc#/filter-multiselect.cs"></pre>
+<div class="text">
+    <p>
+        Multi select filter has exactly the same UI opions configuration approach as <span class="tip" data-tip="multiselect">regular select filter</span>.
+    </p>
+    <h3>How to add range filter to column</h3>
+    <p>
+        Use <code>.FilterRange</code> method:
+    </p>
+</div>
+<pre class="language-csharp wrap-code" data-src="#doc#/filter-range.cs"></pre>
+<div class="text">
+    <h3>How to use client filtering</h3>
+    <p>
+        Each filter's UI configurator has <code>.ClientFiltering</code> method. Just call it and filtration will be performed on client-side, without involving server:
+    </p>
+</div>
+<pre class="language-csharp wrap-code" data-src="#doc#/filter-client.cs"></pre>
+<div class="text">
+    <p>
+        You <b>CAN</b> use both client and server filters within single table. Please keep in mind that if column has client filter configured then 
+        <b>it will not be filtered on server</b>! It means that all objects that were not filtered out by server filter will be returned to client-side 
+        for futher filtering. Beware of significant volumes of data and balance load between client and server.
+    </p>
+    <h3>How to override placeholder texts for filters</h3>
+    <p>
+        Use <code>.Placeholder</code> UI configurator method for value filter and <code>.Placeholders</code> method for range filter:
+    </p>
+</div>
+<pre class="language-csharp wrap-code" data-src="#doc#/filter-placeholders.cs"></pre>
+
+<div class="text tiptext" data-tiptext="multiselect" data-caption="Select and multiselect filters">
+    <p>
+        Actually there is no multi-select filter on client side. There is select filter with enabled multi-selection feature. <br/>
+        At the same time, there is no select filter on server side - there is value filter only. <br/>
+        But! On server-side multi-select filter has its own implementation.<br/>
+        So <b>multi-select</b> and <b>select</b> filters do share client side, but have different server side implementations.
+        And both <b>select</b> and <b>value</b> filters do share server side, but have different client side implementations.<br/>
+        That seems weird, but actually it is correct approach. <br/>
+        Only range filter has its own dedicated server-side and client-side implementations.
     </p>
 </div>

@@ -1866,11 +1866,27 @@ var Reinforced;
                     if (Object.prototype.toString.call(date) === "[object Date]") {
                         if (isNaN(date.getTime()))
                             return '';
-                        else
-                            return Date.prototype.toISOString.call(date);
+                        var offset = 0 - date.getTimezoneOffset();
+                        var r = date.getFullYear() +
+                            '-' + DateService.pad(date.getMonth() + 1) +
+                            '-' + DateService.pad(date.getDate()) +
+                            'T' + DateService.pad(date.getHours()) +
+                            ':' + DateService.pad(date.getMinutes()) +
+                            ':' + DateService.pad(date.getSeconds()) +
+                            '.' + (date.getMilliseconds() / 1000).toFixed(3).slice(2, 5)
+                            + (offset < 0 ? "-" : "+")
+                            + DateService.pad(parseInt((Math.abs(offset) / 60).toString())) +
+                            ':' + DateService.pad(offset % 60);
+                        return r;
                     }
                     else
                         throw new Error(date + " is not a date at all");
+                };
+                DateService.pad = function (x) {
+                    if (x < 10) {
+                        return '0' + x;
+                    }
+                    return x.toString();
                 };
                 /**
                  * Parses ISO date string to regular Date object
@@ -7069,25 +7085,58 @@ var Reinforced;
                             return false;
                         if (this.AssociatedColumn.IsString) {
                             var str = objVal.toString();
-                            return ((frmEmpty) || str.localeCompare(fromValue) >= 0) && ((toEmpty) || str.localeCompare(toValue) <= 0);
+                            return ((frmEmpty) ||
+                                (this.Configuration.InclusiveLeft
+                                    ? (str.localeCompare(fromValue) >= 0)
+                                    : (str.localeCompare(fromValue) > 0)))
+                                && ((toEmpty) ||
+                                    (this.Configuration.InclusiveRight
+                                        ? (str.localeCompare(toValue) <= 0)
+                                        : (str.localeCompare(toValue) < 0)));
                         }
                         if (this.AssociatedColumn.IsFloat) {
-                            return ((frmEmpty) || objVal >= parseFloat(fromValue)) && ((toEmpty) || objVal <= parseFloat(toValue));
+                            return ((frmEmpty) ||
+                                (this.Configuration.InclusiveLeft
+                                    ? (objVal >= parseFloat(fromValue))
+                                    : (objVal > parseFloat(fromValue))))
+                                && ((toEmpty) ||
+                                    (this.Configuration.InclusiveRight
+                                        ? (objVal <= parseFloat(toValue))
+                                        : (objVal < parseFloat(toValue))));
                         }
                         if (this.AssociatedColumn.IsInteger || this.AssociatedColumn.IsEnum) {
-                            return ((frmEmpty) || objVal >= parseInt(fromValue)) && ((toEmpty) || objVal <= parseInt(toValue));
+                            return ((frmEmpty) ||
+                                (this.Configuration.InclusiveLeft
+                                    ? (objVal >= parseInt(fromValue))
+                                    : (objVal > parseInt(fromValue))))
+                                && ((toEmpty) ||
+                                    (this.Configuration.InclusiveRight
+                                        ? (objVal <= parseInt(toValue))
+                                        : (objVal < parseInt(toValue))));
                         }
                         if (this.AssociatedColumn.IsDateTime) {
-                            var toVal;
-                            if (!toEmpty) {
-                                toVal = this.MasterTable.Date.parse(toValue);
-                                if (this.Configuration.TreatEqualDateAsWholeDay) {
-                                    toVal.setHours(23);
-                                    toVal.setMinutes(59);
-                                    toVal.setSeconds(59);
+                            var incLeft = this.Configuration.InclusiveLeft;
+                            var incRight = this.Configuration.InclusiveRight;
+                            var toVal = toEmpty ? null : this.MasterTable.Date.parse(toValue);
+                            var fromVal = frmEmpty ? null : this.MasterTable.Date.parse(fromValue);
+                            if (this.Configuration.CompareOnlyDates) {
+                                if (!frmEmpty) {
+                                    fromVal.setHours(0, 0, 0, 0);
+                                    if (!incLeft) {
+                                        fromVal.setDate(fromVal.getDate() + 1);
+                                        incLeft = true;
+                                    }
+                                }
+                                if (!toEmpty) {
+                                    toVal.setHours(0, 0, 0, 0);
+                                    if (incRight) {
+                                        toVal.setDate(toVal.getDate() + 1);
+                                        incRight = false;
+                                    }
                                 }
                             }
-                            return ((frmEmpty) || objVal >= this.MasterTable.Date.parse(fromValue)) && ((toEmpty) || objVal <= toVal);
+                            return ((frmEmpty) || (incLeft ? (objVal >= fromVal) : (objVal > fromVal)))
+                                && ((toEmpty) || (incRight ? (objVal <= toVal) : (objVal < toVal)));
                         }
                         return true;
                     };

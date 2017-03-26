@@ -5,6 +5,7 @@
 @using Reinforced.Lattice.CellTemplating
 @using Reinforced.Lattice.Configuration
 @using Reinforced.Lattice.Filters
+@using Reinforced.Lattice.Filters.Multi
 @using Reinforced.Lattice.Filters.Range
 @using Reinforced.Lattice.Filters.Select
 @using Reinforced.Lattice.Filters.Value
@@ -21,25 +22,13 @@
         ));
 
     conf.Column(c => c.FirstName).Title("First name");
-    conf.Column(c => c.UserType2).FilterSelect(c => c.UserType,
-        ui => ui
-        .SelectAny()
-        .SelectNotPresent()
-        .SelectItems(new UiListItem[]
-        {
-            new UiListItem() {Text = "Admin",Value = "0"},
-            new UiListItem() {Text = "Customer",Value = "1"},
-        }));
 
-    conf.Column(c => c.UserType2).FilterSelect(c => c.UserType,
-        ui => ui
-            .SelectItems(new UiListItem[]
-            {
-                new UiListItem() {Text = "Admin",Value = "0"},
-                new UiListItem() {Text = "Customer",Value = "1"},
-            })
-            .SelectAny()
-            .SelectNotPresent());
+    conf.Column(c => c.UserType).FilterMultiSelectUi(ui => ui.SelectItems(EnumHelper.GetSelectList(typeof(UserType))));
+
+    conf.Column(c => c.FirstName).FilterValueUi(ui => ui.ClientFiltering());
+    conf.Column(c => c.UserType).FilterRangeUi(ui => ui.ClientFiltering());
+    conf.Column(c => c.UserType).FilterSelectUi(ui => ui.ClientFiltering());
+    conf.Column(c => c.UserType).FilterMultiSelectUi(ui => ui.ClientFiltering());
 }
 <div id="table"></div>
 
