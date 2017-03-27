@@ -262,12 +262,49 @@
 <pre class="language-csharp wrap-code" data-src="#doc#/filter-by-method.cs"></pre>
 <div class="text">
     <p>
-        When you do not have any property from <code>TSource</code> to filter then you can use <code>.Filter*By</code>/<code>.Filter*NoUiBy</code>. These methods consume <i>filtering delegate</i> 
+        When you do not have any property from <code>TSource</code> to filter then you can use <code>.Filter*By</code>/<code>.Filter*NoUiBy</code>. These methods consume <i>filtering delegate</i>
         as their first parameter, allowing you to avoid specification of <code>TSource</code>'s filtering. The difference is that all filtering keys are being parametrized with column type, not
         <code>TSource</code> property:
     </p>
 </div>
 <pre class="language-csharp wrap-code" data-src="#doc#/filter-by-method-wo-prop.cs"></pre>
+<div class="text">
+    <h3>How to extract filtering key manually</h3>
+    <p>
+        You can use <code>.Value</code> method of core filter configurator to override filtering key extraction process. <code>.Value</code> method
+        consumes delegate consuming Reinforced.Lattice <code>Query</code> object and must return <i>filter tuple</i>. <br />
+        <code>Query</code> object has following significant fields:
+    </p>
+    <ul>
+        <li><code>Filterings</code> - <code>Dictionary&lt;string,string&gt;</code> containing filter parameters for columns. Key is <code>TRow</code>'s property name (column name), value is serialized filtering key</li>
+        <li><code>Orderings</code> - <code>Dictionary&lt;string,Ordering&gt;</code> containing orderings for columns. Key is <code>TRow</code>'s property name (column name), value is desired ordering value </li>
+        <li><code>Partition</code> - information about requested partition of query (skip/take)</li>
+        <li><code>Selection</code> - raw information about selection</li>
+    </ul>
+    <p>
+        Other fields are service fields and not presumed to be used directly. <br />
+        You can obtain serialized filter value from Query's <code>Filterings</code> property using corresponding <code>TRow</code>'s property name as key.
+        Serialized filter value is:
+    </p>
+    <ul>
+        <li>For <b>Value filter</b> - stringified filter value. To parse it use <code>ValueConverter.Convert&lt;T&gt;(value)</code> where <code>T</code> is type of your filtering key </li>
+        <li>
+            For <b>Range filter</b> - stringified filter values split by <code>|</code> symbol. Call <code>val.Split('|')</code> and you will get array of 2 stringified filter value. 0 stands for "from", 1 stands for "to".
+            Use <code>ValueConverter.Convert&lt;T&gt;</code> method on each of them to parse "from" and "to" values. Do not forget to call <code>string.IsNullOrEmpty</code> to determine from/to value presence.
+        </li>
+        <li>
+            For <b>Multi select filter</b> - stringified values split by <code>|</code> symbol. Use the same approach as above to parse it to array of options
+        </li>
+    </ul>
+    <p>
+        After parsering filtering keys you can change them. Finally you have to return <i>filter tuple</i>. <br/>
+        Filter tuple is <code>Tuple&lt;bool,TKey&gt;</code> where <code>TKey</code> is <i>filtering key</i> type defined by filter you use (see <i>How to override server filtering function (filtering delegates)</i> section on this page).
+        If <code>Item1</code> of this tuple is <code>false</code> then filtering will not be applied entirely. Otherwise filter will use filtering key provided by <code>Item2</code> to perform filtering. <br/>
+        Use <code>.ToFilterTuple</code> extension method to easily produce filter tuple from parsed values. <br/>
+        Use <code>FilterTuple.None&lt;TKey&gt;()</code> to obtain empty filter tuple that will cancel filtering.
+    </p>
+</div>
+<pre class="language-csharp wrap-code" data-src="#doc#/filter-extract-value.cs"></pre>
 
 <div class="text">
     <h3>How to override placeholder texts for filters</h3>

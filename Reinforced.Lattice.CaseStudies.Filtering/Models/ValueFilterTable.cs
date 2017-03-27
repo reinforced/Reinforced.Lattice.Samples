@@ -39,7 +39,7 @@ namespace Reinforced.Lattice.CaseStudies.Filtering.Models
                     if (!q.Filterings.ContainsKey("Tax")) return FilterTuple.None<double?>();
                     var f = q.Filterings["Tax"];
                     if (string.IsNullOrEmpty(f)) return FilterTuple.None<double?>();
-                    var d = double.Parse(f);
+                    var d = ValueConverter.Convert<double>(f);
                     if (d > 10) d = d / 100;
                     return ((double?)d).ToFilterTuple();
                 });
