@@ -305,6 +305,37 @@
     </p>
 </div>
 <pre class="language-csharp wrap-code" data-src="#doc#/filter-extract-value.cs"></pre>
+<div class="text">
+    <h3>How to override client filtering function</h3>
+    <p>
+        Client filtering function is JavaScript predicate function that tests particular object and must return <code>true</code> 
+        if object fits filter criteria and <b>must not</b> be excluded from resulting set and <code>false</code> otherwise. 
+        Client filtering predicate consumes 3 parameters:
+    </p>
+    <ul>
+        <li><code>object</code> - object to test</li>
+        <li>
+            <code>value</code> - client filtering key. It depends on filter type:
+            <ul>
+                <li>For <b>Value filter</b> - deserialized JavaScript value of filter (number, string, boolean or <code>Date</code>)</li>
+                <li>For <b>Select and Multi-select filter</b> - array of deserialized JavaScript values</li>
+                <li>For <b>Range filter</b> - JavaScript object having similar structure as <code>RangeTuple&lt;T&gt;</code> metioned above</li>
+            </ul>
+        </li>
+        <li><code>query</code> - JavaScript version of <code>Query</code> object (described in <i>How to extract filtering key manually</i>) section</li>
+    </ul>
+    <p>
+        You can supply either function body or function name to <code>.ClientFiltering</code> call:
+    </p>
+</div>
+<pre class="language-cshtml wrap-code" data-src="#doc#/filter-client-function.cshtml"></pre>
+<div class="text">
+    <p>
+        Also you can specify filtering function using <code>.ClientFilteringExpression</code> method by supplying expression in `{@}`-notation. 
+        Use <code>x</code> variable to refer to filter value and <code>q</code> variable to refer to query:
+    </p>
+</div>
+<pre class="language-csharp wrap-code" data-src="#doc#/filter-client-expression.cs"></pre>
 
 <div class="text">
     <h3>How to override placeholder texts for filters</h3>
