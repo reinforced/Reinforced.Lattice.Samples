@@ -17,7 +17,7 @@ namespace Reinforced.Lattice.CaseStudies.Filtering.Models
             conf.Table();
             conf.Column(c => c.Id).DataOnly();
 
-            // Simple select filter
+            // Simple select filter with default value selected
             conf.Column(c => c.Rating)
                 .FilterSelect(c => c.Rating, ui => ui.SelectAny()
                     .SelectItems(new UiListItem[]
@@ -27,7 +27,7 @@ namespace Reinforced.Lattice.CaseStudies.Filtering.Models
                         new UiListItem() { Text = "***", Value = "3"},
                         new UiListItem() { Text = "****", Value = "4"},
                         new UiListItem() { Text = "*****", Value = "5"},
-                    }));
+                    }).SelectDefault(4));
 
             // Select filter for enumeration with client filtering
             conf.Column(c => c.Scope)

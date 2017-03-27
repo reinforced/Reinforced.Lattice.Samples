@@ -19,8 +19,8 @@ namespace Reinforced.Lattice.CaseStudies.Filtering.Models
             conf.Table();
             conf.Column(c => c.Id).DataOnly();
 
-            // Simple server filtering
-            conf.Column(c => c.Price).FilterRange(c => c.Price);
+            // Simple server filtering with default values
+            conf.Column(c => c.Price).FilterRange(c => c.Price, ui => ui.RangeDefault(5000, 12000));
 
             // Filter delegate for tax filter
             conf.Column(c => c.Tax).FilterRange(c => c.Tax).Value(ExtractTaxRange);
@@ -29,7 +29,7 @@ namespace Reinforced.Lattice.CaseStudies.Filtering.Models
             conf.Column(c => c.StartDate).FilterRange(c => c.StartDate).CompareOnlyDates();
             conf.Column(c => c.EndDate).FilterRangeNoUi(c => c.StartDate).CompareOnlyDates();
 
-            
+
             return conf;
         }
 

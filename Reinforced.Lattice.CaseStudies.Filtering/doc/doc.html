@@ -356,7 +356,7 @@
     <h3>How to control range filter inclusive</h3>
     <p>
         Consider 3 objects with Price fields: 100 for 1st, 200 for 2nd and 300 for 3rd. Consider also range filter configured for Price column. 
-        User selects range from 100 to 300. If range filter is left-inclusive then object with Price = 100 will be included to resulting set. 
+        User selects range from 100 to 300. Then:
     </p>
     <ul>
         <li><b>Left-inclusive</b> filter will include object with price 100 to target set</li>
@@ -377,6 +377,22 @@
         as shown in example. <br /> <br />
     </p>
 </div>
+<div class="text">
+    <h3>How to specify default values for filters</h3>
+    <ul>
+        <li>For <b>Value filter</b> - use <code>.Default</code> method of UI configurator. It consumes strongly typed value to be set as default one</li>
+        <li>For <b>Range filter</b> - use <code>.RangeDefault</code> method of UI configurator. It consumes two strongly typed values to be set as "from" and "to" default values correspondingly</li>
+        <li>
+            For <b>Select filter</b> - use <code>.SelectDefault</code> method  of UI configurator. Works in the same manner as for value filter.
+            Please keep in mind that if no default value specified for select filter then first option in list will be selected by default.
+        </li>
+        <li>
+            For <b>Multi-Select filter</b> - when passing select items to filter, set <code>Selected</code> property of list items that have to be selected by default.
+            None of options will be selected by default if there are no <code>Selected</code> options.
+        </li>
+    </ul>
+</div>
+<pre class="language-csharp wrap-code" data-src="#doc#/default-values.cs"></pre>
 
 <div class="text">
     <h3>How to override placeholder texts for filters</h3>

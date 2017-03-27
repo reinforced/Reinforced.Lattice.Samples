@@ -18,15 +18,15 @@ namespace Reinforced.Lattice.CaseStudies.Filtering.Models
             conf.Table();
             conf.Column(c => c.Id).DataOnly();
 
-            // Simple select filter
+            // Simple select filter with default values
             conf.Column(c => c.Rating)
                 .FilterMultiSelect(c => c.Rating, ui => ui.SelectAny()
                     .SelectItems(new UiListItem[]
                     {
                         new UiListItem() { Text = "*", Value = "1"},
-                        new UiListItem() { Text = "**", Value = "2"},
-                        new UiListItem() { Text = "***", Value = "3"},
-                        new UiListItem() { Text = "****", Value = "4"},
+                        new UiListItem() { Text = "**", Value = "2", Selected = true},
+                        new UiListItem() { Text = "***", Value = "3", Selected = true},
+                        new UiListItem() { Text = "****", Value = "4", Selected = true},
                         new UiListItem() { Text = "*****", Value = "5"},
                     }));
 
