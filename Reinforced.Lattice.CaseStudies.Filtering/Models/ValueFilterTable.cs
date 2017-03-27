@@ -16,7 +16,7 @@ namespace Reinforced.Lattice.CaseStudies.Filtering.Models
         {
             conf.Table();
             conf.Column(c => c.Id).DataOnly();
-
+            
             // Simple server filtering
             conf.Column(c => c.Title).FilterValue(c => c.Title);
 

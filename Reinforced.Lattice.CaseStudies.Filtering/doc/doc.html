@@ -226,6 +226,24 @@
         <b>it will not be filtered on server</b>! It means that all objects that were not filtered out by server filter will be returned to client-side
         for futher filtering. Beware of significant volumes of data transmitted and do balance load between client and server.
     </p>
+</div>
+<div class="text">
+    <h3>How to specify default values for filters</h3>
+    <ul>
+        <li>For <b>Value filter</b> - use <code>.Default</code> method of UI configurator. It consumes strongly typed value to be set as default one</li>
+        <li>For <b>Range filter</b> - use <code>.RangeDefault</code> method of UI configurator. It consumes two strongly typed values to be set as "from" and "to" default values correspondingly</li>
+        <li>
+            For <b>Select filter</b> - use <code>.SelectDefault</code> method  of UI configurator. Works in the same manner as for value filter.
+            Please keep in mind that if no default value specified for select filter then first option in list will be selected by default.
+        </li>
+        <li>
+            For <b>Multi-Select filter</b> - when passing select items to filter, set <code>Selected</code> property of list items that have to be selected by default.
+            None of options will be selected by default if there are no <code>Selected</code> options.
+        </li>
+    </ul>
+</div>
+<pre class="language-csharp wrap-code" data-src="#doc#/default-values.cs"></pre>
+<div class="text">
     <h3>How to override server filtering function (filtering delegates)</h3>
     <p>
         You can customize behavior of server filter using filtering delegates. <code>.Filter*</code> and <code>.Filter*NoUi</code> methods return
@@ -297,10 +315,10 @@
         </li>
     </ul>
     <p>
-        After parsering filtering keys you can change them. Finally you have to return <i>filter tuple</i>. <br/>
+        After parsering filtering keys you can change them. Finally you have to return <i>filter tuple</i>. <br />
         Filter tuple is <code>Tuple&lt;bool,TKey&gt;</code> where <code>TKey</code> is <i>filtering key</i> type defined by filter you use (see <i>How to override server filtering function (filtering delegates)</i> section on this page).
-        If <code>Item1</code> of this tuple is <code>false</code> then filtering will not be applied entirely. Otherwise filter will use filtering key provided by <code>Item2</code> to perform filtering. <br/>
-        Use <code>.ToFilterTuple</code> extension method to easily produce filter tuple from parsed values. <br/>
+        If <code>Item1</code> of this tuple is <code>false</code> then filtering will not be applied entirely. Otherwise filter will use filtering key provided by <code>Item2</code> to perform filtering. <br />
+        Use <code>.ToFilterTuple</code>/<code>.TupleIfNot</code>/<code>.TupleIfNotNull</code> extension methods to easily produce filter tuple from parsed values. <br />
         Use <code>FilterTuple.None&lt;TKey&gt;()</code> to obtain empty filter tuple that will cancel filtering.
     </p>
 </div>
@@ -308,8 +326,8 @@
 <div class="text">
     <h3>How to override client filtering function</h3>
     <p>
-        Client filtering function is JavaScript predicate function that tests particular object and must return <code>true</code> 
-        if object fits filter criteria and <b>must not</b> be excluded from resulting set and <code>false</code> otherwise. 
+        Client filtering function is JavaScript predicate function that tests particular object and must return <code>true</code>
+        if object fits filter criteria and <b>must not</b> be excluded from resulting set and <code>false</code> otherwise.
         Client filtering predicate consumes 3 parameters:
     </p>
     <ul>
@@ -331,7 +349,7 @@
 <pre class="language-cshtml wrap-code" data-src="#doc#/filter-client-function.cshtml"></pre>
 <div class="text">
     <p>
-        Also you can specify filtering function using <code>.ClientFilteringExpression</code> method by supplying expression in `{@}`-notation. 
+        Also you can specify filtering function using <code>.ClientFilteringExpression</code> method by supplying expression in `{@}`-notation.
         Use <code>x</code> variable to refer to filter value and <code>q</code> variable to refer to query:
     </p>
 </div>
@@ -339,23 +357,23 @@
 <div class="text">
     <h3>How to filter dates properly</h3>
     <p>
-        .NET <code>DateTime</code> type usually includes not only date but also time. As well as JavaScript <code>Date</code>. If you want to ignore time when 
+        .NET <code>DateTime</code> type usually includes not only date but also time. As well as JavaScript <code>Date</code>. If you want to ignore time when
         performing filtration, there is <code>.CompareOnlyDates</code> methods both for core filter configuration and UI filter configuration:
     </p>
 </div>
 <pre class="language-csharp wrap-code" data-src="#doc#/filter-compare-only-dates.cs"></pre>
 <div class="text">
     <p>
-        <b>Important!</b> <code>.CompareOnlyDates</code> works <b>SEPARATELY</b> for client and for server. To perform consistency 
+        <b>Important!</b> <code>.CompareOnlyDates</code> works <b>SEPARATELY</b> for client and for server. To perform consistency
         you have to specify it both on core configurator and UI configurator (using <code>.Filter*</code> or <code>.Filter*Ui</code>)
-        as shown in example. <br/> <br/>
-        
+        as shown in example. <br /> <br />
+
         Note about timezones: please also keep in mind that <i>dates from client side appears on server in client's time zone</i>. Use <code>.By</code> or <code>.Value</code>
         methods to hijack and modify dates on server if necessary.
     </p>
     <h3>How to control range filter inclusive</h3>
     <p>
-        Consider 3 objects with Price fields: 100 for 1st, 200 for 2nd and 300 for 3rd. Consider also range filter configured for Price column. 
+        Consider 3 objects with Price fields: 100 for 1st, 200 for 2nd and 300 for 3rd. Consider also range filter configured for Price column.
         User selects range from 100 to 300. Then:
     </p>
     <ul>
@@ -365,7 +383,7 @@
         <li><b>Not inclusive</b> filter will not include any objects with price 300 and 100 to target set. Target set will consist of single entry with Price = 200</li>
     </ul>
     <p>
-        By default range filter is <b>Right-Left inclusive</b>. To configure range filter inclusivity use <code>.Inclusive</code> method. First parameter controls left-inclusive, second one 
+        By default range filter is <b>Right-Left inclusive</b>. To configure range filter inclusivity use <code>.Inclusive</code> method. First parameter controls left-inclusive, second one
         controls right-inclusive:
     </p>
 </div>
@@ -378,29 +396,25 @@
     </p>
 </div>
 <div class="text">
-    <h3>How to specify default values for filters</h3>
-    <ul>
-        <li>For <b>Value filter</b> - use <code>.Default</code> method of UI configurator. It consumes strongly typed value to be set as default one</li>
-        <li>For <b>Range filter</b> - use <code>.RangeDefault</code> method of UI configurator. It consumes two strongly typed values to be set as "from" and "to" default values correspondingly</li>
-        <li>
-            For <b>Select filter</b> - use <code>.SelectDefault</code> method  of UI configurator. Works in the same manner as for value filter.
-            Please keep in mind that if no default value specified for select filter then first option in list will be selected by default.
-        </li>
-        <li>
-            For <b>Multi-Select filter</b> - when passing select items to filter, set <code>Selected</code> property of list items that have to be selected by default.
-            None of options will be selected by default if there are no <code>Selected</code> options.
-        </li>
-    </ul>
-</div>
-<pre class="language-csharp wrap-code" data-src="#doc#/default-values.cs"></pre>
-
-<div class="text">
     <h3>How to override placeholder texts for filters</h3>
     <p>
         Use <code>.Placeholder</code> UI configurator method for value filter and <code>.Placeholders</code> method for range filter:
     </p>
 </div>
 <pre class="language-csharp wrap-code" data-src="#doc#/filter-placeholders.cs"></pre>
+<div class="text">
+    <h3>How to change filter delay (debouncing)</h3>
+    <p>
+        You can configure debouncing only for value and range filters. Use <code>.Inputdelay</code> methog of filter UI configurator passing 
+        delay in milliseconds to pass after last filter change and befor filtering is done:
+    </p>
+</div>
+<pre class="language-csharp wrap-code" data-src="#doc#/filter-debouncing.cs"></pre>
+<div class="text">
+    <p>
+        Set shorter input delay for client filters and longer for server ones. By default debounce is 500 ms.
+    </p>
+</div>
 
 <div class="text tiptext" data-tiptext="multiselect" data-caption="Select and multiselect filters">
     <p>
