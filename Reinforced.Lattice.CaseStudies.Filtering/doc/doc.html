@@ -336,6 +336,47 @@
     </p>
 </div>
 <pre class="language-csharp wrap-code" data-src="#doc#/filter-client-expression.cs"></pre>
+<div class="text">
+    <h3>How to filter dates properly</h3>
+    <p>
+        .NET <code>DateTime</code> type usually includes not only date but also time. As well as JavaScript <code>Date</code>. If you want to ignore time when 
+        performing filtration, there is <code>.CompareOnlyDates</code> methods both for core filter configuration and UI filter configuration:
+    </p>
+</div>
+<pre class="language-csharp wrap-code" data-src="#doc#/filter-compare-only-dates.cs"></pre>
+<div class="text">
+    <p>
+        <b>Important!</b> <code>.CompareOnlyDates</code> works <b>SEPARATELY</b> for client and for server. To perform consistency 
+        you have to specify it both on core configurator and UI configurator (using <code>.Filter*</code> or <code>.Filter*Ui</code>)
+        as shown in example. <br/> <br/>
+        
+        Note about timezones: please also keep in mind that <i>dates from client side appears on server in client's time zone</i>. Use <code>.By</code> or <code>.Value</code>
+        methods to hijack and modify dates on server if necessary.
+    </p>
+    <h3>How to control range filter inclusive</h3>
+    <p>
+        Consider 3 objects with Price fields: 100 for 1st, 200 for 2nd and 300 for 3rd. Consider also range filter configured for Price column. 
+        User selects range from 100 to 300. If range filter is left-inclusive then object with Price = 100 will be included to resulting set. 
+    </p>
+    <ul>
+        <li><b>Left-inclusive</b> filter will include object with price 100 to target set</li>
+        <li><b>Right-inclusive</b> filter will include object with price 300 to target set</li>
+        <li><b>Right-Left inclusive</b> filter will include both objects with price 300 and 100 to target set</li>
+        <li><b>Not inclusive</b> filter will not include any objects with price 300 and 100 to target set. Target set will consist of single entry with Price = 200</li>
+    </ul>
+    <p>
+        By default range filter is <b>Right-Left inclusive</b>. To configure range filter inclusivity use <code>.Inclusive</code> method. First parameter controls left-inclusive, second one 
+        controls right-inclusive:
+    </p>
+</div>
+<pre class="language-csharp wrap-code" data-src="#doc#/filter-inclusive.cs"></pre>
+<div class="text">
+    <p>
+        <b>Important!</b> <code>.Inclusive</code> works <b>SEPARATELY</b> for client and for server. To perform consistency
+        you have to specify it both on core configurator and UI configurator (using <code>.FilterRange</code> or <code>.FilterRangeUi</code>)
+        as shown in example. <br /> <br />
+    </p>
+</div>
 
 <div class="text">
     <h3>How to override placeholder texts for filters</h3>

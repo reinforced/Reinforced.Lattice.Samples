@@ -23,12 +23,13 @@ namespace Reinforced.Lattice.CaseStudies.Filtering.Models
             conf.Column(c => c.Price).FilterRange(c => c.Price);
 
             // Filter delegate for tax filter
-            conf.Column(c => c.Tax).FilterRange(c=>c.Tax).Value(ExtractTaxRange);
+            conf.Column(c => c.Tax).FilterRange(c => c.Tax).Value(ExtractTaxRange);
 
             // Date range filters
             conf.Column(c => c.StartDate).FilterRange(c => c.StartDate).CompareOnlyDates();
             conf.Column(c => c.EndDate).FilterRangeNoUi(c => c.StartDate).CompareOnlyDates();
 
+            
             return conf;
         }
 
