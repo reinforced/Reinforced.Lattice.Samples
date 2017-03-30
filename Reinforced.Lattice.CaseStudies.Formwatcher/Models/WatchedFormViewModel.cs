@@ -27,6 +27,7 @@ namespace Reinforced.Lattice.CaseStudies.Formwatcher.Models
 
         public OrderingPreset Ordering { get; set; }
 
+        [Display(Name = "Tax")]
         public double? TaxFrom { get; set; }
 
         public double? TaxTo { get; set; }

@@ -9218,6 +9218,11 @@ var Reinforced;
                             else {
                                 if (fieldConf.FieldValueFunction) {
                                     value = fieldConf.FieldValueFunction();
+                                    if (fieldConf.IsDateTime) {
+                                        if (typeof value === 'object') {
+                                            value = dateService.serialize(value);
+                                        }
+                                    }
                                 }
                                 else {
                                     var elements = rootElement.querySelectorAll(fieldConf.FieldSelector);
@@ -11926,4 +11931,4 @@ var Reinforced;
         })(Plugins = Lattice.Plugins || (Lattice.Plugins = {}));
     })(Lattice = Reinforced.Lattice || (Reinforced.Lattice = {}));
 })(Reinforced || (Reinforced = {}));
-//# sourceMappingURL=../../../Reinforced.Lattice.DebugSink/Scripts/reinforced.lattice.js.map
+//# sourceMappingURL=../../../../../../../build/package/Reinforced.Lattice.Script/content/Scripts/Reinforced.Lattice/reinforced.lattice.js.map

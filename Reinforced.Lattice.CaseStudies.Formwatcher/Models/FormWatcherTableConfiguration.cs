@@ -4,9 +4,8 @@ using System.Linq;
 using System.Web;
 using Reinforced.Lattice.Configuration;
 using Reinforced.Lattice.Filters;
-using Reinforced.Lattice.Filters.Range;
-using Reinforced.Lattice.Filters.Value;
 using Reinforced.Lattice.Plugins.Formwatch;
+
 
 namespace Reinforced.Lattice.CaseStudies.Formwatcher.Models
 {

@@ -53,20 +53,20 @@
       <HintPath>..\packages\Newtonsoft.Json.9.0.1\lib\net45\Newtonsoft.Json.dll</HintPath>
       <Private>True</Private>
     </Reference>
-    <Reference Include="Reinforced.Lattice, Version=1.0.13.0, Culture=neutral, processorArchitecture=MSIL">
-      <HintPath>..\packages\Reinforced.Lattice.Bundle.Mvc5.1.0.13\lib\net45\Reinforced.Lattice.dll</HintPath>
+    <Reference Include="Reinforced.Lattice, Version=1.0.14.0, Culture=neutral, processorArchitecture=MSIL">
+      <HintPath>..\packages\Reinforced.Lattice.Bundle.Mvc5.1.0.14\lib\net45\Reinforced.Lattice.dll</HintPath>
       <Private>True</Private>
     </Reference>
-    <Reference Include="Reinforced.Lattice.Mvc5, Version=1.0.13.0, Culture=neutral, processorArchitecture=MSIL">
-      <HintPath>..\packages\Reinforced.Lattice.Bundle.Mvc5.1.0.13\lib\net45\Reinforced.Lattice.Mvc5.dll</HintPath>
+    <Reference Include="Reinforced.Lattice.Mvc5, Version=1.0.14.0, Culture=neutral, processorArchitecture=MSIL">
+      <HintPath>..\packages\Reinforced.Lattice.Bundle.Mvc5.1.0.14\lib\net45\Reinforced.Lattice.Mvc5.dll</HintPath>
       <Private>True</Private>
     </Reference>
-    <Reference Include="Reinforced.Lattice.Mvc5.Razor, Version=1.0.13.0, Culture=neutral, processorArchitecture=MSIL">
-      <HintPath>..\packages\Reinforced.Lattice.Bundle.Mvc5.1.0.13\lib\net45\Reinforced.Lattice.Mvc5.Razor.dll</HintPath>
+    <Reference Include="Reinforced.Lattice.Mvc5.Razor, Version=1.0.14.0, Culture=neutral, processorArchitecture=MSIL">
+      <HintPath>..\packages\Reinforced.Lattice.Bundle.Mvc5.1.0.14\lib\net45\Reinforced.Lattice.Mvc5.Razor.dll</HintPath>
       <Private>True</Private>
     </Reference>
     <Reference Include="Reinforced.Lattice.Templates.Mvc5, Version=0.0.0.0, Culture=neutral, processorArchitecture=MSIL">
-      <HintPath>..\packages\Reinforced.Lattice.Bundle.Mvc5.1.0.13\lib\net45\Reinforced.Lattice.Templates.Mvc5.dll</HintPath>
+      <HintPath>..\packages\Reinforced.Lattice.Bundle.Mvc5.1.0.14\lib\net45\Reinforced.Lattice.Templates.Mvc5.dll</HintPath>
       <Private>True</Private>
     </Reference>
     <Reference Include="System" />

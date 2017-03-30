@@ -1141,7 +1141,7 @@ var Reinforced;
                         return;
                     this._lastWidth = this._newWidth;
                     this._lastHeight = this._newHeight;
-                    this._handler.call();
+                    this._handler.call(this);
                 };
                 Resensor.prototype.onScroll = function () {
                     this._newWidth = this._element.offsetWidth;
@@ -1759,6 +1759,15 @@ var Reinforced;
                 Driver.plugins = function (p, pluginPosition) {
                     var plugins = p.Executor.Instances.getPlugins(pluginPosition);
                     if (!plugins)
+                        return;
+                    var anyPlugins = false;
+                    for (var i = 0; i < plugins.length; i++) {
+                        if ((plugins[i].Configuration) && !plugins[i].Configuration.Hidden) {
+                            anyPlugins = true;
+                            break;
+                        }
+                    }
+                    if (!anyPlugins)
                         return;
                     for (var a in plugins) {
                         if (plugins.hasOwnProperty(a)) {
@@ -9095,6 +9104,7 @@ var Reinforced;
                         this._existingValues = {};
                         this._filteringExecuted = {};
                         this._timeouts = {};
+                        this._configurations = {};
                     }
                     FormwatchPlugin.extractValueFromMultiSelect = function (o) {
                         var value = [];
@@ -9208,6 +9218,11 @@ var Reinforced;
                             else {
                                 if (fieldConf.FieldValueFunction) {
                                     value = fieldConf.FieldValueFunction();
+                                    if (fieldConf.IsDateTime) {
+                                        if (typeof value === 'object') {
+                                            value = dateService.serialize(value);
+                                        }
+                                    }
                                 }
                                 else {
                                     var elements = rootElement.querySelectorAll(fieldConf.FieldSelector);
@@ -9224,7 +9239,7 @@ var Reinforced;
                         return result;
                     };
                     FormwatchPlugin.prototype.modifyQuery = function (query, scope) {
-                        var result = FormwatchPlugin.extractFormData(this.Configuration.FieldsConfiguration, document, this.MasterTable.Date);
+                        var formData = FormwatchPlugin.extractFormData(this.Configuration.FieldsConfiguration, document, this.MasterTable.Date);
                         for (var fm in this.Configuration.FiltersMappings) {
                             if (this.Configuration.FiltersMappings.hasOwnProperty(fm)) {
                                 var mappingConf = this.Configuration.FiltersMappings[fm];
@@ -9235,30 +9250,42 @@ var Reinforced;
                                 if (needToApply) {
                                     switch (mappingConf.FilterType) {
                                         case 0:
-                                            var val = result[mappingConf.FieldKeys[0]];
+                                            var val = formData[mappingConf.FieldKeys[0]];
                                             if (!val || val.length === 0)
                                                 break;
                                             query.Filterings[fm] = val;
                                             break;
                                         case 1:
-                                            if (mappingConf.FieldKeys.length === 1 && (Object.prototype.toString.call(result[mappingConf[0]]) === '[object Array]')) {
-                                                query.Filterings[fm] = result[mappingConf[0]][0] + "|" + result[mappingConf[0]][1];
+                                            var v1 = '', v2 = '';
+                                            if (mappingConf.FieldKeys.length === 1 && (Object.prototype.toString.call(formData[mappingConf[0]]) === '[object Array]')) {
+                                                v1 = formData[mappingConf.FieldKeys[0]][0] == null ? '' : formData[mappingConf.FieldKeys[0]][0].toString();
+                                                v2 = formData[mappingConf.FieldKeys[0]][1] == null ? '' : formData[mappingConf.FieldKeys[0]][1].toString();
                                             }
                                             else {
-                                                query.Filterings[fm] = result[mappingConf.FieldKeys[0]] + "|" + result[mappingConf.FieldKeys[1]];
+                                                v1 = formData[mappingConf.FieldKeys[0]] == null ? '' : formData[mappingConf.FieldKeys[0]].toString();
+                                                v2 = formData[mappingConf.FieldKeys[1]] == null ? '' : formData[mappingConf.FieldKeys[1]].toString();
                                             }
+                                            query.Filterings[fm] = v1 + "|" + v2;
                                             break;
                                         case 2:
-                                            if (mappingConf.FieldKeys.length === 1 && (Object.prototype.toString.call(result[mappingConf[0]]) === '[object Array]')) {
-                                                query.Filterings[fm] = result[mappingConf[0]].join('|');
+                                            var serialized = [];
+                                            if (mappingConf.FieldKeys.length === 1 && (Object.prototype.toString.call(formData[mappingConf[0]]) === '[object Array]')) {
+                                                for (var i = 0; i < mappingConf[0].length; i++) {
+                                                    if (mappingConf[0][i] == null)
+                                                        serialized.push('');
+                                                    else
+                                                        serialized.push(mappingConf[0][i].toString());
+                                                }
                                             }
                                             else {
-                                                var values = [];
                                                 for (var m = 0; m < mappingConf.FieldKeys.length; m++) {
-                                                    values.push(result[mappingConf.FieldKeys[m]]);
+                                                    if (formData[mappingConf.FieldKeys[m]] == null)
+                                                        serialized.push('');
+                                                    else
+                                                        serialized.push(formData[mappingConf.FieldKeys[m]].toString());
                                                 }
-                                                query.Filterings[fm] = values.join('|');
                                             }
+                                            query.Filterings[fm] = serialized.join('|');
                                             break;
                                     }
                                 }
@@ -9266,7 +9293,11 @@ var Reinforced;
                         }
                         if (this.Configuration.DoNotEmbed)
                             return;
-                        var str = JSON.stringify(result);
+                        for (var j = 0; j < this.Configuration.FieldsConfiguration.length; j++) {
+                            if (this.Configuration.FieldsConfiguration[j].DoNotEmbed)
+                                delete formData[this.Configuration.FieldsConfiguration[j].FieldJsonName];
+                        }
+                        var str = JSON.stringify(formData);
                         query.AdditionalData['Formwatch'] = str;
                     };
                     FormwatchPlugin.prototype.subscribe = function (e) {
@@ -9313,6 +9344,10 @@ var Reinforced;
                     };
                     FormwatchPlugin.prototype.init = function (masterTable) {
                         _super.prototype.init.call(this, masterTable);
+                        for (var i = 0; i < this.Configuration.FieldsConfiguration.length; i++) {
+                            this._configurations[this.Configuration.FieldsConfiguration[i].FieldJsonName] =
+                                this.Configuration.FieldsConfiguration[i];
+                        }
                         this.MasterTable.Loader.registerQueryPartProvider(this);
                     };
                     return FormwatchPlugin;
@@ -10352,21 +10387,19 @@ var Reinforced;
                     function LoadingOverlapPlugin() {
                         var _this = this;
                         _super.apply(this, arguments);
-                        this._overlappingElement = [];
-                        this._overlapLayer = [];
                         this._isOverlapped = false;
                         this.afterDrawn = function (e) {
                             _this.MasterTable.Events.Loading.subscribeBefore(function (e) { return _this.onBeforeLoading(e); }, 'overlapLoading');
                             _this.MasterTable.Events.DataRendered.subscribeAfter(function () { return _this.deoverlap(); }, 'overlapLoading');
                             _this.MasterTable.Events.Loading.subscribeAfter(function () { return _this.deoverlap(); }, 'overlapLoading');
-                            Reinforced.Lattice.Services.EventsDelegatorService.addHandler(window, 'resize', _this.updateCoordsAll.bind(_this));
+                            //Reinforced.Lattice.Services.EventsDelegatorService.addHandler(<any>window, 'resize', this.updateCoordsAll.bind(this));
                         };
                     }
                     LoadingOverlapPlugin.prototype.overlapAll = function () {
                         if (this._isOverlapped)
                             return;
-                        this._overlapLayer = [];
-                        this._overlappingElement = [];
+                        this._overlapInstances = [];
+                        var ths = this;
                         for (var k in this.Configuration.Overlaps) {
                             if (this.Configuration.Overlaps.hasOwnProperty(k)) {
                                 var elements = null;
@@ -10379,14 +10412,24 @@ var Reinforced;
                                 else {
                                     elements = document.querySelectorAll(k);
                                 }
-                                var elems = [];
-                                var overlappers = [];
+                                var info = {
+                                    Entries: []
+                                };
                                 for (var i = 0; i < elements.length; i++) {
-                                    elems.push(elements[i]);
-                                    overlappers.push(this.createOverlap(elements[i], this.Configuration.Overlaps[k]));
+                                    var layer = this.createOverlap(elements[i], this.Configuration.Overlaps[k]);
+                                    var updateFn = (function (l, e) {
+                                        return function () { ths.updateCoords(l, e); };
+                                    })(layer, elements[i]);
+                                    var sensor = new Reinforced.Lattice.Rendering.Resensor(elements[i], updateFn);
+                                    sensor.attach();
+                                    var entry = {
+                                        Element: elements[i],
+                                        Layer: layer,
+                                        Sensor: sensor
+                                    };
+                                    info.Entries.push(entry);
                                 }
-                                this._overlappingElement.push(elems);
-                                this._overlapLayer.push(overlappers);
+                                this._overlapInstances.push(info);
                             }
                         }
                         this._isOverlapped = true;
@@ -10394,8 +10437,8 @@ var Reinforced;
                     LoadingOverlapPlugin.prototype.createOverlap = function (efor, templateId) {
                         var element = this.MasterTable.Renderer.Modifier.createElement(this.MasterTable.Renderer.renderToString(templateId, null));
                         var mezx = null;
-                        if (this._overlappingElement.currentStyle)
-                            mezx = this._overlappingElement.currentStyle.zIndex;
+                        if (efor.currentStyle)
+                            mezx = efor.currentStyle.zIndex;
                         else if (window.getComputedStyle) {
                             mezx = window.getComputedStyle(element, null).zIndex;
                         }
@@ -10410,31 +10453,31 @@ var Reinforced;
                     LoadingOverlapPlugin.prototype.updateCoords = function (overlapLayer, overlapElement) {
                         overlapLayer.style.display = "none";
                         var eo = overlapElement.getBoundingClientRect();
-                        //overlapLayer.style.left = eo.left + 'px';
-                        //overlapLayer.style.top = overlapElement.offsetTop + 'px';
-                        overlapLayer.style.left = eo.left + 'px'; //'0px';
-                        overlapLayer.style.top = eo.top + 'px'; // '0px';
+                        var bodyrect = document.body.getBoundingClientRect();
+                        overlapLayer.style.left = (eo.left - bodyrect.left) + 'px'; //'0px';
+                        overlapLayer.style.top = (eo.top - bodyrect.top) + 'px'; // '0px';
                         overlapLayer.style.width = eo.width + 'px';
                         overlapLayer.style.height = eo.height + 'px';
                         overlapLayer.style.display = "block";
                     };
                     LoadingOverlapPlugin.prototype.updateCoordsAll = function () {
-                        for (var j = 0; j < this._overlapLayer.length; j++) {
-                            for (var l = 0; l < this._overlapLayer[j].length; l++) {
-                                this.updateCoords(this._overlapLayer[j][l], this._overlappingElement[j][l]);
+                        for (var j = 0; j < this._overlapInstances.length; j++) {
+                            for (var l = 0; l < this._overlapInstances[j].Entries.length; l++) {
+                                var entry = this._overlapInstances[j].Entries[l];
+                                this.updateCoords(entry.Layer, entry.Element);
                             }
                         }
                     };
                     LoadingOverlapPlugin.prototype.deoverlap = function () {
                         if (!this._isOverlapped)
                             return;
-                        for (var j = 0; j < this._overlapLayer.length; j++) {
-                            for (var l = 0; l < this._overlapLayer[j].length; l++) {
-                                window.document.body.removeChild(this._overlapLayer[j][l]);
+                        for (var j = 0; j < this._overlapInstances.length; j++) {
+                            for (var l = 0; l < this._overlapInstances[j].Entries.length; l++) {
+                                var entry = this._overlapInstances[j].Entries[l];
+                                window.document.body.removeChild(entry.Layer);
                             }
                         }
-                        this._overlapLayer = [];
-                        this._overlappingElement = [];
+                        this._overlapInstances = [];
                         this._isOverlapped = false;
                     };
                     LoadingOverlapPlugin.prototype.onBeforeLoading = function (e) {
