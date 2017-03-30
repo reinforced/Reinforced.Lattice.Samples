@@ -1,7 +1,7 @@
 {
   "Id": "Formwatcher",
-  "Title": "Getting It Working",
-  "Subtitle": "For ones who've just started",
+  "Title": "Intagration with custom filters form",
+  "Subtitle": "FormWatch, LoadingOverlap and Reload button",
   "Link": "https://github.com/reinforced/Reinforced.Lattice.Samples/tree/master/Reinforced.Lattice.CaseStudies.Formwatcher",
   "Keywords": [],
   "Downloads": [
@@ -14,30 +14,17 @@
   ],
   "LiveDemos": [
     {
-      "Id": "Basic",
-      "Title": "Basic",
-      "Description": "Basic datagrid setup demo",
+      "Id": "Demo",
+      "Title": "Demo",
+      "Description": "Watched form demo",
       "Controller": "HomeController",
       "Action": "Index",
       "View": "Index",
       "Data": "data.json",
-      "AdditionalFiles": ["WatchedForm.cshtml"]
+      "AdditionalFiles": [ "WatchedForm.cshtml" ]
     }
   ],
   "CodePieces": [
-    {
-      "Id": "_Layout.cshtml",
-      "Title": "_Layout.cshtml",
-      "Description": "MVC Layout file for this test case",
-      "Files": [
-        {
-          "Path": "/Views/Shared/_Layout.cshtml",
-          "Language": "cshtml",
-          "Comment": null,
-          "Title": "_Layout.cshtml"
-        }
-      ]
-    },
     {
       "Id": "Index.cshtml",
       "Title": "Index.cshtml and its ViewModel",
@@ -48,70 +35,51 @@
           "Language": "cshtml",
           "Comment": null,
           "Title": "Index.cshtml"
+        }
+      ]
+    },
+    {
+      "Id": "WatchedForm.cshtml",
+      "Title": "WatchedForm.cshtml and its ViewModel",
+      "Description": "MVC view for filter and its ViewModel",
+      "Files": [
+        {
+          "Path": "/Views/Home/WatchedForm.cshtml",
+          "Language": "cshtml",
+          "Comment": null,
+          "Title": "WatchedForm.cshtml"
         },
         {
-          "Path": "/Models/HomeIndexViewModel.cs",
+          "Path": "/Models/WatchedFormViewModel.cs",
           "Language": "csharp",
           "Comment": null,
-          "Title": "HomeIndexViewModel.cs"
+          "Title": "WatchedFormViewModel.cs"
         }
       ]
     },
     {
-      "Id": "DataClasses",
-      "Title": "Data Classes",
-      "Description": "Definitions of Source Data and row ViewModel",
+      "Id": "CommonTableConfiguration.cs",
+      "Title": "Common table configuration",
+      "Description": "Class holding common table configuration extension method",
       "Files": [
         {
-          "Path": "/Models/User.cs",
+          "Path": "/Models/CommonTableConfiguration.cs",
           "Language": "csharp",
-          "Comment": "Data from data source",
-          "Title": "User.cs"
-        },
-        {
-          "Path": "/Models/UserRow.cs",
-          "Language": "csharp",
-          "Comment": "ViewModel of table's row",
-          "Title": "UserRow.cs"
+          "Comment": null,
+          "Title": "CommonTableConfiguration.cs"
         }
       ]
     },
     {
-      "Id": "UsersTable.cs",
-      "Title": "Configuration extension class",
-      "Description": "Class holding our configuration extension method",
+      "Id": "FormWatcherTableConfiguration.cs",
+      "Title": "Table configuration for FormWatch plugin",
+      "Description": "Class holding FormWatch configuration",
       "Files": [
         {
-          "Path": "/Models/UsersTable.cs",
+          "Path": "/Models/FormWatcherTableConfiguration.cs",
           "Language": "csharp",
           "Comment": null,
-          "Title": "UsersTable.cs"
-        }
-      ]
-    },
-    {
-      "Id": "HomeController.cs",
-      "Title": "Controller",
-      "Description": "Implementation of MVC controller handling table on server side",
-      "Files": [
-        {
-          "Path": "/Controllers/HomeController.cs",
-          "Language": "csharp",
-          "Comment": null,
-          "Title": "HomeController.cs"
-        }
-      ]
-    },
-    {
-      "Id": "DataService.cs",
-      "Title": "Data service implementation",
-      "Description": "Sample implementation of data service",
-      "Files": [
-        {
-          "Path": "/Data/DataService.cs",
-          "Language": "csharp",
-          "Comment": null,
-          "Title": "DataService.cs"
+          "Title": "FormWatcherTableConfiguration.cs"
         }
       ]
     }

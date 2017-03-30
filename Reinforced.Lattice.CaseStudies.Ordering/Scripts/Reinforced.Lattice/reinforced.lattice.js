@@ -10,14 +10,24 @@ var Reinforced;
 (function (Reinforced) {
     var Lattice;
     (function (Lattice) {
+        /** Message type enum */
         (function (MessageType) {
+            /**
+            * UserMessage is shown using specified custom functions for
+            *             messages showing
+            */
             MessageType[MessageType["UserMessage"] = 0] = "UserMessage";
+            /** Banner message is displayed among whole table instead of data */
             MessageType[MessageType["Banner"] = 1] = "Banner";
         })(Lattice.MessageType || (Lattice.MessageType = {}));
         var MessageType = Lattice.MessageType;
+        /** Ordering */
         (function (Ordering) {
+            /** Ascending */
             Ordering[Ordering["Ascending"] = 0] = "Ascending";
+            /** Descending */
             Ordering[Ordering["Descending"] = 1] = "Descending";
+            /** Ordering is not applied */
             Ordering[Ordering["Neutral"] = 2] = "Neutral";
         })(Lattice.Ordering || (Lattice.Ordering = {}));
         var Ordering = Lattice.Ordering;
@@ -68,13 +78,22 @@ var Reinforced;
         (function (Plugins) {
             var Hierarchy;
             (function (Hierarchy) {
+                /** Controls policy of nodes collapsing and expanding */
                 (function (NodeExpandBehavior) {
+                    /** This option will not fetch subtree nodes when locally loaded data available */
                     NodeExpandBehavior[NodeExpandBehavior["LoadFromCacheWhenPossible"] = 0] = "LoadFromCacheWhenPossible";
+                    /**
+                    * This option will make hierarchy plugin always fetch subtree from
+                    *             server-side even if local data available
+                    */
                     NodeExpandBehavior[NodeExpandBehavior["AlwaysLoadRemotely"] = 1] = "AlwaysLoadRemotely";
                 })(Hierarchy.NodeExpandBehavior || (Hierarchy.NodeExpandBehavior = {}));
                 var NodeExpandBehavior = Hierarchy.NodeExpandBehavior;
+                /** This option controls client filtering policy related to collapsed nodes */
                 (function (TreeCollapsedNodeFilterBehavior) {
+                    /** In this case, even collapsed nodes will be included to filter results */
                     TreeCollapsedNodeFilterBehavior[TreeCollapsedNodeFilterBehavior["IncludeCollapsed"] = 0] = "IncludeCollapsed";
+                    /** In this case, even collapsed nodes will be excluded from filter results */
                     TreeCollapsedNodeFilterBehavior[TreeCollapsedNodeFilterBehavior["ExcludeCollapsed"] = 1] = "ExcludeCollapsed";
                 })(Hierarchy.TreeCollapsedNodeFilterBehavior || (Hierarchy.TreeCollapsedNodeFilterBehavior = {}));
                 var TreeCollapsedNodeFilterBehavior = Hierarchy.TreeCollapsedNodeFilterBehavior;

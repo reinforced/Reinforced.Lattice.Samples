@@ -1,28 +1,61 @@
 ﻿<div class="text">
     <h2>Case</h2>
     <p>
-        You have heard about Reinforced.Lattice somewhere. Or your colleague told to you about that and you decided to try.
-        Or your boss have directed you to embed it to the project because he has heard somewhere that it is
-        cool and handy to use. However, you are here and want to start with Reinforced.Lattice. <br />
-        <i>Do not be afraid of complex manual - it will be significantly simplier in future! Initial setup is the most complex part.</i> <br />
-        Also, If you are too lazy to read - you can download this case study source code using buttons above. Code comments hold almost same information. <br/>
-        Read carefully, follow the steps and here we go.
+        Headers filters are not enough and you want more flexibility creating your own filters form around table. Reinforced.Lattice supplies several options to simplify 
+        integration between your standalone filtering MVC form and accompanying table.
     </p>
     <h2>Solution</h2>
-    <h3>Step 1 - Download and install</h3>
+    <h3>How to create form to be used with Reinforced.Lattice</h3>
     <p>
-        Let's assume that you already have ASP.NET MVC5 project and also you have some DB connected to it. It must be behind
-        ORM supporting LINQ and IQueryables. If you do not have database - you can use any other data source supplying IQueryable
-        of some entitites you want to display. <br />
-        I will provide examples using
-        <code>User</code> class as my source entity stored in database and ORM that I want to display and also <code>UserRow</code>
-        class acting like POCO ViewModel (<a href="#code_DataClasses" data-inpage>show</a>).
-        If you do not have ViewModel - create it just as you <span class="tip" data-tip="vm">regulary create ViewModels for MVC forms</span>.
-        Of course, you can do it later.
-        <br />
-        Go to your NuGet Package Manager Console and type there:
+        There are no special forms type to be used with Reinforced.Lattice. Recommended way is to create filter forms as <b>partial Razor views with strongly-typed ViewModel</b>.
+        Your form has to be "flat" (contain properties only of simple types). <b>Nested form objects are not supported yet.</b>
+        Reinforced.Lattice uses special plugin called <code>FormWatch</code> plugin to observe your form's <code>input</code>s and retrieve values from them according to its configuration. 
+        Retrieved form data will be embedded to every <code>Query</code> using <code>AdditionalData</code> field according to <code>FormWatch</code> configuration. 
+        Please check <a href="#code_WatchedForm_cshtml">our form and ViewModel that will be used in current example</a>. Please note multiple checkboxes with similar names and different values. We will return to them later.
+    </p>
+    <h3>How to configure form to be watched</h3>
+    <p>
+        Connect <code>Reinforced.Lattice.Plugins.Formwatch</code> namespace and call <code>.WatchForm&lt;T&gt;</code> method of table configurator where <code>T</code> is
+        type of your ViewModel for watched form. We will use <code>WatchedFormViewModel</code> class. <code>.WatchForm&lt;T&gt;</code> method consumes <i>FormWatch configuration method</i> of <i>FormWatch configurator</i> as first parameter.
+        To make Reinforced.Lattice automatically embed all fields by corresponding <code>input</code>s names within query use <code>.WatchAllFields</code> method of FormWatch configurator:
     </p>
 </div>
+<pre class="language-csharp wrap-code" data-src="#doc#/form-watch.cs"></pre>
+<div class="text">
+    <p>
+        You can use <code>.Field</code> method of FormWatch configurator to configure particular settings of field being watched by FormWatch plugin. <br/>
+        <b>Important!</b> FormWatch plugin configuration is <b>safe</b> to be used in <code>cshtml</code>. Handler method does not use FormWatch configuration.
+    </p>
+    <h3>How to obtain form values on server side</h3>
+    <p>
+        Watched form values are being serialized to JSON, then stringified and then placed to <code>AdditionalData</code> dictionary of <code>Query</code> with key <code>Formwatch</code>. 
+        Please do not try to retrieve these values manually! Use <code>.Form&lt;T&gt;</code> extension method of <code>Query</code> (also presents on <code>LatticeRequest</code> type). Supply your 
+        watched form's type as <code>T</code>. Method <code>.Form&lt;T&gt;</code> uses <a href="http://www.newtonsoft.com/json" target="_blank">Json.NET</a> library to deserialize value from <code>AdditionalData</code>.
+        It also has overload consuming array of <a href="http://www.newtonsoft.com/json/help/html/CustomJsonConverter.htm" target="_blank">JsonConverters</a> and <a href="http://www.newtonsoft.com/json/help/html/T_Newtonsoft_Json_JsonSerializerSettings.htm" target="_blank">JsonSerializerSettings</a> 
+        instances to allow you to customize serialization process. You can obtain <code>Query</code> instance within <code>.Value()</code> method of filter to extract specific value. Either you can use <code>handler.ExtractRequest()</code> method 
+        of <code>MvcRequestHandler</code> that you create in your handle-method in controller. It will extract <code>LatticeRequest</code> object from request context. You can retrieve <code>Query</code> from it:
+    </p>
+</div>
+<pre class="language-csharp wrap-code" data-src="#doc#/lattice-query.cs"></pre>
+<div class="text">
+    <p>
+        But there are better methods developed for handy FormWatch integration: <code>FreeFilter</code> and <code>FreeOrdering</code>.
+    </p>
+    <h3>How to use free filters and free orderings</h3>
+    <p>
+        You can use free filters and free orderings when you want to create filtering or ordering that is not strictly bound to any of columns. There are two methods of table configurator: <code>.FreeFilter</code> and <code>.FreeOrdering</code>.
+        They both consume filter extractor function as first parameter (exactly the same as used for <code>.Value</code>). For <code>.FreeOrdering</code> you must return <code>Tuple&lt;bool,Reinforced.LatticeOrdering&gt;</code> as result of filter extractor. Then, 
+    </p>
+    <ul>
+        <li><code>.FreeFilter</code> consumes delegate consuming source query and filtering key and returns filtered source query as 2nd parameter</li>
+        <li><code>.FreeOrdering</code> consumes property expression of <code>TSource</code> to order by</li>
+    </ul>
+    <p>
+        Actually no one stops you from using <code>.FreeFilter</code> to perform completely custom ordering:
+    </p>
+</div>
+<pre class="language-csharp wrap-code" data-src="#doc#/free.cs"></pre>
+
 <pre class="pm-console">
     PM > Install-Package Reinforced.Lattice.Bundle.Mvc5
     </pre>
@@ -43,9 +76,7 @@
     <p>Now go to your master page (usually, <code>_Layout.cshtml</code>) and paste following lines to your <code>&lt;head&gt;</code>  tag:</p>
 </div>
 
-<pre class="language-cshtml wrap-code" data-src="#doc#/connect-script.cshtml">
-
-</pre>
+<pre class="language-cshtml wrap-code" data-src="#doc#/connect-script.cshtml"></pre>
 <div class="text">
     <p>
         Compare with <a href="#code__Layout_cshtml" data-inpage>my one</a> if you're not sure. We will need this "scripts" section later. It is critically important for

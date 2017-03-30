@@ -5,6 +5,7 @@ using Reinforced.Lattice.CaseStudies.Formwatcher.Data;
 using Reinforced.Lattice.CaseStudies.Formwatcher.Models;
 using Reinforced.Lattice.Configuration;
 using Reinforced.Lattice.Mvc;
+using Reinforced.Lattice.Plugins.Formwatch;
 
 namespace Reinforced.Lattice.CaseStudies.Formwatcher.Controllers
 {
@@ -30,7 +31,10 @@ namespace Reinforced.Lattice.CaseStudies.Formwatcher.Controllers
         {
             var conf = new Configurator<Contract, ContractRow>().ConfigureFormWatcher();
             var handler = conf.CreateMvcHandler(ControllerContext);
-            Thread.Sleep(2000);
+            LatticeRequest req = handler.ExtractRequest();
+            Query lq = req.Query;
+            var formData = lq.Form<WatchedFormViewModel>();
+            var sameFormData = req.Form<WatchedFormViewModel>();
             var q = DataService.GetAllData();
             return handler.Handle(q);
         }
