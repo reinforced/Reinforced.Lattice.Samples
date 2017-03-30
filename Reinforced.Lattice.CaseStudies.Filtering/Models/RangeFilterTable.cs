@@ -43,8 +43,8 @@ namespace Reinforced.Lattice.CaseStudies.Filtering.Models
             var sTo = spl[1];
             var from = string.IsNullOrEmpty(sFrom) ? (double?)null : ValueConverter.Convert<double>(sFrom);
             var to = string.IsNullOrEmpty(sTo) ? (double?)null : ValueConverter.Convert<double>(sTo);
-            if (from.HasValue && from > 10) from = from / 100;
-            if (to.HasValue && to > 10) to = to / 100;
+            if (from.HasValue && from >= 10) from = from / 100;
+            if (to.HasValue && to >= 10) to = to / 100;
             var rng = new RangeTuple<double?>
             {
                 From = @from,
