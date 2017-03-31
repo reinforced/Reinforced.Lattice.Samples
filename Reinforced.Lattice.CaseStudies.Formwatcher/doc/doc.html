@@ -159,3 +159,18 @@
     </p>
 </div>
 <pre class="language-csharp wrap-code" data-src="#doc#/ignore.cs"></pre>
+<div class="text">
+    <h3>How to use loading overlap</h3>
+    <p>
+        Loading overlap adds "overlapping" element to page that covers specified elements while table is loading. It is very similar to <a href="http://malsup.com/jquery/block/" target="_blank">jQuery BlockUI plugin</a>. 
+        You can change its design using loading overlap's core template. To configure elements to be overlapped while loading use <code>.LoadingOverlap</code> method. It consumes UI configurator:
+    </p>
+</div>
+<pre class="language-csharp wrap-code" data-src="#doc#/loading-overlap.cs"></pre>
+<div class="text">
+    <p>
+        By passing <code>OverlapMode</code> to <code>.Overlap</code> method you can overlap <code>All</code> table including header filters, layout and plugins (like pager),
+        <code>BodyOnly</code> to overlap only table body (default value), or body <code>Parent</code> element. Also you can provide your own selector to overlap 
+        custom elements. In live demo we overlap two Bootstrap columns containing form filter and table body (headers are left active).
+    </p>
+</div>

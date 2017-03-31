@@ -26,7 +26,7 @@ namespace Reinforced.Lattice.CaseStudies.Formwatcher.Models
             {
                 w.WatchAllFields();
                 w.Field(x => x.Supplier).TriggerSearchOnEvents(10, "keyup").DoNotEmbedToQuery();
-                w.Field(x => x.Ratings).TriggerSearchOnEvents("keyup", "blur");
+                w.Field(x => x.Ratings).Delimiter(",");
                 w.Field(x => x.PriceRanges).Selector("input[name='chb_Price']");
                 w.Field(x => x.StartDateFrom).AutoDatePicker();
                 w.Field(x => x.StartDateTo).AutoDatePicker();
