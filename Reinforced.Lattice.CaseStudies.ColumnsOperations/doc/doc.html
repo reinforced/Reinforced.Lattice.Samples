@@ -13,7 +13,7 @@
 <div class="text">
     <h3>Configuration location</h3>
     <p>
-        Actually you can configure your table not only in configuration method itself, but in your <code>.cshtml</code> file also. Moreover, <i>I hardly recommend to do so</i> just to keep UI-specific configuration along with other UI. Of course, technically there is no difference where to call all configuration methods mentioned below, but you will:
+        Actually you can configure your table not only in configuration method itself, but in your <code>.cshtml</code> file also. Moreover, <i>I hardly recommend doing so</i> just to keep UI-specific configuration along with other UI. Of course, technically there is no difference where to call all configuration methods mentioned below, but you will:
     </p>    
     <ul>
         <li>save couple of CPU ticks/few bytes of RAM</li>
@@ -32,7 +32,7 @@
     <h2>Solution</h2>
     <h3>How to change column title</h3>
     <p>
-        If column title is not provided then corresponding <code>TRow</code>'s property name will be used as column title. 
+        If column title is not provided then corresponding <code>TRow</code>'s property name will be used as the column title. 
         Use <code>.Title</code> method of column configurator to change column title (HTML is supporeted there):
     </p>
 </div>
@@ -43,7 +43,7 @@
     </p>
     <h3>How to set columns titles automatically</h3>
     <p>
-        If you are using standard C# code conventions and <i>PascalCase</i> for properties names, and of course if you give your properties sensitive names then Reinforced.Lattice can prettify these names and use as column titles.
+        If you are using standard C# code conventions and <i>PascalCase</i> for properties names, and of course if you give sensitive names to them, then Reinforced.Lattice can prettify these names and use as column titles.
         To do that use <code>.PrettifyTitles</code> method of configurator. Make sure to call it <b>prior</b> to invoking <code>.Title</code>. 
     </p>
 </div>

@@ -7,12 +7,12 @@
     <h2>Solution</h2>
     <h3>How to create form to be used with Reinforced.Lattice</h3>
     <p>
-        There are no special forms type to be used with Reinforced.Lattice. Recommended way is to create filter forms as <b>partial Razor views with strongly-typed ViewModel</b>.
+        There is no particular forms type to be used with Reinforced.Lattice. Recommended way is to create filter forms as <b>partial Razor views with strongly-typed ViewModel</b>.
         Your form has to be "flat" (contain properties only of simple types). <b>Nested form objects are not supported yet.</b>
         Reinforced.Lattice uses special plugin called <code>FormWatch</code> plugin to observe your form's <code>input</code>s and retrieve values from them according to its configuration. 
         Retrieved form data will be embedded to every <code>Query</code> using <code>AdditionalData</code> field according to <code>FormWatch</code> configuration. 
         Please check <a href="#code_WatchedForm_cshtml">our form and ViewModel that will be used in current example</a>. Please note multiple checkboxes with similar names and different values. We will return to them later. <br/>
-        One of common used tactics to increase flexibility is to create hidden <code>input</code>s for filter form fields, filling then with appropriate values using client-side JavaScript and letting FormWatch to do its work. 
+        One of the standard used tactics to increase flexibility is to create hidden <code>input</code>s for filter form fields, filling then with appropriate values using client-side JavaScript and letting FormWatch do its work. 
         At the same time no one can stop you from attaching AngularJS app to the filtering form to enrich it with additional behavior.
     </p>
     <h3>How to configure form to be watched</h3>
@@ -92,8 +92,7 @@
 <pre class="language-csharp wrap-code" data-src="#doc#/reload-button.cs"></pre>
 <div class="text">
     <p>
-        Reload button can also reload data <i>forcibly</i>. Since Reinforced.Lattice has both client and server filtering, it can detect whether there are 
-        any changes in current filtration query to be applied on server-side. If there are no such changes then Reinforced.Lattice will not request server for data. 
+        Reload button can also reload data <i>forcibly</i>. Since Reinforced.Lattice has both client and server filtering; it can detect whether there are any changes in current filtration query to be applied on server-side. If there are no such changes then Reinforced.Lattice will not request the server for data. 
         It works only for data queries and also this behavior includes data retrieved using FormWatch. <b>Force reload</b> will forcibly send request to server 
         even if there are no data query changes according to Reinforced.Lattice's opinion. <br/>
         Other way to trigger search when using watched form is <code>.TriggerSearchOnEvents</code> method of field configurator:

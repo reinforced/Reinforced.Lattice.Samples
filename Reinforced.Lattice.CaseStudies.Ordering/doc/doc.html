@@ -6,8 +6,7 @@
     <h2>Solution</h2>
     <p>
         Ordering functionality is exposed by <code>.Orderable</code>/<code>.OrderableUi</code>/<code>.OrderableNoUi</code> methods available on column configurator.
-        Please note that orderings are applied from left to right column. It means that if you choose several orderings by columns, then resulting table will be ordered by 
-        left-column criteria, then each group with equal values of 1st column will be sorted by 2nd column etc until last right column. In current version this behavior cannot be overriden.
+        Please note that orderings are being applied from left to right column. It means that if you choose several orderings by columns, then resulting table will be ordered by the left-column criteria, then each group with equal values of the 1st column will be sorted by 2nd column, etc. until last right column. In the current version, this behavior cannot be overridden.
     </p>
     <h3>How to use server ordering</h3>
     <p>
@@ -31,8 +30,7 @@
     <ul>
         <li>
             You <b>CAN</b> use client ordered and server-ordered columns at the same table. Reinforced.Lattice supports such behavior. Yes, it is allowed.
-            For columns that are not configured to use client ordering - server request will be performed. For columns that are configured to support client ordering -
-            server request will not be performed.
+            For columns that are not configured to use client ordering - server request will be performed. For columns that are set up to support client ordering - server request will not be performed.
         </li>
         <li>
             After calling <code>.Orderable</code> once, you can override UI properties specified there by calling <code>.OrderableUi</code> method.

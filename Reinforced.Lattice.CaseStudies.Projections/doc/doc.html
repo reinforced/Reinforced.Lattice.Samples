@@ -9,7 +9,7 @@
     <p>There are 3 possible ways to map TSource to TRow in Reinforced.Lattice</p>
     <h3>Automatic mapping</h3>
     <p>
-        In simple cases Reinforced.Lattice is able to map your data automatically. As you have seen at "Getting it Working" tutorial, Reinforced.Lattice has automatically determined which data to show,
+        In simple cases Reinforced.Lattice can map your data automatically. As you have seen at "Getting it Working" tutorial, Reinforced.Lattice has automatically determined which data to show,
         but you have not specified any additional settings to do that.
         That is because Reinforced.Lattice mapping at work: <i>Reinforced.Lattice automatically copies properties with matching names from <code>TSource</code> to <code>TRow</code>.</i> <a href="http://automapper.org" target="_blank">Automapper</a> behaves almost in the same way. Obviously, for some cases this approach is not applicable.
     </p>
@@ -41,7 +41,7 @@
     <h3>Manual mapping using <code>.ProjectDataWith</code></h3>
     <p>
         For complex models you can use projection method. <code>.ProjectDataWith</code> is used to specify method that takes your <code>IQueryable&lt;TSource&gt;</code> and turns it to <code>IQueryable&lt;TRow&gt;</code>. 
-        The trick is pretty simple: in case if you use ORM that translates LINQ to store internal query language (e.g. EF translates LINQ to SQL) then your projection method will be also processed by query translator and all the fields of projection will be calculated on store side. It solves Select N+1 issue but requires little bit more boilerplate code:
+        The trick is pretty simple: in case if you use ORM that translates LINQ to store internal query language (e.g. EF translates LINQ to SQL) then your projection method will also be processed by query translator and all the fields of projection will be calculated on the store side. It solves the Select N+1 issue but requires little bit more boilerplate code:
     </p>
 </div>
 <pre class="language-csharp wrap-code" data-src="#doc#/project-with.cs">

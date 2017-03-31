@@ -1,19 +1,16 @@
-﻿<div class="text">
+﻿﻿<div class="text">
     <h2>Case</h2>
     <p>
-        You have heard about Reinforced.Lattice somewhere. Or your colleague told to you about that and you decided to try.
-        Or your boss have directed you to embed it to the project because he has heard somewhere that it is
-        cool and handy to use. However, you are here and want to start with Reinforced.Lattice. <br />
-        <i>Do not be afraid of complex manual - it will be significantly simplier in future! Initial setup is the most complex part.</i> <br />
+        You have heard about Reinforced.Lattice somewhere. Or your colleague told you about that, and you decided to try.
+        Or your boss has directed you to embed it in the project because he has heard somewhere that it is fresh and handy to use. However, you are here and want to start with Reinforced.Lattice. <br />
+        <i>Do not be afraid of the complex manual - it will be significantly simpler in future! Initial setup is the most complex part.</i> <br />
         Also, If you are too lazy to read - you can download this case study source code using buttons above. Code comments hold almost same information. <br/>
         Read carefully, follow the steps and here we go.
     </p>
     <h2>Solution</h2>
     <h3>Step 1 - Download and install</h3>
     <p>
-        Let's assume that you already have ASP.NET MVC5 project and also you have some DB connected to it. It must be behind
-        ORM supporting LINQ and IQueryables. If you do not have database - you can use any other data source supplying IQueryable
-        of some entitites you want to display. <br />
+        Let's assume that you already have ASP.NET MVC5 project and also you have some DB connected to it. It must be behind ORM supporting LINQ and IQueryables. If you do not have a database - you can use any other data source supplying IQueryable of some entities you want to display. <br />
         I will provide examples using
         <code>User</code> class as my source entity stored in database and ORM that I want to display and also <code>UserRow</code>
         class acting like POCO ViewModel (<a href="#code_DataClasses" data-inpage>show</a>).
@@ -66,8 +63,7 @@
 
     </ol>
     <p>
-        <code>Configurator&lt;,&gt;</code> is key class exposing Reinforced.Lattice functionality. It is being used to produce piece of JSON code for client side as well as for
-        maintaining upcoming requests to server side. And we have to keep it in the same (well, almost same) state both in our controller and in our ViewModel. That's why we use
+        <code>Configurator&lt;,&gt;</code> is key class exposing Reinforced.Lattice functionality. It is being used to produce a piece of JSON code for client side as well as for maintaining future requests to the server side. And we have to keep it in the same (well, almost same) state both in our controller and in our ViewModel. That's why we use
         extension method for configuration.
     </p>
     <h3>Step 4 - Prepare your page</h3>
@@ -99,7 +95,7 @@
 <div class="text tiptext" data-tiptext="vm" data-caption="About ViewModels">
     <p>
         Reinforced.Lattice ViewModels are of course are little bit different than regular MVC forms ViewModels.
-        E.g. you do not have to put arrays of <code>SelectListItem</code>s to it. Also complex nested types are not allowed there.
+        E.g. you do not have to put arrays of <code>SelectListItem</code>s to it. Also, complex nested types are not allowed there.
         Optimal way is to keep you ViewModel for Lattice as <b>flat</b> and as plain-est as possible. Try to put actually all the fields
         that you are displaying to there. Of course, Lattice works with nested types, but it <i>may</i> reduce performance.
     </p>
@@ -109,7 +105,7 @@
     <b>NB! <code>Configurator&lt;,&gt;</code> type parameters. Learn them clearly.</b>
     <ul>
         <li>
-            <code>TSource</code> - first one. Is actually type of data from your ORM. It is safe to put entities from DataContext/DbContext here.
+            <code>TSource</code> - first one. It is type of data from your ORM. Putting entities from DataContext/DbContext here is safe.
             Also may be referred as "first", "left", "source", "from".
         </li>
         <li>

@@ -6,18 +6,16 @@
     <h2>Necessary knowledge</h2>
     <h3>Filter types</h3>
     <p>
-        Reinforced.Lattice has filters to perform filtering out non-satisfying data. It is possible to set up
-        filters working on server side as well as client-side ones. Usually filters are being attached to columns,
-        but there are some other use-cases. Basically, Reinforced.Lattice has 4 different types of client filters and it
-        is enough since Reinforced.Lattice allows to easily customize UI and behavior:
+        Reinforced.Lattice has filters to perform filtering out non-satisfying data. It is possible to set up filters working on the server side as well as client-side ones. Usually, filters are being attached to columns,
+        but there are some other use-cases. Basically, Reinforced.Lattice has four different types of client filters, and it is enough since Reinforced.Lattice allows to customize UI and behavior quickly:
     </p>
     <ul>
         <li>
-            <b>Value filter</b> - by default exposed as textbox allowind user to input any value that he/she is looking for. It is exact filter. Being placed to particular column, filters out (removes) all rows that have corresponding column's value not equal to value put to filter.
+            <b>Value filter</b> - by default exposed as textbox allowing user to input any value that he/she is looking for. It is "exact" filter. Being placed in the particular column, filters out (removes) all rows that have corresponding column's value not equal to value put to filter.
             Actually it works in little bit different way for strings and dates
         </li>
         <li>
-            <b>Select filter</b> - by default exposed as select list allowing user to select one of predefined values. Technically it is the same as value filter, but its UI allows to choose one of several predefined options to filter by
+            <b>Select filter</b> - by default exposed as select list allowing user to select one of predefined values. Technically it is the same as value filter, but its UI allows to choose one of the several predefined options to filter by
         </li>
         <li>
             <b>Multi-select filter</b> - by default exposed as multi-select list allowing user to select <i>multiple</i> of predefined values. Almost the same as select filter, but allows to change several possible values values. Row will satisfy this filter in case if corresponding column's value matches one of selected values
@@ -27,8 +25,8 @@
         </li>
     </ul>
     <p>
-        Using core templating, you can easily change supplied filter's UI without changing their logic. <br />
-        To configure filter you have to select column and call filter configuration method. Filters configuration in almost all cases exposed by 5 methods:
+        Using core templating, you can quickly change supplied filter's UI without changing their logic. <br />
+        To configure filter you have to select column and call filter configuration method. Filters configuration in almost all cases exposed by five methods:
     </p>
     <ul>
         <li><code>.Filter*(source_prop,ui)</code> - configures filter that filters <code>source_prop</code> property of <code>TSource</code> on server side and has <code>ui</code> configuration for UI representation</li>
@@ -39,21 +37,19 @@
     </ul>
     <h3>Client and server filters</h3>
     <p>
-        For each filter you can override server filtering criteria as well as client one.
+        For each filter, you can override server filtering criteria as well as client one.
         This process is pretty similar to <code>.Where</code> invokation even for client filtering (thanks to `{@}`-notation).
-        Table <b>CAN</b> contain both client and server filters. So if you change client filter value then no additional server request will be performed.
+        Table <b>CAN</b> contain both client and server filters. So if you change client filter value, then no additional server request will be performed.
         At the other hand, if you touch server filter then server request will happen.
         It is important to understand that <i>client filters are not bein executed on server</i>.
-        So if you have table consisting of 1000 rows and 999 of them are filtered out by client filter -
-        it means that 1000 records will be fetched from server.
+        So if you have the table consisting of 1000 rows and 999 of them are filtered out by client filter - it means that 1000 records will be fetched from the server.
         You can combine client and server filter and fine-tune your tables performance by that aspect.
     </p>
     <h3>Filtering strings</h3>
     <p>
         Keep in mind that by default <i>server</i> value filter being attached to string column filters out all the rows
         that doesnt have corresponding columns <b>strictly</b> equal to specified filter value.
-        At the other hand, client string filter works in <b>totatlly different manner</b>: it breaks input string into words
-        and tries to match substring among all the options being filtered. This behavior takes place only for strings,
+        At the other hand, client string filter works in <b>totatlly different manner</b>: it breaks input string into words and tries to match substring among all the options being filtered. This behavior takes place only for strings,
         so make sure to override client filtering function or just deal with such behavior.
     </p>
     <h3>How to connect your favorite date picker</h3>
@@ -83,7 +79,7 @@
 <pre class="language-cshtml wrap-code" data-src="#doc#/connect-datepicker.cshtml"></pre>
 <div class="text">
     <p>
-        Reinforced.Lattice uses specified datepicker methods for value filter, range filter and also for editing, forms, formwatch and other places.
+        Reinforced.Lattice uses specified date picker methods for value filter, range filter and also for editing, forms, FormWatch and other places.
         So being specified once, your favorite datepicker will be used everywhere.
     </p>
     <h3>How to use <code>.AppendEmptyFilters()</code> method, what it does?</h3>
@@ -223,8 +219,7 @@
 <div class="text">
     <p>
         You <b>CAN</b> use both client and server filters within single table. Please keep in mind that if column has client filter configured then
-        <b>it will not be filtered on server</b>! It means that all objects that were not filtered out by server filter will be returned to client-side
-        for futher filtering. Beware of significant volumes of data transmitted and do balance load between client and server.
+        <b>it will not be filtered on server</b>! It means that all objects that were not filtered out by server filter will be returned to client-side for further filtering. Beware of significant volumes of data transmitted and do balance load between client and server.
     </p>
 </div>
 <div class="text">
@@ -234,7 +229,7 @@
         <li>For <b>Range filter</b> - use <code>.RangeDefault</code> method of UI configurator. It consumes two strongly typed values to be set as "from" and "to" default values correspondingly</li>
         <li>
             For <b>Select filter</b> - use <code>.SelectDefault</code> method  of UI configurator. Works in the same manner as for value filter.
-            Please keep in mind that if no default value specified for select filter then first option in list will be selected by default.
+            Please keep in mind that if no default value specified for select filter then the first option in the list will be chosen by default.
         </li>
         <li>
             For <b>Multi-Select filter</b> - when passing select items to filter, set <code>Selected</code> property of list items that have to be selected by default.
@@ -373,7 +368,7 @@
     </p>
     <h3>How to control range filter inclusive</h3>
     <p>
-        Consider 3 objects with Price fields: 100 for 1st, 200 for 2nd and 300 for 3rd. Consider also range filter configured for Price column.
+        Consider three objects with Price fields: 100 for 1st, 200 for 2nd and 300 for 3rd. Consider also range filter configured for Price column.
         User selects range from 100 to 300. Then:
     </p>
     <ul>
