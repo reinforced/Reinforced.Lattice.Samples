@@ -1,0 +1,35 @@
+@model Reinforced.Lattice.CaseStudies.Formwatcher.Models.WatchedFormViewModel
+@{
+    conf.WatchForm<WatchedFormViewModel>(w =>
+    {
+        w.WatchAllFields();        
+        w.Field(x => x.Ratings).Delimiter(",");
+        w.Field(x => x.PriceRanges).Selector("input[name='chb_Price']");        
+    });
+}
+
+<div class="form-group">
+    @Html.LabelFor(c => c.Priorities)
+    <div class="col-sm-9">
+        @* Formwatcher will see this input because of .WatchAllFields - ASP.NET MVC generates input with names corresponding to property names *@
+        @Html.DropDownListFor(c => c.Priorities, EnumHelper.GetSelectList(typeof(Priority)), new { multiple = "multiple" })        
+    </div>
+</div>
+
+<div class="form-group">
+    @Html.LabelFor(c => c.Ratings)
+    <div class="col-sm-9">
+        @* You can type comma-split numbers into rating field - they will be parsed into array *@
+        @Html.TextBoxFor(c => c.Ratings)
+    </div>
+</div>
+
+<div class="form-group">
+    <label class="col-sm-3 control-label">Price</label>
+    <div class="col-sm-3">
+        @* Note equal names, selector input[name='chb_Price'] pointing to these 3 inputs *@
+        <div class="checkbox"><label><input type="checkbox" name="chb_Price" value="@PriceRange.From5_15" /> 5k - 15k</label></div>
+        <div class="checkbox"><label><input type="checkbox" name="chb_Price" value="@PriceRange.From15_25" /> 15k - 25k</label></div>
+        <div class="checkbox"><label><input type="checkbox" name="chb_Price" value="@PriceRange.From25_35" /> 25k - 35k</label></div>
+    </div>    
+</div>

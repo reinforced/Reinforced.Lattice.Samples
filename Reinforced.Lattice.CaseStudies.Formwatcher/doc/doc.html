@@ -11,7 +11,9 @@
         Your form has to be "flat" (contain properties only of simple types). <b>Nested form objects are not supported yet.</b>
         Reinforced.Lattice uses special plugin called <code>FormWatch</code> plugin to observe your form's <code>input</code>s and retrieve values from them according to its configuration. 
         Retrieved form data will be embedded to every <code>Query</code> using <code>AdditionalData</code> field according to <code>FormWatch</code> configuration. 
-        Please check <a href="#code_WatchedForm_cshtml">our form and ViewModel that will be used in current example</a>. Please note multiple checkboxes with similar names and different values. We will return to them later.
+        Please check <a href="#code_WatchedForm_cshtml">our form and ViewModel that will be used in current example</a>. Please note multiple checkboxes with similar names and different values. We will return to them later. <br/>
+        One of common used tactics to increase flexibility is to create hidden <code>input</code>s for filter form fields, filling then with appropriate values using client-side JavaScript and letting FormWatch to do its work. 
+        At the same time no one can stop you from attaching AngularJS app to the filtering form to enrich it with additional behavior.
     </p>
     <h3>How to configure form to be watched</h3>
     <p>
@@ -55,110 +57,105 @@
     </p>
 </div>
 <pre class="language-csharp wrap-code" data-src="#doc#/free.cs"></pre>
-
-<pre class="pm-console">
-    PM > Install-Package Reinforced.Lattice.Bundle.Mvc5
-    </pre>
+<div class="text">
+    <h3>How to specify field selector for FormWatch</h3>
+    <p>
+        By default FormWatch extracts value for each ViewModel property from <code>input</code> element with corresponding name. You 
+        can use <code>.Selector</code> method of field configurator to override element to extract value for this property from:
+    </p>
+</div>
+<pre class="language-csharp wrap-code" data-src="#doc#/field-selector.cs"></pre>
 <div class="text">
     <p>
-        Or you can use Visual Studio NuGet's Ui if you like it. <br />
-        Reinforced.Lattice bundle package will bring several important things:
+        If specified selector has multiple corresponding elements then value will be extracted from the first one. Except the case when 
+        corresponding ViewModel property is of array type - then every array item will extracted from separate HTML element.
     </p>
-    <ul class="blogger-sans">
-        <li><b>Reinforced.Lattice core library</b> itself</li>
-        <li><b>Client script</b> to be used on your pages</li>
-        <li><b>Huge templates page</b> containing default datagrid template for Twitter Bootstrap</li>
-        <li><b>Reinforced.Lattice.Mvc5</b> library that contains extensions for its requests handling via Mvc5</li>
-        <li><b>Reinforced.Lattice.Mvc5.Razor</b> library with some handy extensions for Razor templating</li>
-    </ul>
-    <p>Remember all these components - we will use them later</p>
-    <h3>Step 2 - Connect scrpt</h3>
-    <p>Now go to your master page (usually, <code>_Layout.cshtml</code>) and paste following lines to your <code>&lt;head&gt;</code>  tag:</p>
+    <h3>How to use arrays with FormWatch properly</h3>
+    <p>
+        First, create property of array type within your ViewModel. It can be any simple type including enumeration either <code>string[]</code>. Then 
+        either create multiple select list with corresponding <code>name</code> attribute equal to property name <b>or</b> specify selector that points to 
+        <b>set</b> of HTML <code>input</code> elements:
+    </p>
 </div>
-
-<pre class="language-cshtml wrap-code" data-src="#doc#/connect-script.cshtml"></pre>
+<pre class="language-cshtml wrap-code" data-src="#doc#/arrays.cshtml"></pre>
 <div class="text">
     <p>
-        Compare with <a href="#code__Layout_cshtml" data-inpage>my one</a> if you're not sure. We will need this "scripts" section later. It is critically important for
-        it to follow <b>after</b> Reinforced.Lattice script connection.
+        Use <code>.Delimiter</code> method to specify array delimiter to split <code>input</code> value by and turn into array. Retrieved items will be automatically 
+        converted to corresponding property type automatically. Please do not do this job by yourself.
     </p>
-    <h3>Step 3 - Prepare your ViewModel</h3>
-    <ol>
-        <li>Go to your page's ViewModel</li>
-        <li>Add <code>using</code> to <code>Reinforced.Lattice.Configuration</code> namespace</li>
-        <li><span class="tip" data-tip="parametrization">Put a property</span> of type <code>Configurator&lt;User,UserRow&gt;</code> called Table to your ViewModel (<a href="#code_Index_cshtml">verify with my one if you aren't sure</a>)</li>
-        <li>Create somewhere a <code>static</code> class - we will use it to store our table's configuration</li>
-        <li>
-            Navigate to static class created at previous step and create there <span class="tip" data-tip="extension">
-                static method
-            </span> consuming configurator as <code>this</code>-parameter and returning itself.
-            Put some code using configurator into it. <a href="#code_UsersTable_cs">See how I do that</a>.
-        </li>
-
-    </ol>
+    <h3>How to trigger table search properly when filter is being changed</h3>
     <p>
-        <code>Configurator&lt;,&gt;</code> is key class exposing Reinforced.Lattice functionality. It is being used to produce piece of JSON code for client side as well as for
-        maintaining upcoming requests to server side. And we have to keep it in the same (well, almost same) state both in our controller and in our ViewModel. That's why we use
-        extension method for configuration.
+        You can use <code>ReloadButton</code> plugin to diplsay reload button that will be automatically disabled during request. Use <code>.ReloadButton</code> method and 
+        call <code>.RenderTo</code> method of its configurator supplying target element to render search ("refresh") button:
     </p>
-    <h3>Step 4 - Prepare your page</h3>
-    <ol>
-        <li>Go to your page that you want to put table to</li>
-        <li>Pick a <code>&lt;div&gt;</code> or another tag you wish to display table in and assign <code>id="table"</code> to it</li>
-        <li>
-            Go to the bottom of the page and set up following code around your <code>scripts</code> section:
-        </li>
-    </ol>
 </div>
-<pre class="language-cshtml" data-src="#doc#/table-init.cshtml">
-
-</pre>
+<pre class="language-csharp wrap-code" data-src="#doc#/reload-button.cs"></pre>
 <div class="text">
-    <p>Basically that's how we use configurator to pass necessary data to our client script. <a href="#code_Index_cshtml">Check full page + ViewModel configuration</a>. </p>
-
-    <h3>Step 5 - Prepare your controller</h3>
     <p>
-        Now you have to make table crunch your <code>IQueryable&lt;TSource&gt;</code> and produce results. To do that you have to implement so-called "handle method" within your controller. Also add necessary initializations of your ViewModel with empty configurator, calling configuration method on it that you've created before. <br />
-        <a href="#code_HomeController_cs" data-inpage>Please refer to controller class explained with comments</a> as it is too senseless to reveal it to step-by-step process.
-    </p>
-    <h3>And we are done here</h3>
-    <p>
-        After changing controller code you can press <kbd>F5</kbd> or <code>Run</code> button in your Visual Studio, or run local IIS and navigate to <code>/Home/Index</code> page. <br/>
-        Also you can launch live demo on all documentation pages using green "Live Demo" button.
+        Reload button can also reload data <i>forcibly</i>. Since Reinforced.Lattice has both client and server filtering, it can detect whether there are 
+        any changes in current filtration query to be applied on server-side. If there are no such changes then Reinforced.Lattice will not request server for data. 
+        It works only for data queries and also this behavior includes data retrieved using FormWatch. <b>Force reload</b> will forcibly send request to server 
+        even if there are no data query changes according to Reinforced.Lattice's opinion. <br/>
+        Other way to trigger search when using watched form is <code>.TriggerSearchOnEvents</code> method of field configurator:
     </p>
 </div>
-<div class="text tiptext" data-tiptext="vm" data-caption="About ViewModels">
+<pre class="language-csharp wrap-code" data-src="#doc#/trigger-search-on-events.cs"></pre>
+<div class="text">
     <p>
-        Reinforced.Lattice ViewModels are of course are little bit different than regular MVC forms ViewModels.
-        E.g. you do not have to put arrays of <code>SelectListItem</code>s to it. Also complex nested types are not allowed there.
-        Optimal way is to keep you ViewModel for Lattice as <b>flat</b> and as plain-est as possible. Try to put actually all the fields
-        that you are displaying to there. Of course, Lattice works with nested types, but it <i>may</i> reduce performance.
+        This configuration will automatically subscribe table reloading to specified events happening on <code>input</code> (or set of <code>input</code>s). 
+        You can specify debouncing timeout there, but unfortunately there is no option to reload table forcibly from <code>input</code> event at this moment.
+    </p>
+    <h3>How to properly filter dates with form watcher</h3>
+    <p>
+        Reinforced.Lattice pass dates between client and server as strings containing date in <a href="https://en.wikipedia.org/wiki/ISO_8601" target="_blank">ISO 8601</a> format. 
+        So, if you want to specify value for form field from client-side, just set corresponding <code>input</code>'s value to properly formed ISO 8601. Use <code>window.$$table.Date.serialize(date)</code> 
+        JavaScript method - it will convert your JS Date object to string, suitable for Reinforced.Lattice. <br/>
+        But at other hand, you have option to use <b>the same datepicker as you've configured for your table</b> with <code>conf.DatePicker(...)</code> method. To initialize <code>input</code>s corresponding to 
+        FormWatch fields with table datepicker, just tell that to Reinforced.Lattice using <code>.AutoDatePicker</code> method of field configurator:
     </p>
 </div>
-<div class="text tiptext" data-tiptext="parametrization" data-caption="About Configurator parametrization">
-
-    <b>NB! <code>Configurator&lt;,&gt;</code> type parameters. Learn them clearly.</b>
-    <ul>
-        <li>
-            <code>TSource</code> - first one. Is actually type of data from your ORM. It is safe to put entities from DataContext/DbContext here.
-            Also may be referred as "first", "left", "source", "from".
-        </li>
-        <li>
-            <code>TRow</code> - second one. Is actually type of your ViewModel for <i>single row in table</i>.
-            Also may be referred as "second", "right", "target", "to"
-        </li>
-    </ul>
+<pre class="language-csharp wrap-code" data-src="#doc#/auto-datepicker.cs"></pre>
+<div class="text">
     <p>
-        Do not mess them - there 2 types are your best friends. It is important to understand what is applicable to <code>TSource</code> and what is applicable to <code>TRow</code>
+        It is recommended way that will make you to do not waste time on dates filter configuration.
+    </p>
+    <h3>How to provide value for formwatch field using custom JavaScript function</h3>
+    <p>
+        Instead of providing <code>input</code> element for watcher form's field you can specify JavaScript function returning value that needs to be embedded into form. Use <code>.ValueFunction</code> 
+        to configure such behavior. This method tells Reinforced.Lattice to use supplied function to obtain necessary field's value prior to embedding it into <code>Query</code>. You can provide either funcion name 
+        or inline function there. Function does not consume any parameters and must return value for field having corresponding type - JavaScript number, string, Date or array of ones according to .NET field's type:
     </p>
 </div>
-
-<div class="text tiptext" data-tiptext="extension" data-caption="About Configuration extensions">
+<pre class="language-csharp wrap-code" data-src="#doc#/value-function.cs"></pre>
+<div class="text">
+    <h3>How to provide constant value for watched field</h3>
     <p>
-        In Reinforced.Lattice table configurations are maintained as C# <a href="https://msdn.microsoft.com/en-us/library/bb383977.aspx" target="_blank">extension methods</a> implementing <a href="https://en.wikipedia.org/wiki/Fluent_interface" target="_blank">fluent interface configuration</a>.
-        So you can chain your configurations methods and therefore combine configurations obtaining new configurations. <br />
-        No XML configuration, no <a href="https://datatables.net/" target="_blank">JSON configuration</a>, no <a href="https://demos.devexpress.com/MVCxGridViewDemos/" target="_blank">assigning properties</a>, even
-        no <a href="https://demos.telerik.com/aspnet-mvc/grid" target="_blank">creating separate web project to enable grids</a>! Just clear, precise, chainable and maintainable fluent configuration. <br />
-        Unfortunately you cannot chain configurations for cells templating, but you can do lot more other fun with them.
+        Use <code>.Constant</code> method of wached field configurator. It consumes strongly typed value to be provided for field. Also, optionally, you can use <code>.SetToConstantIfNoValue</code> method 
+        to tell Reinforced.Lattice to use constand value when value extracted from form is null:
     </p>
 </div>
+<pre class="language-csharp wrap-code" data-src="#doc#/constant.cs"></pre>
+<div class="text">
+    <h3>How to connect formwatch to existing filters</h3>
+    <p>
+        Another flexible tactics to be used with FormWatch is configuring column filter and providing values for them from watched form. Use <code>.FilterColumn</code> extension method of 
+        field configurator to obtain FormWatch column behavior configurator. Then use <code>.Filter*</code> methods to configure values streaming to filters:
+    </p>
+</div>
+<pre class="language-csharp wrap-code" data-src="#doc#/stream-to-filters.cs"></pre>
+<div class="text">
+    <p>
+        Optimal solution is to use <code>.HideFilter</code> to hide filter's UI in table heading. So overall system will look like table filtered only using form. 
+        <b>Important!</b> Please make sure that filter configured on columns correspond to field's <code>.Filter*</code> call. Remember that <code>.Filter*</code> methods of 
+        field configurator <b>are not filtering values by themselves</b>! They only provide <code>Query</code> object with filtering keys. Further filtering depends on filter configured 
+        on column. <br/>
+        In example above we use client filtering on <code>Supplier</code> column. So we do not need <code>Supplier</code> field to be embedded to <code>Query</code>'s AdditionalData - if 
+        we do that then table will request server every time (it does not know that we are not using this field on server). Therefore, we use <code>.DoNotEmbedToQuery</code> method to avoid 
+        embedding of this particular field into <code>Query</code>.
+    </p>
+    <h3>How to ignore watched form fields and avoid any processing</h3>
+    <p>
+        Use <code>.Ignore</code> method:
+    </p>
+</div>
+<pre class="language-csharp wrap-code" data-src="#doc#/ignore.cs"></pre>

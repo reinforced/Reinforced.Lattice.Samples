@@ -22,7 +22,7 @@
         x.RazorIf("{@}==5", @<span style="color: #dc0000"><span class="glyphicon glyphicon-fire"></span> Critical</span>);
     });
     conf.LoadingOverlap(ui => ui.Overlap().Overlap(".filterColumn"));
-    conf.ReloadButton(ui => ui.RenderTo("#searchPlaceholder"));
+    conf.ReloadButton(ui => ui.RenderTo("#searchPlaceholder").ForceReload());
 
 }
 @Html.Partial("WatchedForm", new WatchedFormViewModel())

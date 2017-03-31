@@ -31,10 +31,6 @@ namespace Reinforced.Lattice.CaseStudies.Formwatcher.Controllers
         {
             var conf = new Configurator<Contract, ContractRow>().ConfigureFormWatcher();
             var handler = conf.CreateMvcHandler(ControllerContext);
-            LatticeRequest req = handler.ExtractRequest();
-            Query lq = req.Query;
-            var formData = lq.Form<WatchedFormViewModel>();
-            var sameFormData = req.Form<WatchedFormViewModel>();
             var q = DataService.GetAllData();
             return handler.Handle(q);
         }
