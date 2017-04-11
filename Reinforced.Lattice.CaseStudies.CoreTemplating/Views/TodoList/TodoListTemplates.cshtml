@@ -1,0 +1,410 @@
+﻿@using Reinforced.Lattice.CaseStudies.CoreTemplating.Models
+@using Reinforced.Lattice.DOMEvents
+@using Reinforced.Lattice.Templates
+@using Reinforced.Lattice.Templates.BuiltIn
+@using Reinforced.Lattice.Templates.Editing
+@using Reinforced.Lattice.Templates.Editing.Editors.Display
+@using Reinforced.Lattice.Templates.Editing.Editors.Memo
+@using Reinforced.Lattice.Templates.Editing.Editors.PlainText
+@using Reinforced.Lattice.Templates.Editing.Editors.SelectList
+@using Reinforced.Lattice.Templates.Expressions
+@using Reinforced.Lattice.Templates.Filters.Value
+@using Reinforced.Lattice.Templates.Plugins.LoadingOverlap
+@using Reinforced.Lattice.Templates.Plugins.Paging
+@using Reinforced.Lattice.Templates.Plugins.Toolbar
+@inherits Reinforced.Lattice.Templates.TemplatesPageBase
+
+@*
+    Lattice common layout template
+    See available helpers in scope variable "t"
+*@
+
+@using (var t = this.Layout())
+{
+    <div class="container">
+        <div class="row">
+            <div class="col-md-12 text-center">
+                <h3>Tiny ToDo-list</h3>
+                <p>
+                    It just demonstrates Reinforced.Lattice
+                    templating and data handling capabilities
+                </p>
+            </div>
+        </div>
+        <div class="row">
+            @t.Filters()
+            @t.Plugins("toolbar")
+        </div>
+        <div class="row">
+            <hr />
+        </div>
+        <div class="row">
+            <div class="col-md-offset-1 col-md-9" @t.Body()>
+            </div>
+        </div>
+        <div class="row">
+            @t.Plugins("pager")
+        </div>
+    </div>
+}
+
+@*
+    Plugin wrapper template. This template is being wrapped around each plugin
+*@
+@using (var t = this.PluginWrapper())
+{
+    using (t.If(x => x.PluginLocation == "filter-Text-ValueFilter"))
+    {
+        <div class="col-md-7">@t.Content()</div>
+        using (t.ElseIf(x => x.PluginLocation == "filter-Date-ValueFilter"))
+        {
+            <div class="col-md-3">@t.Content()</div>
+            using (t.ElseIf(x => x.PluginLocation == "pager-Paging"))
+            {
+                <div class="col-md-offset-1 col-md-9 text-center">@t.Content()</div>
+                @t.Else()
+                <div class="col-md-2">@t.Content()</div>
+            }
+
+        }
+    }
+}
+
+@*
+    Column header wrapper template.
+*@
+@using (var t = this.HeaderWrapper())
+{ <div>@t.Content()</div> }
+
+@*
+    Row wrapper template.
+    Following HTML is being wrapped around each data row
+*@
+@using (var t = this.RowWrapper<TodoListEntry>())
+{
+    <div class="panel panel-default">
+        <div class="panel-heading">
+            <div class="row">
+                <div class="col-md-10">
+                    @t.Content(c => c.Icon) &nbsp; @t.Content(c => c.Date)
+                </div>
+                <div class="text-right col-md-2">
+                    <button type="button" class="btn btn-xs btn-warning _edit" title="Edit entry">
+                        <span class="glyphicon glyphicon-pencil"></span>
+                    </button>
+                    &nbsp;
+                    <button type="button" class="btn btn-xs btn-success _completed" title="Completed">
+                        <span class="glyphicon glyphicon-ok"></span>
+                    </button>
+                </div>
+            </div>
+        </div>
+        <div class="panel-body">
+            @t.Content(c => c.Text)
+        </div>
+    </div>
+}
+
+@*
+    Cell wrapper template.
+    Following HTML is being wrapped around each data cell
+*@
+@using (var t = this.CellWrapper())
+{ <span>@t.Content()</span> }
+
+@using (var t = this.Message("error"))
+{
+    <div class="panel panel-default">
+        <div class="panel-body text-center bg-danger">
+            @t.Value(c => c.TDO.Title)
+        </div>
+    </div>
+}
+
+@using (var t = this.Message("noresults"))
+{
+    <div class="panel panel-default">
+        <div class="panel-body text-center bg-warning">
+            <i>No Entries</i>
+            <br />
+            No ToDo entries found
+        </div>
+    </div>
+}
+
+@using (var t = this.Message("initial"))
+{
+    <div class="panel panel-default">
+        <div class="panel-body text-center bg-info">
+            Data not loaded yet
+        </div>
+    </div>
+}
+
+@using (var t = Plugin.ValueFilter())
+{
+    <input type="text" @t.BindValueChanged("keyup,input,change,paste")
+           @t.ThisIsFilterValueProvider()
+           style="max-width: 100%;" class="form-control"
+           placeholder="Search records" />
+}
+
+@using (var t = Plugin.ValueFilter("dateFilter"))
+{
+    <div class='input-group date' id='datetimepicker1'>
+        <input type='text' @t.DatepickerCanBeHere()
+               @t.BindValueChanged("keyup,input,change,paste")
+               @t.ThisIsFilterValueProvider()
+               class="form-control" />
+        <span class="input-group-addon">
+            <span class="glyphicon glyphicon-calendar"></span>
+        </span>
+    </div>
+}
+
+@using (var t = Plugin.Editor_PlainText())
+{
+    using (t.If(c => c.IsFormEdit))
+    {
+        <div class="form-group">
+            <label for="edit-@t.Value(c => c.Column.RawName)"
+                   class="col-sm-2 control-label">
+                @t.Value(c => c.Column.Configuration.Title)
+            </label>
+            <div class="col-sm-10">
+                <input type="text" class="form-control"
+                       style="max-width: 100%"
+                       id="edit-@t.Value(c=>c.Column.RawName)"
+                       placeholder="@t.Value(c => c.Column.Configuration.Title)"
+                       @t.ThisIsInput()
+                       @t.BindChanged("keyup")
+                       @t.BindCommit(DOMKeyEvent.E(DOMKey.Up).Key(ConsoleKey.Enter))
+                       @t.WhenInvalid(c => c.State.Color("red").Style("border-color", "red")) />
+                <div class="help-block"
+                     @t.WhenInvalid(c => { c.State.Show(); c.Content(d => d.ValidationMessages); })
+                     style="display: none; color: #E15C5C;">
+                </div>
+            </div>
+        </div>
+    }
+}
+
+@using (var t = Plugin.Editor_SelectList())
+{
+    using (t.If(c => c.IsFormEdit))
+    {
+        <div class="form-group">
+            <label for="edit-@t.Value(c => c.Column.RawName)"
+                   class="col-sm-2 control-label">
+                @t.Value(c => c.Column.Configuration.Title)
+            </label>
+            <div class="col-sm-10">
+
+                <select id="edit-@t.Value(c => c.Column.RawName)"
+                        @t.WhenSaving(c => c.Attr("disabled", "disabled"))
+                        @t.WhenInvalid(c => c.State.Style("background-color", "#FFF7F7"))
+                        class="form-control" style="max-width:100%"
+                        @t.ThisIsList()
+                        @t.BindChanged("change")
+                        @t.BindCommit("change")>
+                    @using (var itm = t.Each(c => c.Items))
+                    {
+                        <option value="@itm.Value(c => c.Value)">
+                            @itm.Value(c => c.Text)
+                        </option>
+                    }
+                </select>
+
+                <div class="help-block"
+                     @t.WhenInvalid(c => { c.State.Show(); c.Content(d => d.ValidationMessages); })
+                     style="display: none; color: #E15C5C;">
+                </div>
+            </div>
+        </div>
+    }
+}
+
+@using (var t = Plugin.Editor_Memo())
+{
+    using (t.If(c => c.IsFormEdit))
+    {
+        <div class="form-group">
+            <label for="edit-@t.Value(c => c.Column.RawName)"
+                   class="col-sm-2 control-label">
+                @t.Value(c => c.Column.Configuration.Title)
+            </label>
+            <div class="col-sm-10">
+                <textarea type="text"
+                          class="form-control"
+                          style="max-width: 100%"
+                          id="edit-@t.Value(c=>c.Column.RawName)"
+                          placeholder="@t.Value(c => c.Column.Configuration.Title)"
+                          @t.ThisIsInput()
+                          @t.BindChanged("keyup")
+                          @t.BindCommit(DOMKeyEvent.E(DOMKey.Up).Key(ConsoleKey.Enter))
+                          @t.WhenInvalid(c => c.State.Color("red").Style("border-color", "red"))></textarea>
+                <div class="help-block"
+                     @t.WhenInvalid(c => { c.State.Show(); c.Content(d => d.ValidationMessages); })
+                     style="display: none; color: #E15C5C;">
+                </div>
+            </div>
+        </div>
+    }
+}
+@using (var t = Plugin.Editor_Display())
+{
+
+    <div class="form-group">
+        <label class="col-sm-2 control-label">
+            @t.Value(c => c.Column.Configuration.Title)
+        </label>
+        <div class="col-sm-10">
+            <p class="form-control-static"
+               @t.ThisIsContentParent()>
+                @t.Render()
+            </p>
+        </div>
+    </div>
+}
+
+@using (var t = Plugin.Editor_ValidationMessages())
+{
+    <p style="margin-bottom: 0">
+        @using (var m = t.Each(c => c.Messages))
+        {
+            <span>@m.Value(c => c.Message)</span>
+        }
+    </p>
+}
+
+@using (var t = Plugin.LoadingOverlap())
+{
+    <div style="background-color: white;opacity: 0.5">
+        <div style="top: 45%; position: relative;" class="text-center">
+            <h1>Loading</h1>
+        </div>
+    </div>
+}
+
+
+@using (var t = Plugin.Toolbar())
+{
+    using (var btn = t.Buttons())
+    {
+        using (btn.If(c => c.IsDisabled))
+        {
+            <button disabled="disabled" type="button"
+                    data-role="toolbar-btn"
+                    class="btn btn-default @btn.Value(c => c.Css) disabled"
+                    title="@btn.Value(c => c.Title)"
+                    id="@btn.Value(c => c.Id)">
+                @btn.HtmlValue(c => c.HtmlContent)
+            </button>
+            @btn.Else()
+            <button @btn.BindButton("click")
+                    type="button"
+                    data-role="toolbar-btn"
+                    class="btn btn-default @btn.Value(c => c.Css)"
+                    title="@btn.Value(c => c.Title)"
+                    id="@btn.Value(c => c.Id)">
+                @btn.HtmlValue(c => c.HtmlContent)
+            </button>
+        }
+    }
+}
+
+@using (var t = Plugin.Confirmation<TodoListEntry, TodoListEntryCreateEditViewModel>("editCreateConfirmation"))
+{
+    <div class="modal-content" @t.Callback("showModal") @t.DestroyCallback("hideModal")>
+        <div class="modal-header">
+            <button type="button" class="close"
+                    data-dismiss="modal" aria-label="Close">
+                <span aria-hidden="true">&times;</span>
+            </button>
+            <h4 class="modal-title">
+                @using (t.If(c => c.Subject == null))
+                {
+                    <text>Create new entry</text>
+                    @t.Else()
+                    <text>Edit entry</text>
+                }
+            </h4>
+        </div>
+        <div class="modal-body">
+            <fieldset class="form-horizontal">
+                @using (t.If(c => c.Subject != null))
+                {
+                    <text>@t.EditorFor(c => c.Id)</text>
+                }
+                @t.EditorFor(c => c.Text)
+                @t.EditorFor(c => c.Icon)
+            </fieldset>
+        </div>
+        <div class="modal-footer">
+            <button type="button" class="btn btn-default"
+                    data-dismiss="modal" @t.BindDismiss("click")>
+                Cancel
+            </button>
+            <button type="button" class="btn btn-primary" @t.BindConfirm("click")>
+                Save
+            </button>
+        </div>
+    </div>
+}
+
+@using (var t = Plugin.Confirmation<TodoListEntry>("completeConfirmation"))
+{
+    <div class="modal-content" @t.Callback("showModal") @t.DestroyCallback("hideModal")>
+        <div class="modal-header">
+            <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                <span aria-hidden="true">&times;</span>
+            </button>
+            <h4 class="modal-title">ToDo Entry completed</h4>
+        </div>
+        <div class="modal-body">
+            <p>
+                Are you sure that you have <b>"@t.Value(c => c.Subject.Text)"</b> done?
+            </p>
+        </div>
+        <div class="modal-footer">
+            <button type="button" class="btn btn-default" data-dismiss="modal" @t.BindDismiss("click")>
+                No
+            </button>
+            <button type="button" class="btn btn-primary" @t.BindConfirm("click")>
+                Yes
+            </button>
+        </div>
+    </div>
+}
+
+@using (var t = Plugin.Paging())
+{
+    using (t.If(c => c.Shown))
+    {
+        using (var m = t.ArrowsMode())
+        {
+            <nav>
+                <ul class="pager">
+                    @using (m.If(c => c.PrevArrow))
+                        {
+                        <li>
+                            <a @t.BindPreviousPage("click") style="cursor: pointer">
+                                <span class="glyphicon glyphicon-chevron-left"></span>
+                            </a>
+                        </li>
+                    }
+                    <li><span>@m.Value(c => c.CurrentPage)</span></li>
+                    @using (m.If(c => c.NextArrow))
+                        {
+                        <li>
+                            <a @t.BindNextPage("click") style="cursor: pointer">
+                                <span class="glyphicon glyphicon-chevron-right"></span>
+                            </a>
+                        </li>
+                    }
+                </ul>
+            </nav>
+        }
+
+    }
+}

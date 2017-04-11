@@ -1,5 +1,6 @@
 ﻿@using Reinforced.Lattice
 @using Reinforced.Lattice.Configuration.Json
+@using Reinforced.Lattice.DOMEvents
 @using Reinforced.Lattice.Templates
 @using Reinforced.Lattice.Templates.BuiltIn
 @using Reinforced.Lattice.Templates.Editing
@@ -57,7 +58,7 @@
                         <tr>@t.Headers()</tr>
                         <tr>@t.Filters()</tr>
                     </thead>
-                    <tbody>@t.Body()</tbody>
+                    <tbody @t.Body()></tbody>
                 </table>
             </div>
         </div>
@@ -519,7 +520,7 @@
 {
     using (t.If(c => c.IsCellEdit))
     {
-        <div style="position: relative" @t.BindReject("out-click")>
+        <div style="position: relative" @t.BindReject(DOMMouseEvent.E(Mouse.Click).Out())>
             <div>
                 @t.OriginalContent()
             </div>
@@ -536,7 +537,7 @@
                            @t.WhenSaving(c => c.Hide())
                            @t.ThisIsInput()
                            @t.BindChanged("keyup")
-                           @t.BindCommit(DOMEvent.Filter("keyup").Prop(13, "keyCode", "which"))
+                           @t.BindCommit(DOMKeyEvent.E(DOMKey.Up).Key(ConsoleKey.Enter))
                            @t.WhenInvalid(c => c.State.Color("red").Style("border-color", "red")) />
                     <span class="text-center" style="display: none; min-width: 200px; min-height: 28px; margin-top: 5px;" @t.WhenSaving(c => c.Show())>
                         <span class="badge"><span class="glyphicon glyphicon-refresh loader"></span> Saving...</span>
@@ -553,7 +554,7 @@
                        @t.WhenSaving(c => c.Attr("disabled", "disabled"))
                        @t.ThisIsInput()
                        @t.BindChanged("keyup")
-                       @t.BindCommit(DOMEvent.Filter("keyup").Prop(13, "keyCode", "which"))
+                       @t.BindCommit(DOMKeyEvent.E(DOMKey.Up).Key(ConsoleKey.Enter))
                        @t.WhenInvalid(c => c.State.Color("red")) />
                 <div class="tooltip bottom" role="tooltip" style="opacity: 1; top: 21px; display: none;"
                      @t.WhenInvalid(c => c.State.Show())>
@@ -572,7 +573,7 @@
                 <input type="text" class="form-control" style="max-width: 100%" id="edit-@t.Value(c=>c.Column.RawName)" placeholder="@t.Value(c => c.Column.Configuration.Title)"
                        @t.ThisIsInput()
                        @t.BindChanged("keyup")
-                       @t.BindCommit(DOMEvent.Filter("keyup").Prop(13, "keyCode", "which"))
+                       @t.BindCommit(DOMKeyEvent.E(DOMKey.Up).Key(ConsoleKey.Enter))
                        @t.WhenInvalid(c => c.State.Color("red").Style("border-color", "red")) />
                 <div class="help-block" @t.WhenInvalid(c => { c.State.Show(); c.Content(d => d.ValidationMessages); }) style="display: none; color: #E15C5C;">
                 </div>
@@ -595,9 +596,9 @@
 {
     using (t.If(c => c.IsCellEdit))
     {
-        <div @t.BindReject(DOMEvent.Filter("click").Out().Prop(true, "ctrlKey"))>
+        <div @t.BindReject(DOMMouseEvent.E(Mouse.Click).Mod(ModifierKey.Alt).Mod(ModifierKey.Ctrl).Out())>
             <div class="input-group" @t.WhenInvalid(c => c.State.AddClass("has-error")) style="max-width: 200px;" @t.WhenSaving(c => c.Hide())>
-                <input @t.ThisIsInput() @t.BindChanged("keyup") @t.BindCommit(DOMEvent.Filter("keyup").Prop(13, "keyCode", "which")) type="text" @t.WhenInvalid(c => c.State.Color("red")) class="form-control input-sm" aria-label="..." style="height: 28px; margin-top: -10px; margin-bottom: -10px" />
+                <input @t.ThisIsInput() @t.BindChanged("keyup") @t.BindCommit(DOMKeyEvent.E(DOMKey.Up).Key(ConsoleKey.Enter)) type="text" @t.WhenInvalid(c => c.State.Color("red")) class="form-control input-sm" aria-label="..." style="height: 28px; margin-top: -10px; margin-bottom: -10px" />
                 <div class="tooltip bottom" role="tooltip" style="opacity: 1; top: 21px; display: none;"
                      @t.WhenInvalid(c => c.State.Show())>
                     <div class="tooltip-arrow" style="border-bottom-color: #E15C5C; left: 15%"></div>
@@ -629,7 +630,7 @@
 {
     using (t.If(c => c.IsCellEdit))
     {
-        <div style="position: relative" @t.BindReject("out-click")>
+        <div style="position: relative" @t.BindReject(DOMMouseEvent.E(Mouse.Click).Out())>
             <div>
                 @t.OriginalContent()
             </div>
@@ -715,7 +716,7 @@
 {
     using (t.If(c => c.IsCellEdit))
     {
-        <div style="position: relative" @t.BindReject("out-click")>
+        <div style="position: relative" @t.BindReject(DOMMouseEvent.E(Mouse.Click).Out())>
             <div>
                 @t.OriginalContent()
             </div>
@@ -779,7 +780,7 @@
                 <textarea type="text" class="form-control" style="max-width: 100%" id="edit-@t.Value(c=>c.Column.RawName)" placeholder="@t.Value(c => c.Column.Configuration.Title)"
                           @t.ThisIsInput()
                           @t.BindChanged("keyup")
-                          @t.BindCommit(DOMEvent.Filter("keyup").Prop(13, "keyCode", "which"))
+                          @t.BindCommit(DOMKeyEvent.E(DOMKey.Up).Key(ConsoleKey.Enter))
                           @t.WhenInvalid(c => c.State.Color("red").Style("border-color", "red"))></textarea>
                 <div class="help-block" @t.WhenInvalid(c => { c.State.Show(); c.Content(d => d.ValidationMessages); }) style="display: none; color: #E15C5C;">
                 </div>
@@ -792,7 +793,7 @@
 {
     using (t.If(c => c.IsCellEdit))
     {
-        <div style="position: relative" @t.BindReject("out-click")>
+        <div style="position: relative" @t.BindReject(DOMMouseEvent.E(Mouse.Click).Out())>
             <div>
                 @t.OriginalContent()
             </div>

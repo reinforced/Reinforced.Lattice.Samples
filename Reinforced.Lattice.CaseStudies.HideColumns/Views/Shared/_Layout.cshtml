@@ -1,0 +1,81 @@
+﻿<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>@ViewBag.Title - Reinforced.Lattice Case Study</title>
+    @Styles.Render("~/Content/css")
+    @Scripts.Render("~/bundles/modernizr")
+    <script type="text/javascript" src="~/Scripts/Reinforced.Lattice/reinforced.lattice.js"></script>
+    @Scripts.Render("~/bundles/jquery")
+    @Scripts.Render("~/bundles/bootstrap")
+    <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/moment.js/2.17.1/moment.min.js"></script>
+    <script type='text/javascript' src='https://cdnjs.cloudflare.com/ajax/libs/bootstrap-datepicker/1.6.4/js/bootstrap-datepicker.min.js'></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-datepicker/1.6.4/css/bootstrap-datepicker3.min.css" />
+    <script type='text/javascript'>
+        var ltcCreateDatePicker = function (element) {
+            var date = null;
+            $(element).css('cursor', 'pointer');
+            $(element).css('text-align', 'center');
+            if ($(element).val()) date = new Date($(element).val());
+            $(element).datepicker({ format: 'dd MM yyyy', weekStart: 1 });
+            if (date) $(element).datepicker('setDate', date);
+            $(element)
+                .on('changeDate', function () {
+                    Reinforced.Lattice.Master.fireDomEvent('keyup', element);
+                });
+        }
+
+        var ltcPutDateToDatepicker = function (element, date) {
+            $(element).datepicker('setDate', date);
+        }
+
+        var ltcGetDateFromDatepicker = function (element, date) {
+            var dt = $(element).datepicker('getDate');
+            if (dt == null || dt == undefined) return null;
+            if (!dt.getTime) return null;
+            dt.setHours(dt.getHours() - dt.getTimezoneOffset() / 60);
+            return dt;
+        }
+
+        var ltcDestroyDatepicker = function (element) {
+            $(element).datepicker('remove');
+        }
+
+        function formatRating(v) {
+            var s = "<div style='color:orange' class='text-center'>";
+            for (var i = 0; i < 5; i++) {
+                if (i < v.DataObject.Rating) s += "<span class='glyphicon glyphicon-star'></span>";
+                else s += "<span class='glyphicon glyphicon-star-empty'></span>";
+            }
+            s += "</div>";
+            return s;
+        }
+        function fixColumnWidths(e) {
+            $(e.Renderer.RootElement).find('th').each(function () {
+                var sx = $(this).width();
+                $(this).css('width', sx + 'px');
+            });
+        }
+    </script>
+    <style type="text/css">
+        .subscript {
+            font-weight: normal;
+            font-size: 11px;
+            color: #0586e1;
+            font-family: monospace;
+        }
+    </style>
+    @RenderSection("scripts", required: false)
+</head>
+<body>
+<div class="container-fluid body-content">
+    <div class="row">
+        <div class="col-sm-12">
+            @RenderBody()
+        </div>
+    </div>
+    
+</div>
+</body>
+</html>

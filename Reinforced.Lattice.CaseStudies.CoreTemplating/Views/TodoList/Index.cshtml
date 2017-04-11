@@ -1,0 +1,129 @@
+﻿@{ ViewBag.Title = "ToDo List"; }
+
+@using Reinforced.Lattice
+@using Reinforced.Lattice.CaseStudies.CoreTemplating.Models
+@using Reinforced.Lattice.CellTemplating
+@using Reinforced.Lattice.Commands
+@using Reinforced.Lattice.Configuration
+@using Reinforced.Lattice.Editing
+@using Reinforced.Lattice.Editing.Editors.Display
+@using Reinforced.Lattice.Editing.Editors.Memo
+@using Reinforced.Lattice.Editing.Editors.SelectList
+@using Reinforced.Lattice.Filters
+@using Reinforced.Lattice.Filters.Value
+@using Reinforced.Lattice.Mvc
+@using Reinforced.Lattice.Plugins
+@using Reinforced.Lattice.Plugins.Ordering
+@using Reinforced.Lattice.Plugins.Paging
+@using Reinforced.Lattice.Plugins.Toolbar
+@using Reinforced.Lattice.Templates
+@model Reinforced.Lattice.CaseStudies.CoreTemplating.Models.TodoListViewModel
+@{
+    var conf = Model.Table;
+    conf.DatePicker(new DatepickerOptions(
+        "initDoubleDatepicker",
+        "putDoubleDatepicker",
+        "getDoubleDatepicker",
+        "ltcDestroyDatepicker"
+        ));
+    conf.ShowMessagesWith("showMessage");
+    conf.Partition(p => p.InitialSkipTake(take: 4));
+    conf.Column(c => c.Text).FilterValueUi(c => c.ClientFiltering().Inputdelay(10));
+    conf.Column(c => c.Date).Format("`moment({@}).format('DD MMMM YYYY, HH:mm');`");
+    conf.Column(c => c.Date).OrderableUi(c => c.UseClientOrdering().DefaultOrdering(Ordering.Descending));
+    conf.Column(c => c.Icon).FormatEnum(content: c => "<span class='glyphicon glyphicon-" + c.Text.Replace("_", "-").ToLower() + "'></span>");
+    conf.Column(c => c.Date).FilterValueUi(c => c.CompareOnlyDates().ClientFiltering().Template("dateFilter").Inputdelay(10));
+    conf.Paging(ui => ui.PagingWithArrows(), "pager");
+    conf.Command("EditOrCreate", _ =>
+    {
+        _.Window<TodoListEntryCreateEditViewModel>("editCreateConfirmation", "#confirmationContent", x =>
+        {
+            x.AutoForm(d =>
+            {
+                d.Display(s => s.Id).FakeColumn(s => s.Title("Id"));
+                d.EditMemo(s => s.Text).FakeColumn(s => s.Title("Text")).AllowEmptyString(false);
+                d.EditSelectList(s => s.Icon).FakeColumn(s => s.Title("Icon")).Items(EnumHelper.GetSelectList(typeof(TodoIcon)));
+            });
+
+            x.InitConfirmationObjectWith(@"function(o,x){
+if (x.Subject==null) { o.Id = ''; return; };
+o.Id = x.Subject.Id;
+o.Text = x.Subject.Text;
+o.Icon = x.Subject.Icon;
+}");
+        });
+    });
+
+    conf.Command("Complete", _ => _.Window("completeConfirmation", "#confirmationContent"));
+
+    conf.Toolbar("toolbar", a =>
+    {
+        a.AddCommandButton("Create new entry", "EditOrCreate").Css("btn-primary btn-block");
+    });
+    conf
+        .SubscribeRowEvent(c => c.Command("click", "Complete").Selector("._completed"))
+        .SubscribeRowEvent(c => c.Command("click", "EditOrCreate").Selector("._edit"))
+        ;
+}
+
+<div id="table"></div>
+
+<div class="modal fade" tabindex="-1" role="dialog" id="confirmationModal">
+    <div class="modal-dialog" id="confirmationContent">
+
+    </div>
+</div>
+
+@section scripts {
+    <link rel="stylesheet" type="text/css" href="https://cdnjs.cloudflare.com/ajax/libs/jquery-toast-plugin/1.3.1/jquery.toast.min.css" />
+    <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/jquery-toast-plugin/1.3.1/jquery.toast.min.js"></script>
+
+    <script type="text/javascript">
+        @* Custom datepicker configuration *@
+        var initDoubleDatepicker = function(e) {
+            var p = $(e).parent();
+            p.datepicker({ format: 'dd MM yyyy', weekStart: 1 });
+            p.on('changeDate', function () {
+                Reinforced.Lattice.Master.fireDomEvent('keyup', e);
+            });
+        }
+
+        var getDoubleDatepicker = function (e) {
+            var p = $(e).parent();
+            var dt = p.datepicker('getDate');
+            if (dt == null || dt == undefined) return null;
+            if (!dt.getTime) return null;
+            dt.setHours(dt.getHours() - dt.getTimezoneOffset() / 60);
+            return dt;
+        }
+
+        var putDoubleDatepicker = function (element, date) {
+            var p = $(element).parent();
+            p.datepicker('setDate', date);
+        }
+
+        @* Message function *@
+        var showMessage = function (e) {
+            $.toast({
+                heading: e.Title,
+                text: e.Details,
+                icon: e.Class,
+                position: 'top-center',
+                showHideTransition: 'slide',
+                hideAfter: 1000
+            });
+        }
+
+        @* Modal windo functions *@
+        var showModal = function (element) {
+            $('#confirmationModal').modal('show');
+        }
+
+        var hideModal = function (element) {
+            $('#confirmationModal').modal('hide');
+        }
+    </script>
+    @{ Html.RenderTemplates("lt", "TodoListTemplates"); }
+
+    @Model.Table.InitializationScript("table", "window.$$table")
+}

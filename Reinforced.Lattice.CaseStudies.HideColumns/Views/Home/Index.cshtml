@@ -1,0 +1,44 @@
+﻿@{ ViewBag.Title = "Columns hiding and showing"; }
+
+@using Reinforced.Lattice.CellTemplating
+@using Reinforced.Lattice.Configuration
+@using Reinforced.Lattice.Filters
+@using Reinforced.Lattice.Filters.Value
+@using Reinforced.Lattice.Mvc
+@using Reinforced.Lattice.Templates
+
+@model Reinforced.Lattice.CaseStudies.Filtering.Models.HomeIndexViewModel
+@{
+    var conf = Model.Table;
+    conf.Column(c => c.Priority).Template(x =>
+    {
+        x.RazorIf("{@}==0", @<span style="color: #c7c7c7"><span class="glyphicon glyphicon-unchecked"></span> Minor</span>);
+        x.RazorIf("{@}==1", @<span style="color: #049404"><span class="glyphicon glyphicon-arrow-down"></span> Low</span>);
+        x.RazorIf("{@}==2", @<span><span class="glyphicon glyphicon-tasks"></span> Normal</span>);
+        x.RazorIf("{@}==3", @<span style="color: #ff4489"><span class="glyphicon glyphicon-arrow-up"></span> High</span>);
+        x.RazorIf("{@}==4", @<span style="color: #e89a0c"><span class="glyphicon glyphicon-exclamation-sign"></span> Major</span>);
+        x.RazorIf("{@}==5", @<span style="color: #dc0000"><span class="glyphicon glyphicon-fire"></span> Critical</span>);
+    });
+}
+<div id="table"></div>
+
+@section scripts {
+    <style type="text/css">
+        [data-track='h-Tax'] {
+            width: 200px;
+        }
+        [data-track='h-Price'] {
+            width: 200px;
+        }
+        [data-track='h-StartDate'] {
+            width: 120px;
+        }
+        [data-track='h-EndDate'] {
+            width: 120px;
+        }
+    </style>
+    @{ Html.RenderTemplates("lt", "Lattice_Templates_Bootstrap"); }
+    @Model.Table.OnInitialized("fixColumnWidths").InitializationScript("table", "window.$$table")
+
+
+}

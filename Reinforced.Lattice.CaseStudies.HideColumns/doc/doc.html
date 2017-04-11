@@ -1,0 +1,424 @@
+﻿<div class="text">
+    <h2>Case</h2>
+    <p>
+        Table needs seaching (filtering) capabilities.
+    </p>
+    <h2>Necessary knowledge</h2>
+    <h3>Filter types</h3>
+    <p>
+        Reinforced.Lattice has filters to perform filtering out non-satisfying data. It is possible to set up filters working on the server side as well as client-side ones. Usually, filters are being attached to columns,
+        but there are some other use-cases. Basically, Reinforced.Lattice has four different types of client filters, and it is enough since Reinforced.Lattice allows to customize UI and behavior quickly:
+    </p>
+    <ul>
+        <li>
+            <b>Value filter</b> - by default exposed as textbox allowing user to input any value that he/she is looking for. It is "exact" filter. Being placed in the particular column, filters out (removes) all rows that have corresponding column's value not equal to value put to filter.
+            Actually it works in little bit different way for strings and dates
+        </li>
+        <li>
+            <b>Select filter</b> - by default exposed as select list allowing user to select one of predefined values. Technically it is the same as value filter, but its UI allows to choose one of the several predefined options to filter by
+        </li>
+        <li>
+            <b>Multi-select filter</b> - by default exposed as multi-select list allowing user to select <i>multiple</i> of predefined values. Almost the same as select filter, but allows to change several possible values values. Row will satisfy this filter in case if corresponding column's value matches one of selected values
+        </li>
+        <li>
+            <b>Range filter</b> - by default exposed as two textboxes placed under each others. Allows to filter out (hide) all the rows if their corresponding column's value is not in specified range.
+        </li>
+    </ul>
+    <p>
+        Using core templating, you can quickly change supplied filter's UI without changing their logic. <br />
+        To configure filter you have to select column and call filter configuration method. Filters configuration in almost all cases exposed by five methods:
+    </p>
+    <ul>
+        <li><code>.Filter*(source_prop,ui)</code> - configures filter that filters <code>source_prop</code> property of <code>TSource</code> on server side and has <code>ui</code> configuration for UI representation</li>
+        <li><code>.Filter*NoUi(source_prop)</code> - configures only server filter that filtres <code>source_prop</code> property of <code>TSource</code> without any UI representation</li>
+        <li><code>.Filter*Ui(ui)</code> - configures UI part for filter. This method is safe to be called in <code>cshtml</code>, as server part does not need UI configuration. Best practice is to use <code>.Filter*NoUi(source_prop)</code> in server configuration method and <code>.Filter*Ui(ui)</code> in <code>cshtml</code>. </li>
+        <li><code>.Filter*By(filter_delegate,ui)</code> - configures filter using filtering delegate instead of column. Second parameter optionally specifies UI</li>
+        <li><code>.Filter*NoUiBy(filter_delegate)</code> - configures filter using filtering delegate without UI</li>
+    </ul>
+    <h3>Client and server filters</h3>
+    <p>
+        For each filter, you can override server filtering criteria as well as client one.
+        This process is pretty similar to <code>.Where</code> invokation even for client filtering (thanks to `{@}`-notation).
+        Table <b>CAN</b> contain both client and server filters. So if you change client filter value, then no additional server request will be performed.
+        At the other hand, if you touch server filter then server request will happen.
+        It is important to understand that <i>client filters are not bein executed on server</i>.
+        So if you have the table consisting of 1000 rows and 999 of them are filtered out by client filter - it means that 1000 records will be fetched from the server.
+        You can combine client and server filter and fine-tune your tables performance by that aspect.
+    </p>
+    <h3>Filtering strings</h3>
+    <p>
+        Keep in mind that by default <i>server</i> value filter being attached to string column filters out all the rows
+        that doesnt have corresponding columns <b>strictly</b> equal to specified filter value.
+        At the other hand, client string filter works in <b>totatlly different manner</b>: it breaks input string into words and tries to match substring among all the options being filtered. This behavior takes place only for strings,
+        so make sure to override client filtering function or just deal with such behavior.
+    </p>
+    <h3>How to connect your favorite date picker</h3>
+    <p>
+        Value filter being attached to <code>DateTime</code> or <code>DateTime?</code> column is being automatically turned to datepicker. With lattice you can use <b>any</b> third-party datepicker framework (I prefer bootstrap datepicker).
+        To connect your favorite datepicker to lattice, you have to specify datepicker instatniation methods
+        within <code>Configurator&lt;,&gt;.Datepcker</code> method invokation. It consumes instance of <code>DatepickerOptions</code> object, having constructor with 4 string parameters:
+    </p>
+    <ul>
+        <li>
+            <code>createDatepicker</code>: inline JS function or function name. Reinforced.Lattice calls this function when it needs to turn UI input to datepicker. It receives <code>&lt;input&gt;</code> HTML element instance as first parameter and flag that date is nullable as 2nd parameter.
+            Inside of this function implementation you have to create datepicker wrapper around specified <code>&lt;input&gt;</code> element or hide it and make your own, or whatever else. We are instantiating Bootstrap Datepicker here and also subscribe to its
+            <code>changeDate</code> event, and fire <code>keyup</code> DOM event on original input - just because, Bootstrap Datepicker stops events propagation to original input.
+        </li>
+        <li>
+            <code>putToDatepicker</code>: this function is being called when Reinforced.Lattice needs to put existing date value to the date picker. Here, as first parameter you will receive <code>&lt;input&gt;</code> element where you have to put date to and JS Date object instance
+            as second parameter. You obviously have to set your date picker to specified date. Please note that passed date may be actually <code>null</code> - it depends on your column configuration
+        </li>
+        <li>
+            <code>getFromDatePicker</code>: Reinforced.Lattice calls it when it needs to get value from datepicker. Corresponding <code>&lt;input&gt;</code> element is being passed as 1st parameter. As return, Reinforced.Lattice expects JS Date object or null
+        </li>
+        <li>
+            <code>destroyDatepicker</code>: this function must destroy datepicker object associated with corrsponding <code>&lt;input&gt;</code> element. Reinforced.Lattice calls it to release memory from unnecessary datepicker. In order to use Bootstrap Datepicker, we call <code>$(element).datepicker('remove');</code> witin this function.
+        </li>
+    </ul>
+</div>
+<pre class="language-cshtml wrap-code" data-src="#doc#/connect-datepicker.cshtml"></pre>
+<div class="text">
+    <p>
+        Reinforced.Lattice uses specified date picker methods for value filter, range filter and also for editing, forms, FormWatch and other places.
+        So being specified once, your favorite datepicker will be used everywhere.
+    </p>
+    <h3>How to use <code>.AppendEmptyFilters()</code> method, what it does?</h3>
+    <p>
+        If you are using datagrid-like layout then you should use <code>.AppendEmptyFilters()</code> method of table configurator
+        to append empty filter wrappers to layout. Withot calling of this method, filters will be appended to layout template sequentionally in order they were defined:
+    </p>
+    <div class="row">
+        <div class="col-sm-6">
+            <p class="text-center"><span style="color:#c91818"><span class="glyphicon glyphicon-remove"></span></span> Without <code>.AppendEmptyFilters</code></p>
+            <div class="text-center">
+                <img style="width: 100%" src="#doc#/without-appendempty.png" alt="Table with filters without AppendEmptyFilters called" />
+            </div>
+        </div>
+        <div class="col-sm-6">
+            <p class="text-center"><span style="color:#669026"><span class="glyphicon glyphicon-ok"></span></span> With <code>.AppendEmptyFilters</code></p>
+            <div class="text-center">
+                <img style="width: 100%" src="#doc#/with-appendempty.png" alt="Table with filters without AppendEmptyFilters called" />
+            </div>
+        </div>
+    </div>
+    <p>
+        We will avoid call to <code>.AppendEmptyFilters()</code> method in "Core templating" case study when we will change table layout. But for now we will use this method
+        to achieve pretty UI. If you are using built-in Bootstrap template then call this method too.
+    </p>
+    <h2>Solution</h2>
+    <h3>How to add value filter to column</h3>
+    <p>
+        Select column and call <code>.FilterValue</code> method:
+    </p>
+</div>
+<pre class="language-csharp wrap-code" data-src="#doc#/filter-value.cs"></pre>
+<div class="text">
+    <h3>How to add select filter to column</h3>
+    <p>
+        Use <code>.FilterSelect</code> method:
+    </p>
+</div>
+<pre class="language-csharp wrap-code" data-src="#doc#/filter-select.cs"></pre>
+<div class="text">
+    <h3>How to customize select filter items</h3>
+    <p>
+        Select filter's Ui configuration has several extension methods to fullfill it with items:
+    </p>
+    <ul>
+        <li>
+            <code>.SelectItems(items, bool replaceItems = false)</code> - appends items list for select filter. It consumes <code>IEnumerable</code> of instances of special Reinforced.Lattice's internal type: <code>UiListItem</code>.
+            It is almost the same as default <a href="https://msdn.microsoft.com/en-us/library/system.web.mvc.selectlistitem(v=vs.118).aspx" target="_blank">MVC's SelectListItem</a>. It is only made to make Reinforced.Lattice core
+            library does not depend on MVC. <br />
+            <ul>
+                <li>
+                    If you are using <code>Reinforced.Lattice.Bundle.Mvc4/5</code> or <code>Reinforced.Lattice.Mvc5.Razor</code> package then there will be second overload for <code>.SelectItems</code>
+                    consuming <code>IEnumerable</code> of MVC's SelectListItem so you can use both. Consider also using <code>.ToUi</code> method provided in <code>Reinforced.Lattice.Mvc5.Razor</code> to convert MVC select list items to Reinforced.Lattice's ones.
+                </li>
+                <li>
+                    Second parameter - <code>replaceItems</code> by default is <code>false</code>. When it is set to <code>true</code> then if list that you configure already has some items specified - they will be discarded and <i>replaced</i> with items passed by the first parameter.
+                    So, when <code>replaceItems</code> is <code>false</code> - items will be <i>appended</i>, when <code>true</code> - items will be <i>replaced</i>.
+                </li>
+            </ul>
+        </li>
+        <li>
+            <code>.SelectAny(bool allowAny = true,string anyText = "Any")</code> - appends "Any" item to select list options list. When user selects this item in filter's select list, it will basically disable this filter, leaving all the records from initial set.
+            E.g. filter users by "any" user type will display users of all available types. <br />
+            <ul>
+                <li>You can specify text for "any" option using <code>anyText</code> parameter. <br /></li>
+                <li>Setting <code>allowAny</code> to <code>false</code> will remove all "any" options from select list items list. <br /></li>
+                <li>
+                    Please also note that every option (<code>UiListItem</code>/<code>SelectListItme</code>) with <code>Value</code> set to empty string are considered as "Any" options.
+                </li>
+            </ul>
+        </li>
+        <li>
+            <code>.SelectNotPresent(bool allowNotPresent = true,string notPresentText = "Not present")</code> - only available on select UI configuration for nullable or reference-typed columns.
+            Basically this option will match all the rows that have <code>null</code> value in particular column. <br />
+            <ul>
+                <li>"Not present" option technically equals to regular options with <code>Value</code> set to <code>Reinforced.Lattice.ValueConverter.NotPresentValue</code> that by default is equal to <code>"$$lattice_not_present$$"</code>. <br /></li>
+                <li>You can specify text for "Not present" option using <code>notPresentText</code> parameter. <br /></li>
+                <li>Setting <code>allowNotPresent</code> to <code>false</code> will remove all "Not present" options from select list items list. <br /></li>
+            </ul>
+        </li>
+    </ul>
+    <p>
+        Invokation of several of these methods preserves order of options:
+    </p>
+</div>
+<pre class="language-csharp wrap-code" data-src="#doc#/filter-select-options.cs"></pre>
+<div class="text">
+    <div class="row">
+        <div class="col-sm-6">
+            <p>
+                In case 1 list options will be
+            </p>
+            <ul>
+                <li>"Any"</li>
+                <li>"Not present"</li>
+                <li>"Admin"</li>
+                <li>"Customer"</li>
+            </ul>
+        </div>
+        <div class="col-sm-6">
+            <p>
+                In case 2 list options will be
+            </p>
+            <ul>
+                <li>"Admin"</li>
+                <li>"Customer"</li>
+                <li>"Any"</li>
+                <li>"Not present"</li>
+            </ul>
+        </div>
+    </div>
+</div>
+<div class="text">
+    <h3>How to add multi-select filter to column</h3>
+    <p>
+        Use <code>.FilterMultiSelect</code> method:
+    </p>
+</div>
+<pre class="language-csharp wrap-code" data-src="#doc#/filter-multiselect.cs"></pre>
+<div class="text">
+    <p>
+        Multi select filter has exactly the same UI opions configuration approach as <span class="tip" data-tip="multiselect">regular select filter</span>.
+    </p>
+    <h3>How to add range filter to column</h3>
+    <p>
+        Use <code>.FilterRange</code> method:
+    </p>
+</div>
+<pre class="language-csharp wrap-code" data-src="#doc#/filter-range.cs"></pre>
+<div class="text">
+    <h3>How to use client filtering</h3>
+    <p>
+        Each filter's UI configurator has <code>.ClientFiltering</code> method. Just call it and filtration will be performed on client-side, without involving server:
+    </p>
+</div>
+<pre class="language-csharp wrap-code" data-src="#doc#/filter-client.cs"></pre>
+<div class="text">
+    <p>
+        You <b>CAN</b> use both client and server filters within single table. Please keep in mind that if column has client filter configured then
+        <b>it will not be filtered on server</b>! It means that all objects that were not filtered out by server filter will be returned to client-side for further filtering. Beware of significant volumes of data transmitted and do balance load between client and server.
+    </p>
+</div>
+<div class="text">
+    <h3>How to specify default values for filters</h3>
+    <ul>
+        <li>For <b>Value filter</b> - use <code>.Default</code> method of UI configurator. It consumes strongly typed value to be set as default one</li>
+        <li>For <b>Range filter</b> - use <code>.RangeDefault</code> method of UI configurator. It consumes two strongly typed values to be set as "from" and "to" default values correspondingly</li>
+        <li>
+            For <b>Select filter</b> - use <code>.SelectDefault</code> method  of UI configurator. Works in the same manner as for value filter.
+            Please keep in mind that if no default value specified for select filter then the first option in the list will be chosen by default.
+        </li>
+        <li>
+            For <b>Multi-Select filter</b> - when passing select items to filter, set <code>Selected</code> property of list items that have to be selected by default.
+            None of options will be selected by default if there are no <code>Selected</code> options.
+        </li>
+    </ul>
+</div>
+<pre class="language-csharp wrap-code" data-src="#doc#/default-values.cs"></pre>
+<div class="text">
+    <h3>How to override server filtering function (filtering delegates)</h3>
+    <p>
+        You can customize behavior of server filter using filtering delegates. <code>.Filter*</code> and <code>.Filter*NoUi</code> methods return
+        core filter configurator. You can use method <code>.By</code> on them to customize filtering behavior. By its single paramter it consumes <i>filtering delegate</i>.
+        Filtering delegate receives 2 parameters as input:
+    </p>
+    <ul>
+        <li><code>IQueryable&lt;TSource&gt;</code> - source data set that you have to filter</li>
+        <li><code>filtering key</code> - criteria to filter source data set by. Its type depends on particular filter. </li>
+    </ul>
+    <p>
+        You must return <code>IQueryable&lt;TSource&gt;</code> from filtering delegate. It has to be source set filtered according to <code>filtering key</code>. <br />
+        Filtering key type depends on filter type:
+    </p>
+    <ul>
+        <li>For <b>Value filter</b> - filtering key is instance of corresponding <code>TSource</code> property that you specify by 1st parameter of preceding <code>.FilterValue</code>/<code>.FilterValueNoUi</code> call </li>
+        <li>For <b>Select filter</b> - same behavior as for value filter </li>
+        <li>For <b>Multi-select filter</b> - filtering key is <code>IEnumerable&lt;T&gt;</code> where <code>T</code> is type of property that you specify by 1st parameter of preceding <code>.FilterMultiSelect</code>/<code>.FilterMultiSelectNoUi</code> call</li>
+        <li>For <b>Range filter</b> - filtering key is <code>RangeTuple&lt;T&gt;</code> where <code>T</code> is type of property that you specify by 1st parameter of preceding <code>.FilterRange</code>/<code>.FilterRangeNoUi</code> call</li>
+    </ul>
+    <p>
+        <code>RangeTuple&lt;T&gt;</code> has 4 properties:
+    </p>
+    <ul>
+        <li><code>From</code> - left edge value of filter.Use it to specify as left filter condition. E.g.: <code>.Where(x =&gt; x.Something &gt;= key.From)</code>. If <code>From</code> is not supplied then it will be <code>null</code> for reference types and <code>default(T)</code> for value types. </li>
+        <li><code>To</code> - exactly the same, but for right edge </li>
+        <li><code>HasFrom</code> - indicates presence of <code>From</code> value. When <code>HasFrom</code> is false then filtering of values greater that left edge must not be applied </li>
+        <li><code>HasTo</code> - exactly the same, but for right edge </li>
+    </ul>
+    <p>
+        Consider following examples of usage:
+    </p>
+</div>
+<pre class="language-csharp wrap-code" data-src="#doc#/filter-by-method.cs"></pre>
+<div class="text">
+    <p>
+        When you do not have any property from <code>TSource</code> to filter then you can use <code>.Filter*By</code>/<code>.Filter*NoUiBy</code>. These methods consume <i>filtering delegate</i>
+        as their first parameter, allowing you to avoid specification of <code>TSource</code>'s filtering. The difference is that all filtering keys are being parametrized with column type, not
+        <code>TSource</code> property:
+    </p>
+</div>
+<pre class="language-csharp wrap-code" data-src="#doc#/filter-by-method-wo-prop.cs"></pre>
+<div class="text">
+    <h3>How to extract filtering key manually</h3>
+    <p>
+        You can use <code>.Value</code> method of core filter configurator to override filtering key extraction process. <code>.Value</code> method
+        consumes delegate consuming Reinforced.Lattice <code>Query</code> object and must return <i>filter tuple</i>. <br />
+        <code>Query</code> object has following significant fields:
+    </p>
+    <ul>
+        <li><code>Filterings</code> - <code>Dictionary&lt;string,string&gt;</code> containing filter parameters for columns. Key is <code>TRow</code>'s property name (column name), value is serialized filtering key</li>
+        <li><code>Orderings</code> - <code>Dictionary&lt;string,Ordering&gt;</code> containing orderings for columns. Key is <code>TRow</code>'s property name (column name), value is desired ordering value </li>
+        <li><code>Partition</code> - information about requested partition of query (skip/take)</li>
+        <li><code>Selection</code> - raw information about selection</li>
+    </ul>
+    <p>
+        Other fields are service fields and not presumed to be used directly. <br />
+        You can obtain serialized filter value from Query's <code>Filterings</code> property using corresponding <code>TRow</code>'s property name as key.
+        Serialized filter value is:
+    </p>
+    <ul>
+        <li>For <b>Value filter</b> - stringified filter value. To parse it use <code>ValueConverter.Convert&lt;T&gt;(value)</code> where <code>T</code> is type of your filtering key </li>
+        <li>
+            For <b>Range filter</b> - stringified filter values split by <code>|</code> symbol. Call <code>val.Split('|')</code> and you will get array of 2 stringified filter value. 0 stands for "from", 1 stands for "to".
+            Use <code>ValueConverter.Convert&lt;T&gt;</code> method on each of them to parse "from" and "to" values. Do not forget to call <code>string.IsNullOrEmpty</code> to determine from/to value presence.
+        </li>
+        <li>
+            For <b>Multi select filter</b> - stringified values split by <code>|</code> symbol. Use the same approach as above to parse it to array of options
+        </li>
+    </ul>
+    <p>
+        After parsering filtering keys you can change them. Finally you have to return <i>filter tuple</i>. <br />
+        Filter tuple is <code>Tuple&lt;bool,TKey&gt;</code> where <code>TKey</code> is <i>filtering key</i> type defined by filter you use (see <i>How to override server filtering function (filtering delegates)</i> section on this page).
+        If <code>Item1</code> of this tuple is <code>false</code> then filtering will not be applied entirely. Otherwise filter will use filtering key provided by <code>Item2</code> to perform filtering. <br />
+        Use <code>.ToFilterTuple</code>/<code>.TupleIfNot</code>/<code>.TupleIfNotNull</code> extension methods to easily produce filter tuple from parsed values. <br />
+        Use <code>FilterTuple.None&lt;TKey&gt;()</code> to obtain empty filter tuple that will cancel filtering.
+    </p>
+</div>
+<pre class="language-csharp wrap-code" data-src="#doc#/filter-extract-value.cs"></pre>
+<div class="text">
+    <h3>How to override client filtering function</h3>
+    <p>
+        Client filtering function is JavaScript predicate function that tests particular object and must return <code>true</code>
+        if object fits filter criteria and <b>must not</b> be excluded from resulting set and <code>false</code> otherwise.
+        Client filtering predicate consumes 3 parameters:
+    </p>
+    <ul>
+        <li><code>object</code> - object to test</li>
+        <li>
+            <code>value</code> - client filtering key. It depends on filter type:
+            <ul>
+                <li>For <b>Value filter</b> - deserialized JavaScript value of filter (number, string, boolean or <code>Date</code>)</li>
+                <li>For <b>Select and Multi-select filter</b> - array of deserialized JavaScript values</li>
+                <li>For <b>Range filter</b> - JavaScript object having similar structure as <code>RangeTuple&lt;T&gt;</code> metioned above</li>
+            </ul>
+        </li>
+        <li><code>query</code> - JavaScript version of <code>Query</code> object (described in <i>How to extract filtering key manually</i>) section</li>
+    </ul>
+    <p>
+        You can supply either function body or function name to <code>.ClientFiltering</code> call:
+    </p>
+</div>
+<pre class="language-cshtml wrap-code" data-src="#doc#/filter-client-function.cshtml"></pre>
+<div class="text">
+    <p>
+        Also you can specify filtering function using <code>.ClientFilteringExpression</code> method by supplying expression in `{@}`-notation.
+        Use <code>x</code> variable to refer to filter value and <code>q</code> variable to refer to query:
+    </p>
+</div>
+<pre class="language-csharp wrap-code" data-src="#doc#/filter-client-expression.cs"></pre>
+<div class="text">
+    <h3>How to filter dates properly</h3>
+    <p>
+        .NET <code>DateTime</code> type usually includes not only date but also time. As well as JavaScript <code>Date</code>. If you want to ignore time when
+        performing filtration, there is <code>.CompareOnlyDates</code> methods both for core filter configuration and UI filter configuration:
+    </p>
+</div>
+<pre class="language-csharp wrap-code" data-src="#doc#/filter-compare-only-dates.cs"></pre>
+<div class="text">
+    <p>
+        <b>Important!</b> <code>.CompareOnlyDates</code> works <b>SEPARATELY</b> for client and for server. To perform consistency
+        you have to specify it both on core configurator and UI configurator (using <code>.Filter*</code> or <code>.Filter*Ui</code>)
+        as shown in example. <br /> <br />
+
+        Note about timezones: please also keep in mind that <i>dates from client side appears on server in client's time zone</i>. Use <code>.By</code> or <code>.Value</code>
+        methods to hijack and modify dates on server if necessary.
+    </p>
+    <h3>How to control range filter inclusive</h3>
+    <p>
+        Consider three objects with Price fields: 100 for 1st, 200 for 2nd and 300 for 3rd. Consider also range filter configured for Price column.
+        User selects range from 100 to 300. Then:
+    </p>
+    <ul>
+        <li><b>Left-inclusive</b> filter will include object with price 100 to target set</li>
+        <li><b>Right-inclusive</b> filter will include object with price 300 to target set</li>
+        <li><b>Right-Left inclusive</b> filter will include both objects with price 300 and 100 to target set</li>
+        <li><b>Not inclusive</b> filter will not include any objects with price 300 and 100 to target set. Target set will consist of single entry with Price = 200</li>
+    </ul>
+    <p>
+        By default range filter is <b>Right-Left inclusive</b>. To configure range filter inclusivity use <code>.Inclusive</code> method. First parameter controls left-inclusive, second one
+        controls right-inclusive:
+    </p>
+</div>
+<pre class="language-csharp wrap-code" data-src="#doc#/filter-inclusive.cs"></pre>
+<div class="text">
+    <p>
+        <b>Important!</b> <code>.Inclusive</code> works <b>SEPARATELY</b> for client and for server. To perform consistency
+        you have to specify it both on core configurator and UI configurator (using <code>.FilterRange</code> or <code>.FilterRangeUi</code>)
+        as shown in example. <br /> <br />
+    </p>
+</div>
+<div class="text">
+    <h3>How to override placeholder texts for filters</h3>
+    <p>
+        Use <code>.Placeholder</code> UI configurator method for value filter and <code>.Placeholders</code> method for range filter:
+    </p>
+</div>
+<pre class="language-csharp wrap-code" data-src="#doc#/filter-placeholders.cs"></pre>
+<div class="text">
+    <h3>How to change filter delay (debouncing)</h3>
+    <p>
+        You can configure debouncing only for value and range filters. Use <code>.Inputdelay</code> methog of filter UI configurator passing 
+        delay in milliseconds to pass after last filter change and befor filtering is done:
+    </p>
+</div>
+<pre class="language-csharp wrap-code" data-src="#doc#/filter-debouncing.cs"></pre>
+<div class="text">
+    <p>
+        Set shorter input delay for client filters and longer for server ones. By default input delay is 500 ms.
+    </p>
+</div>
+
+<div class="text tiptext" data-tiptext="multiselect" data-caption="Select and multiselect filters">
+    <p>
+        Actually there is no multi-select filter on client side. There is select filter with enabled multi-selection feature. <br />
+        At the same time, there is no select filter on server side - there is value filter only. <br />
+        But! On server-side multi-select filter has its own implementation.<br />
+        So <b>multi-select</b> and <b>select</b> filters do share client side, but have different server side implementations.
+        And both <b>select</b> and <b>value</b> filters do share server side, but have different client side implementations.<br />
+        That seems weird, but actually it is correct approach. <br />
+        Only range filter has its own dedicated server-side and client-side implementations.
+    </p>
+</div>

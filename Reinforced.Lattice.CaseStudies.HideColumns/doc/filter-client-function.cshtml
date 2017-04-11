@@ -1,0 +1,21 @@
+@{
+    // Override client value filter function to limit price
+
+    // Client filtering function override with function name
+    conf.Column(c => c.Price).FilterValueUi(c => c.ClientFiltering("filterPrice"));
+    
+    // OR
+    
+    // The same with function body
+    conf.Column(c => c.Price).FilterValueUi(c => c.ClientFiltering("function(obj, val, query){ return obj.Price < val; }"));
+}
+
+@* ... *@
+
+@section scripts {
+    <script type='text/javascript'>
+    function filterPrice(obj, val, query){
+        return obj.Price < val;
+    }
+    </script>
+}
