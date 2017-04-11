@@ -20,7 +20,8 @@
       "Controller": "TodoListController",
       "Action": "Index",
       "View": "Index",
-      "Data": "data.json"
+      "Data": "data.json",
+      "AdditionalFiles": [ "TodoListTemplates.cshtml" ]
     }
   ],
   "CodePieces": [
