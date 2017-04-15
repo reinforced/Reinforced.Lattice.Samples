@@ -24,11 +24,15 @@ namespace Reinforced.Lattice.CaseStudies.CoreTemplating
             BundleConfig.RegisterBundles(BundleTable.Bundles);
 
             var file = HttpContext.Current.Server.MapPath("~/App_Data/data.json");
+            var chairs = HttpContext.Current.Server.MapPath("~/App_Data/chairs.json");
             Data = JsonConvert.DeserializeObject<List<Contract>>(File.ReadAllText(file),
+                new IsoDateTimeConverter());
+            Chairs = JsonConvert.DeserializeObject<List<IkeaChair>>(File.ReadAllText(chairs),
                 new IsoDateTimeConverter());
         }
 
         public static IList Data;
+        public static IList Chairs;
 
     }
 }

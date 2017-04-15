@@ -1,0 +1,135 @@
+﻿@{ ViewBag.Title = "Ikea Chairs storage"; }
+
+@using Reinforced.Lattice
+@using Reinforced.Lattice.CaseStudies.CoreTemplating.Models
+@using Reinforced.Lattice.CellTemplating
+@using Reinforced.Lattice.Commands
+@using Reinforced.Lattice.Configuration
+@using Reinforced.Lattice.Editing
+@using Reinforced.Lattice.Editing.Editors.Display
+@using Reinforced.Lattice.Editing.Editors.Memo
+@using Reinforced.Lattice.Editing.Editors.SelectList
+@using Reinforced.Lattice.Filters
+@using Reinforced.Lattice.Filters.Range
+@using Reinforced.Lattice.Filters.Value
+@using Reinforced.Lattice.Mvc
+@using Reinforced.Lattice.Plugins
+@using Reinforced.Lattice.Plugins.Formwatch
+@using Reinforced.Lattice.Plugins.Ordering
+@using Reinforced.Lattice.Plugins.Paging
+@using Reinforced.Lattice.Plugins.Toolbar
+@using Reinforced.Lattice.Templates
+@using Reinforced.Lattice.Templates.BuiltIn
+@using Reinforced.Lattice.Templates.Expressions
+@model Reinforced.Lattice.CaseStudies.CoreTemplating.Models.IkeaChairsViewModel
+@{
+    var conf = Model.Table;
+    conf.CoreTemplates(layout: "ikeaLayout", rowWrapper: "ikeaChairRow");
+    conf.UseLines(4);
+    conf.Column(c => c.Colors).FilterValueUi(c => c.Inputdelay(10).ClientFiltering());
+    conf.Column(c => c.Category).FilterValueUi(c => c.Inputdelay(10).ClientFiltering());
+    conf.Column(c => c.Price).FilterRangeUi(c => c.Inputdelay(10).ClientFiltering());
+    conf.Column(c => c.IsByableOnline).FilterValueUi(c => c.Inputdelay(10).ClientFiltering());
+
+    conf.WatchForm<IkeaChairsFilterViewModel>(x =>
+    {
+        x.WatchAllFields();
+        x.DoNotEmbedAdditionalData();
+        x.Field(c => c.Color).TriggerSearchOnEvents(10,"change");
+        x.Field(c => c.Category).TriggerSearchOnEvents(10, "change");
+        x.Field(c => c.ByableOnline).TriggerSearchOnEvents(10, "change");
+        x.Field(c => c.PriceFrom).TriggerSearchOnEvents(10, "keyup");
+        x.Field(c => c.PriceTo).TriggerSearchOnEvents(10, "keyup");
+
+        x.FilterColumn(conf, c => c.Colors).FilterValue(c => c.Color).ClientServer(server: false);
+        x.FilterColumn(conf, c => c.Category).FilterValue(c => c.Category).ClientServer(server: false);
+        x.FilterColumn(conf, c => c.Price).FilterRange(c => c.PriceFrom, c => c.PriceTo).ClientServer(server: false);
+        x.FilterColumn(conf, c => c.IsByableOnline).FilterValue(c => c.ByableOnline).ClientServer(server: false);
+    });
+}
+<div id="allContent" style="width:1131px">
+    <div id="mainPadding">
+        <div id="main">
+            @Html.Partial("Disclamer")
+            @Html.Partial("MainFilter", new IkeaChairsFilterViewModel() {PriceFrom = 10, PriceTo = 175})
+            <div id="table"></div>
+        </div>
+    </div>
+</div>
+<div id="table"></div>
+
+@section scripts {
+    <link rel="stylesheet" type="text/css" href="http://www.ikea.com/ms/css/css_main.css">
+    <link rel="stylesheet" type="text/css" href="http://www.ikea.com/ms/css/new_category_page.css">
+
+    @using (var t = this.LatticeAdditionalTemplates())
+    {
+        using (var tpl = t.Layout("ikeaLayout"))
+        {
+            <div class="productLists adproductLists" id="productLists" @tpl.Body()></div>
+        }
+
+        using (var tpl = t.Line())
+        {
+            <div class="gridRow">
+                @tpl.Content()
+                <div class="clearGrid"></div>
+            </div>
+        }
+
+        using (var tpl = t.Message("noresults"))
+        {
+            <div class="zeroSearchResults">
+                No matches found based on your applied filters. Undo the latest selection or make a new search
+            </div>
+        }
+
+        using (var tpl = t.RowWrapper<IkeaChairRow>("ikeaChairRow"))
+        {
+            <div id="item_@tpl.Value(c=>c.DO.Id)" class="threeColumn product @tpl.If(c=>c.DisplayIndex!=0&&((c.DisplayIndex+1)%4==0),"lastColumn")" title="">
+                <div class="image">
+                    <a href="@tpl.Value(c => c.DO.Link)" class="productLink">
+                        <img src="@tpl.Value(c=>c.DO.PictureUrl)" border="0" alt="" class="prodImg">
+                    </a>
+                </div>
+                <div class="productDetails">
+                    <a href="@tpl.Value(c => c.DO.Link)" style="color:#000000">
+                        <div class="productTitle floatLeft">@tpl.Value(c => c.DO.Name)</div>
+                        <div class="productDesp">@tpl.Value(c => c.DO.Description)</div>
+                        @using (tpl.If(c => c.DO.IsSpecialPrice))
+                        {
+                            <div style="clear:both"></div>
+                            <div class="btiSpace"></div>
+                            <div class="productBtiBack">
+                                <div class="productBtiFront">
+                                    <div class="price regularPrice">$@tpl.Value(c => c.DO.Price)</div>
+                                </div>
+                            </div>
+
+                            @tpl.Else()
+                            <div class="price regularPrice">
+                                $@tpl.Value(c => c.DO.Price)
+                            </div>
+                        }
+
+                    </a>
+                    <div class="moreInfo" id="">
+                        <span class="size" id="">
+                            @tpl.Value(c => c.DO.Size)
+                        </span>
+                        <div class="buttonsContainer">
+                            <a href="#" class="blueBtn" id="popupAddToCart70298455">Buy online</a>
+                            <a href="#" class="orangeBtn" id="popupShoppingList70298455">Save to list</a>
+                        </div>
+                    </div>
+                </div>
+                <div class="clearBoth"></div>
+            </div>
+        }
+    }
+
+    @* Short piece of code to deal with IKEA's HTML layout *@
+
+    @Model.Table.InitializationScript("table", "window.$$table")
+
+}

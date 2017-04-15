@@ -1,0 +1,1716 @@
+[
+  {
+    "Id": "80217798",
+    "PictureUrl": "http://www.ikea.com/PIAimages/0239247_PE378636_S3.JPG",
+    "Name": "GUNDE",
+    "Link": "http://www.ikea.com/aa/en/catalog/products/80217798/",
+    "Description": "folding chair",
+    "IsSpecialPrice": true,
+    "Price": 11.95,
+    "Size": "Tested for: 100 kg,\t\t\t\t\t\tWidth: 41 cm,\t\t\t\t\t\tDepth: 45 cm",
+    "Colors": [
+      0,
+      5
+    ],
+    "IsByableOnline": true,
+    "Category": 3
+  },
+  {
+    "Id": "80336598",
+    "PictureUrl": "http://www.ikea.com/PIAimages/0462762_PE608312_S3.JPG",
+    "Name": "HENRIKSDAL",
+    "Link": "http://www.ikea.com/aa/en/catalog/products/80336598/",
+    "Description": "chair cover",
+    "IsSpecialPrice": false,
+    "Price": 10.0,
+    "Size": "",
+    "Colors": [
+      5,
+      7
+    ],
+    "IsByableOnline": true,
+    "Category": 0
+  },
+  {
+    "Id": "20217800",
+    "PictureUrl": "http://www.ikea.com/PIAimages/0239249_PE378635_S3.JPG",
+    "Name": "GUNDE",
+    "Link": "http://www.ikea.com/aa/en/catalog/products/20217800/",
+    "Description": "folding chair",
+    "IsSpecialPrice": true,
+    "Price": 11.95,
+    "Size": "Tested for: 100 kg,\t\t\t\t\t\tWidth: 41 cm,\t\t\t\t\t\tDepth: 45 cm",
+    "Colors": [
+      5,
+      7
+    ],
+    "IsByableOnline": true,
+    "Category": 3
+  },
+  {
+    "Id": "20301634",
+    "PictureUrl": "http://www.ikea.com/PIAimages/0314966_PE513824_S3.JPG",
+    "Name": "HENRIKSDAL",
+    "Link": "http://www.ikea.com/aa/en/catalog/products/20301634/",
+    "Description": "chair cover",
+    "IsSpecialPrice": false,
+    "Price": 20.0,
+    "Size": "",
+    "Colors": [],
+    "IsByableOnline": true,
+    "Category": 0
+  },
+  {
+    "Id": "20280844",
+    "PictureUrl": "http://www.ikea.com/PIAimages/0418685_PE575722_S3.JPG",
+    "Name": "NORRARYD",
+    "Link": "http://www.ikea.com/aa/en/catalog/products/20280844/",
+    "Description": "chair",
+    "IsSpecialPrice": false,
+    "Price": 95.0,
+    "Size": "Tested for: 110 kg,\t\t\t\t\t\tWidth: 47 cm,\t\t\t\t\t\tDepth: 51 cm",
+    "Colors": [
+      0,
+      5
+    ],
+    "IsByableOnline": true,
+    "Category": 1
+  },
+  {
+    "Id": "70246211",
+    "PictureUrl": "http://www.ikea.com/PIAimages/0243012_PE382260_S3.JPG",
+    "Name": "NISSE",
+    "Link": "http://www.ikea.com/aa/en/catalog/products/70246211/",
+    "Description": "folding chair",
+    "IsSpecialPrice": false,
+    "Price": 19.95,
+    "Size": "Tested for: 100 kg,\t\t\t\t\t\tWidth: 45 cm,\t\t\t\t\t\tDepth: 47 cm",
+    "Colors": [
+      5,
+      8
+    ],
+    "IsByableOnline": true,
+    "Category": 3
+  },
+  {
+    "Id": "30245614",
+    "PictureUrl": "http://www.ikea.com/PIAimages/0164719_PE319856_S3.JPG",
+    "Name": "HENRIKSDAL",
+    "Link": "http://www.ikea.com/aa/en/catalog/products/30245614/",
+    "Description": "chair cover",
+    "IsSpecialPrice": false,
+    "Price": 20.0,
+    "Size": "",
+    "Colors": [
+      3,
+      5
+    ],
+    "IsByableOnline": true,
+    "Category": 0
+  },
+  {
+    "Id": "30162208",
+    "PictureUrl": "http://www.ikea.com/PIAimages/74031_PE190778_S3.JPG",
+    "Name": "NISSE",
+    "Link": "http://www.ikea.com/aa/en/catalog/products/30162208/",
+    "Description": "folding chair",
+    "IsSpecialPrice": false,
+    "Price": 19.95,
+    "Size": "Tested for: 100 kg,\t\t\t\t\t\tWidth: 45 cm,\t\t\t\t\t\tDepth: 47 cm",
+    "Colors": [
+      0,
+      5
+    ],
+    "IsByableOnline": true,
+    "Category": 3
+  },
+  {
+    "Id": "60336603",
+    "PictureUrl": "http://www.ikea.com/PIAimages/0462730_PE608310_S3.JPG",
+    "Name": "HENRIKSDAL",
+    "Link": "http://www.ikea.com/aa/en/catalog/products/60336603/",
+    "Description": "chair cover",
+    "IsSpecialPrice": false,
+    "Price": 20.0,
+    "Size": "",
+    "Colors": [
+      4,
+      5
+    ],
+    "IsByableOnline": true,
+    "Category": 0
+  },
+  {
+    "Id": "20222444",
+    "PictureUrl": "http://www.ikea.com/PIAimages/0140865_PE300863_S3.JPG",
+    "Name": "TERJE",
+    "Link": "http://www.ikea.com/aa/en/catalog/products/20222444/",
+    "Description": "folding chair",
+    "IsSpecialPrice": false,
+    "Price": 24.95,
+    "Size": "Tested for: 100 kg,\t\t\t\t\t\tWidth: 44 cm,\t\t\t\t\t\tDepth: 51 cm",
+    "Colors": [
+      5,
+      7
+    ],
+    "IsByableOnline": true,
+    "Category": 3
+  },
+  {
+    "Id": "50172292",
+    "PictureUrl": "http://www.ikea.com/PIAimages/0143756_PE303255_S3.JPG",
+    "Name": "HENRIKSDAL",
+    "Link": "http://www.ikea.com/aa/en/catalog/products/50172292/",
+    "Description": "chair cover, long",
+    "IsSpecialPrice": false,
+    "Price": 30.0,
+    "Size": "",
+    "Colors": [
+      5,
+      7
+    ],
+    "IsByableOnline": true,
+    "Category": 0
+  },
+  {
+    "Id": "20225678",
+    "PictureUrl": "http://www.ikea.com/PIAimages/0140863_PE300862_S3.JPG",
+    "Name": "TERJE",
+    "Link": "http://www.ikea.com/aa/en/catalog/products/20225678/",
+    "Description": "folding chair",
+    "IsSpecialPrice": false,
+    "Price": 24.95,
+    "Size": "Tested for: 100 kg,\t\t\t\t\t\tWidth: 44 cm,\t\t\t\t\t\tDepth: 51 cm",
+    "Colors": [
+      5,
+      6
+    ],
+    "IsByableOnline": true,
+    "Category": 3
+  },
+  {
+    "Id": "30301638",
+    "PictureUrl": "http://www.ikea.com/PIAimages/0367819_PE549325_S3.JPG",
+    "Name": "HENRIKSDAL",
+    "Link": "http://www.ikea.com/aa/en/catalog/products/30301638/",
+    "Description": "chair cover, long",
+    "IsSpecialPrice": false,
+    "Price": 40.0,
+    "Size": "",
+    "Colors": [
+      3,
+      5
+    ],
+    "IsByableOnline": true,
+    "Category": 0
+  },
+  {
+    "Id": "40222443",
+    "PictureUrl": "http://www.ikea.com/PIAimages/0140854_PE300857_S3.JPG",
+    "Name": "TERJE",
+    "Link": "http://www.ikea.com/aa/en/catalog/products/40222443/",
+    "Description": "folding chair",
+    "IsSpecialPrice": false,
+    "Price": 24.95,
+    "Size": "Tested for: 100 kg,\t\t\t\t\t\tWidth: 44 cm,\t\t\t\t\t\tDepth: 51 cm",
+    "Colors": [
+      0,
+      5
+    ],
+    "IsByableOnline": true,
+    "Category": 3
+  },
+  {
+    "Id": "70198489",
+    "PictureUrl": "http://www.ikea.com/PIAimages/0354639_PE547816_S3.JPG",
+    "Name": "BÖRJE",
+    "Link": "http://www.ikea.com/aa/en/catalog/products/70198489/",
+    "Description": "chair cover",
+    "IsSpecialPrice": false,
+    "Price": 10.0,
+    "Size": "",
+    "Colors": [
+      5,
+      7
+    ],
+    "IsByableOnline": true,
+    "Category": 0
+  },
+  {
+    "Id": "10162209",
+    "PictureUrl": "http://www.ikea.com/PIAimages/74032_PE190779_S3.JPG",
+    "Name": "NISSE",
+    "Link": "http://www.ikea.com/aa/en/catalog/products/10162209/",
+    "Description": "folding chair",
+    "IsSpecialPrice": false,
+    "Price": 29.95,
+    "Size": "Tested for: 100 kg,\t\t\t\t\t\tWidth: 45 cm,\t\t\t\t\t\tDepth: 47 cm",
+    "Colors": [
+      5,
+      7
+    ],
+    "IsByableOnline": true,
+    "Category": 3
+  },
+  {
+    "Id": "70217794",
+    "PictureUrl": "http://www.ikea.com/PIAimages/0156169_PE315308_S3.JPG",
+    "Name": "FRODE",
+    "Link": "http://www.ikea.com/aa/en/catalog/products/70217794/",
+    "Description": "folding chair",
+    "IsSpecialPrice": false,
+    "Price": 39.0,
+    "Size": "Tested for: 100 kg,\t\t\t\t\t\tWidth: 45 cm,\t\t\t\t\t\tDepth: 55 cm",
+    "Colors": [
+      3,
+      5
+    ],
+    "IsByableOnline": true,
+    "Category": 3
+  },
+  {
+    "Id": "20172302",
+    "PictureUrl": "http://www.ikea.com/PIAimages/0368621_PE549627_S3.JPG",
+    "Name": "NILS",
+    "Link": "http://www.ikea.com/aa/en/catalog/products/20172302/",
+    "Description": "cover for chair with armrests",
+    "IsSpecialPrice": false,
+    "Price": 20.0,
+    "Size": "",
+    "Colors": [
+      5,
+      7
+    ],
+    "IsByableOnline": true,
+    "Category": 0
+  },
+  {
+    "Id": "80237579",
+    "PictureUrl": "http://www.ikea.com/PIAimages/0156173_PE315313_S3.JPG",
+    "Name": "FRODE",
+    "Link": "http://www.ikea.com/aa/en/catalog/products/80237579/",
+    "Description": "folding chair",
+    "IsSpecialPrice": false,
+    "Price": 39.0,
+    "Size": "Tested for: 100 kg,\t\t\t\t\t\tWidth: 45 cm,\t\t\t\t\t\tDepth: 55 cm",
+    "Colors": [
+      5,
+      6
+    ],
+    "IsByableOnline": true,
+    "Category": 3
+  },
+  {
+    "Id": "30293285",
+    "PictureUrl": "http://www.ikea.com/PIAimages/0449217_PE598744_S3.JPG",
+    "Name": "NILS",
+    "Link": "http://www.ikea.com/aa/en/catalog/products/30293285/",
+    "Description": "cover for chair with armrests",
+    "IsSpecialPrice": false,
+    "Price": 30.0,
+    "Size": "",
+    "Colors": [
+      3,
+      5
+    ],
+    "IsByableOnline": true,
+    "Category": 0
+  },
+  {
+    "Id": "20217796",
+    "PictureUrl": "http://www.ikea.com/PIAimages/0156177_PE315312_S3.JPG",
+    "Name": "FRODE",
+    "Link": "http://www.ikea.com/aa/en/catalog/products/20217796/",
+    "Description": "folding chair",
+    "IsSpecialPrice": false,
+    "Price": 39.0,
+    "Size": "Tested for: 100 kg,\t\t\t\t\t\tWidth: 45 cm,\t\t\t\t\t\tDepth: 55 cm",
+    "Colors": [
+      4,
+      5
+    ],
+    "IsByableOnline": true,
+    "Category": 3
+  },
+  {
+    "Id": "40247052",
+    "PictureUrl": "http://www.ikea.com/PIAimages/0292758_PE425389_S3.JPG",
+    "Name": "GAMLEBY",
+    "Link": "http://www.ikea.com/aa/en/catalog/products/40247052/",
+    "Description": "chair",
+    "IsSpecialPrice": false,
+    "Price": 65.0,
+    "Size": "Tested for: 110 kg,\t\t\t\t\t\tWidth: 42 cm,\t\t\t\t\t\tDepth: 50 cm",
+    "Colors": [
+      3,
+      5
+    ],
+    "IsByableOnline": true,
+    "Category": 1
+  },
+  {
+    "Id": "S39184282",
+    "PictureUrl": "http://www.ikea.com/PIAimages/0462846_PE608351_S3.JPG",
+    "Name": "HENRIKSDAL",
+    "Link": "http://www.ikea.com/aa/en/catalog/products/S39184282/",
+    "Description": "chair",
+    "IsSpecialPrice": false,
+    "Price": 85.0,
+    "Size": "Tested for: 110 kg,\t\t\t\t\t\tWidth: 51 cm,\t\t\t\t\t\tDepth: 58 cm",
+    "Colors": [],
+    "IsByableOnline": true,
+    "Category": 4
+  },
+  {
+    "Id": "S09926459",
+    "PictureUrl": "http://www.ikea.com/PIAimages/0169135_PE322867_S3.JPG",
+    "Name": "HENRIKSDAL",
+    "Link": "http://www.ikea.com/aa/en/catalog/products/S09926459/",
+    "Description": "chair",
+    "IsSpecialPrice": false,
+    "Price": 95.0,
+    "Size": "Tested for: 110 kg,\t\t\t\t\t\tWidth: 51 cm,\t\t\t\t\t\tDepth: 58 cm",
+    "Colors": [
+      3,
+      5
+    ],
+    "IsByableOnline": true,
+    "Category": 4
+  },
+  {
+    "Id": "S89122461",
+    "PictureUrl": "http://www.ikea.com/PIAimages/0367819_PE549325_S3.JPG",
+    "Name": "HENRIKSDAL",
+    "Link": "http://www.ikea.com/aa/en/catalog/products/S89122461/",
+    "Description": "chair with long cover",
+    "IsSpecialPrice": false,
+    "Price": 115.0,
+    "Size": "Tested for: 110 kg,\t\t\t\t\t\tWidth: 51 cm,\t\t\t\t\t\tDepth: 58 cm",
+    "Colors": [],
+    "IsByableOnline": true,
+    "Category": 4
+  },
+  {
+    "Id": "S09871372",
+    "PictureUrl": "http://www.ikea.com/PIAimages/0084148_PE210580_S3.JPG",
+    "Name": "HENRIKSDAL",
+    "Link": "http://www.ikea.com/aa/en/catalog/products/S09871372/",
+    "Description": "chair with long cover",
+    "IsSpecialPrice": false,
+    "Price": 105.0,
+    "Size": "Tested for: 110 kg,\t\t\t\t\t\tWidth: 51 cm,\t\t\t\t\t\tDepth: 58 cm",
+    "Colors": [],
+    "IsByableOnline": true,
+    "Category": 4
+  },
+  {
+    "Id": "70214286",
+    "PictureUrl": "http://www.ikea.com/PIAimages/0174112_PE328016_S3.JPG",
+    "Name": "ADDE",
+    "Link": "http://www.ikea.com/aa/en/catalog/products/70214286/",
+    "Description": "chair",
+    "IsSpecialPrice": true,
+    "Price": 14.95,
+    "Size": "Tested for: 110 kg,\t\t\t\t\t\tWidth: 39 cm,\t\t\t\t\t\tDepth: 47 cm",
+    "Colors": [
+      0,
+      5
+    ],
+    "IsByableOnline": true,
+    "Category": 1
+  },
+  {
+    "Id": "90219179",
+    "PictureUrl": "http://www.ikea.com/PIAimages/0174114_PE328020_S3.JPG",
+    "Name": "ADDE",
+    "Link": "http://www.ikea.com/aa/en/catalog/products/90219179/",
+    "Description": "chair",
+    "IsSpecialPrice": true,
+    "Price": 14.95,
+    "Size": "Tested for: 110 kg,\t\t\t\t\t\tWidth: 39 cm,\t\t\t\t\t\tDepth: 47 cm",
+    "Colors": [
+      5,
+      7
+    ],
+    "IsByableOnline": true,
+    "Category": 1
+  },
+  {
+    "Id": "00163803",
+    "PictureUrl": "http://www.ikea.com/PIAimages/0094408_PE232292_S3.JPG",
+    "Name": "BERNHARD",
+    "Link": "http://www.ikea.com/aa/en/catalog/products/00163803/",
+    "Description": "chair",
+    "IsSpecialPrice": false,
+    "Price": 175.0,
+    "Size": "Tested for: 110 kg,\t\t\t\t\t\tWidth: 49 cm,\t\t\t\t\t\tDepth: 50 cm",
+    "Colors": [
+      2,
+      5
+    ],
+    "IsByableOnline": true,
+    "Category": 4
+  },
+  {
+    "Id": "60161066",
+    "PictureUrl": "http://www.ikea.com/PIAimages/0094409_PE232293_S3.JPG",
+    "Name": "BERNHARD",
+    "Link": "http://www.ikea.com/aa/en/catalog/products/60161066/",
+    "Description": "chair",
+    "IsSpecialPrice": false,
+    "Price": 175.0,
+    "Size": "Tested for: 110 kg,\t\t\t\t\t\tWidth: 49 cm,\t\t\t\t\t\tDepth: 50 cm",
+    "Colors": [
+      5,
+      7
+    ],
+    "IsByableOnline": true,
+    "Category": 4
+  },
+  {
+    "Id": "70211532",
+    "PictureUrl": "http://www.ikea.com/PIAimages/0133759_PE289236_S3.JPG",
+    "Name": "BÖRJE",
+    "Link": "http://www.ikea.com/aa/en/catalog/products/70211532/",
+    "Description": "chair",
+    "IsSpecialPrice": false,
+    "Price": 65.0,
+    "Size": "Tested for: 110 kg,\t\t\t\t\t\tWidth: 44 cm,\t\t\t\t\t\tDepth: 55 cm",
+    "Colors": [
+      5,
+      7
+    ],
+    "IsByableOnline": true,
+    "Category": 4
+  },
+  {
+    "Id": "S09883469",
+    "PictureUrl": "http://www.ikea.com/PIAimages/0449257_PE598766_S3.JPG",
+    "Name": "BÖRJE",
+    "Link": "http://www.ikea.com/aa/en/catalog/products/S09883469/",
+    "Description": "chair",
+    "IsSpecialPrice": false,
+    "Price": 75.0,
+    "Size": "Tested for: 110 kg,\t\t\t\t\t\tWidth: 44 cm,\t\t\t\t\t\tDepth: 55 cm",
+    "Colors": [
+      5,
+      7
+    ],
+    "IsByableOnline": true,
+    "Category": 4
+  },
+  {
+    "Id": "S49883472",
+    "PictureUrl": "http://www.ikea.com/PIAimages/0449260_PE598769_S3.JPG",
+    "Name": "BÖRJE",
+    "Link": "http://www.ikea.com/aa/en/catalog/products/S49883472/",
+    "Description": "chair",
+    "IsSpecialPrice": false,
+    "Price": 75.0,
+    "Size": "Tested for: 110 kg,\t\t\t\t\t\tWidth: 44 cm,\t\t\t\t\t\tDepth: 55 cm",
+    "Colors": [
+      5,
+      7
+    ],
+    "IsByableOnline": true,
+    "Category": 4
+  },
+  {
+    "Id": "S69883471",
+    "PictureUrl": "http://www.ikea.com/PIAimages/0449259_PE598768_S3.JPG",
+    "Name": "BÖRJE",
+    "Link": "http://www.ikea.com/aa/en/catalog/products/S69883471/",
+    "Description": "chair",
+    "IsSpecialPrice": false,
+    "Price": 75.0,
+    "Size": "Tested for: 110 kg,\t\t\t\t\t\tWidth: 44 cm,\t\t\t\t\t\tDepth: 55 cm",
+    "Colors": [
+      5,
+      7
+    ],
+    "IsByableOnline": true,
+    "Category": 4
+  },
+  {
+    "Id": "90162111",
+    "PictureUrl": "http://www.ikea.com/PIAimages/73963_PE190725_S3.JPG",
+    "Name": "BÖRJE",
+    "Link": "http://www.ikea.com/aa/en/catalog/products/90162111/",
+    "Description": "chair",
+    "IsSpecialPrice": false,
+    "Price": 65.0,
+    "Size": "Tested for: 110 kg,\t\t\t\t\t\tWidth: 44 cm,\t\t\t\t\t\tDepth: 55 cm",
+    "Colors": [
+      5,
+      7
+    ],
+    "IsByableOnline": true,
+    "Category": 4
+  },
+  {
+    "Id": "70162112",
+    "PictureUrl": "http://www.ikea.com/PIAimages/73965_PE190726_S3.JPG",
+    "Name": "BÖRJE",
+    "Link": "http://www.ikea.com/aa/en/catalog/products/70162112/",
+    "Description": "chair",
+    "IsSpecialPrice": false,
+    "Price": 65.0,
+    "Size": "Tested for: 110 kg,\t\t\t\t\t\tWidth: 44 cm,\t\t\t\t\t\tDepth: 55 cm",
+    "Colors": [
+      5,
+      7
+    ],
+    "IsByableOnline": true,
+    "Category": 4
+  },
+  {
+    "Id": "30162109",
+    "PictureUrl": "http://www.ikea.com/PIAimages/73957_PE190723_S3.JPG",
+    "Name": "BÖRJE",
+    "Link": "http://www.ikea.com/aa/en/catalog/products/30162109/",
+    "Description": "chair",
+    "IsSpecialPrice": false,
+    "Price": 65.0,
+    "Size": "Tested for: 110 kg,\t\t\t\t\t\tWidth: 44 cm,\t\t\t\t\t\tDepth: 55 cm",
+    "Colors": [
+      5,
+      7
+    ],
+    "IsByableOnline": true,
+    "Category": 4
+  },
+  {
+    "Id": "80162140",
+    "PictureUrl": "http://www.ikea.com/PIAimages/58893_PE164498_S3.JPG",
+    "Name": "HARRY",
+    "Link": "http://www.ikea.com/aa/en/catalog/products/80162140/",
+    "Description": "chair",
+    "IsSpecialPrice": false,
+    "Price": 55.0,
+    "Size": "Tested for: 110 kg,\t\t\t\t\t\tWidth: 48 cm,\t\t\t\t\t\tDepth: 50 cm",
+    "Colors": [
+      5,
+      7
+    ],
+    "IsByableOnline": true,
+    "Category": 4
+  },
+  {
+    "Id": "S19873059",
+    "PictureUrl": "http://www.ikea.com/PIAimages/0108308_PE258044_S3.JPG",
+    "Name": "HENRIKSDAL",
+    "Link": "http://www.ikea.com/aa/en/catalog/products/S19873059/",
+    "Description": "chair",
+    "IsSpecialPrice": false,
+    "Price": 105.0,
+    "Size": "Tested for: 110 kg,\t\t\t\t\t\tWidth: 51 cm,\t\t\t\t\t\tDepth: 58 cm",
+    "Colors": [],
+    "IsByableOnline": true,
+    "Category": 4
+  },
+  {
+    "Id": "20228813",
+    "PictureUrl": "http://www.ikea.com/PIAimages/0207590_PE361528_S3.JPG",
+    "Name": "IDOLF",
+    "Link": "http://www.ikea.com/aa/en/catalog/products/20228813/",
+    "Description": "chair",
+    "IsSpecialPrice": false,
+    "Price": 85.0,
+    "Size": "Tested for: 110 kg,\t\t\t\t\t\tWidth: 42 cm,\t\t\t\t\t\tDepth: 47 cm",
+    "Colors": [
+      5,
+      7
+    ],
+    "IsByableOnline": true,
+    "Category": 1
+  },
+  {
+    "Id": "60225167",
+    "PictureUrl": "http://www.ikea.com/PIAimages/0207587_PE361529_S3.JPG",
+    "Name": "IDOLF",
+    "Link": "http://www.ikea.com/aa/en/catalog/products/60225167/",
+    "Description": "chair",
+    "IsSpecialPrice": false,
+    "Price": 85.0,
+    "Size": "Tested for: 110 kg,\t\t\t\t\t\tWidth: 42 cm,\t\t\t\t\t\tDepth: 47 cm",
+    "Colors": [
+      0,
+      5
+    ],
+    "IsByableOnline": true,
+    "Category": 1
+  },
+  {
+    "Id": "40206805",
+    "PictureUrl": "http://www.ikea.com/PIAimages/0154688_PE312833_S3.JPG",
+    "Name": "IKEA PS 2012",
+    "Link": "http://www.ikea.com/aa/en/catalog/products/40206805/",
+    "Description": "chair with armrests",
+    "IsSpecialPrice": false,
+    "Price": 95.0,
+    "Size": "Tested for: 110 kg,\t\t\t\t\t\tWidth: 52 cm,\t\t\t\t\t\tDepth: 46 cm",
+    "Colors": [
+      0,
+      5
+    ],
+    "IsByableOnline": true,
+    "Category": 1
+  },
+  {
+    "Id": "80217821",
+    "PictureUrl": "http://www.ikea.com/PIAimages/0238365_PE377893_S3.JPG",
+    "Name": "INGOLF",
+    "Link": "http://www.ikea.com/aa/en/catalog/products/80217821/",
+    "Description": "chair",
+    "IsSpecialPrice": false,
+    "Price": 75.0,
+    "Size": "Tested for: 110 kg,\t\t\t\t\t\tWidth: 43 cm,\t\t\t\t\t\tDepth: 52 cm",
+    "Colors": [],
+    "IsByableOnline": false,
+    "Category": 1
+  },
+  {
+    "Id": "70162174",
+    "PictureUrl": "http://www.ikea.com/PIAimages/0454095_PE602593_S3.JPG",
+    "Name": "INGOLF",
+    "Link": "http://www.ikea.com/aa/en/catalog/products/70162174/",
+    "Description": "chair",
+    "IsSpecialPrice": false,
+    "Price": 75.0,
+    "Size": "Tested for: 110 kg,\t\t\t\t\t\tWidth: 43 cm,\t\t\t\t\t\tDepth: 52 cm",
+    "Colors": [
+      5,
+      7
+    ],
+    "IsByableOnline": true,
+    "Category": 1
+  },
+  {
+    "Id": "40246081",
+    "PictureUrl": "http://www.ikea.com/PIAimages/0325073_PE517376_S3.JPG",
+    "Name": "JANINGE",
+    "Link": "http://www.ikea.com/aa/en/catalog/products/40246081/",
+    "Description": "chair",
+    "IsSpecialPrice": false,
+    "Price": 75.0,
+    "Size": "Tested for: 110 kg,\t\t\t\t\t\tWidth: 50 cm,\t\t\t\t\t\tDepth: 46 cm",
+    "Colors": [
+      5,
+      8
+    ],
+    "IsByableOnline": true,
+    "Category": 1
+  },
+  {
+    "Id": "80246079",
+    "PictureUrl": "http://www.ikea.com/PIAimages/0325072_PE517373_S3.JPG",
+    "Name": "JANINGE",
+    "Link": "http://www.ikea.com/aa/en/catalog/products/80246079/",
+    "Description": "chair",
+    "IsSpecialPrice": false,
+    "Price": 75.0,
+    "Size": "Tested for: 110 kg,\t\t\t\t\t\tWidth: 50 cm,\t\t\t\t\t\tDepth: 46 cm",
+    "Colors": [
+      5,
+      7
+    ],
+    "IsByableOnline": true,
+    "Category": 1
+  },
+  {
+    "Id": "60280516",
+    "PictureUrl": "http://www.ikea.com/PIAimages/0325075_PE520756_S3.JPG",
+    "Name": "JANINGE",
+    "Link": "http://www.ikea.com/aa/en/catalog/products/60280516/",
+    "Description": "chair with armrests",
+    "IsSpecialPrice": false,
+    "Price": 85.0,
+    "Size": "Tested for: 110 kg,\t\t\t\t\t\tWidth: 54 cm,\t\t\t\t\t\tDepth: 46 cm",
+    "Colors": [
+      5,
+      7
+    ],
+    "IsByableOnline": true,
+    "Category": 1
+  },
+  {
+    "Id": "20280518",
+    "PictureUrl": "http://www.ikea.com/PIAimages/0452914_PE601695_S3.JPG",
+    "Name": "JANINGE",
+    "Link": "http://www.ikea.com/aa/en/catalog/products/20280518/",
+    "Description": "chair with armrests",
+    "IsSpecialPrice": false,
+    "Price": 85.0,
+    "Size": "Tested for: 110 kg,\t\t\t\t\t\tWidth: 54 cm,\t\t\t\t\t\tDepth: 46 cm",
+    "Colors": [
+      3,
+      5
+    ],
+    "IsByableOnline": true,
+    "Category": 1
+  },
+  {
+    "Id": "10182245",
+    "PictureUrl": "http://www.ikea.com/PIAimages/0115804_PE269526_S3.JPG",
+    "Name": "KAUSTBY",
+    "Link": "http://www.ikea.com/aa/en/catalog/products/10182245/",
+    "Description": "chair",
+    "IsSpecialPrice": false,
+    "Price": 45.0,
+    "Size": "Tested for: 110 kg,\t\t\t\t\t\tWidth: 44 cm,\t\t\t\t\t\tDepth: 48 cm",
+    "Colors": [
+      0,
+      5
+    ],
+    "IsByableOnline": true,
+    "Category": 1
+  },
+  {
+    "Id": "50162194",
+    "PictureUrl": "http://www.ikea.com/PIAimages/21141_PE106141_S3.JPG",
+    "Name": "KAUSTBY",
+    "Link": "http://www.ikea.com/aa/en/catalog/products/50162194/",
+    "Description": "chair",
+    "IsSpecialPrice": false,
+    "Price": 45.0,
+    "Size": "Tested for: 110 kg,\t\t\t\t\t\tWidth: 44 cm,\t\t\t\t\t\tDepth: 48 cm",
+    "Colors": [],
+    "IsByableOnline": true,
+    "Category": 1
+  },
+  {
+    "Id": "00259424",
+    "PictureUrl": "http://www.ikea.com/PIAimages/0238235_PE377688_S3.JPG",
+    "Name": "LERHAMN",
+    "Link": "http://www.ikea.com/aa/en/catalog/products/00259424/",
+    "Description": "chair",
+    "IsSpecialPrice": false,
+    "Price": 35.0,
+    "Size": "Tested for: 110 kg,\t\t\t\t\t\tWidth: 42 cm,\t\t\t\t\t\tDepth: 49 cm",
+    "Colors": [
+      5,
+      7
+    ],
+    "IsByableOnline": true,
+    "Category": 4
+  },
+  {
+    "Id": "40259422",
+    "PictureUrl": "http://www.ikea.com/PIAimages/0238233_PE377690_S3.JPG",
+    "Name": "LERHAMN",
+    "Link": "http://www.ikea.com/aa/en/catalog/products/40259422/",
+    "Description": "chair",
+    "IsSpecialPrice": false,
+    "Price": 35.0,
+    "Size": "Tested for: 110 kg,\t\t\t\t\t\tWidth: 42 cm,\t\t\t\t\t\tDepth: 49 cm",
+    "Colors": [
+      5,
+      7
+    ],
+    "IsByableOnline": false,
+    "Category": 4
+  },
+  {
+    "Id": "S49869541",
+    "PictureUrl": "http://www.ikea.com/PIAimages/0368622_PE549628_S3.JPG",
+    "Name": "NILS",
+    "Link": "http://www.ikea.com/aa/en/catalog/products/S49869541/",
+    "Description": "chair with armrests",
+    "IsSpecialPrice": false,
+    "Price": 125.0,
+    "Size": "Tested for: 110 kg,\t\t\t\t\t\tWidth: 60 cm,\t\t\t\t\t\tDepth: 57 cm",
+    "Colors": [
+      5,
+      7
+    ],
+    "IsByableOnline": true,
+    "Category": 4
+  },
+  {
+    "Id": "40177493",
+    "PictureUrl": "http://www.ikea.com/PIAimages/0105948_PE253720_S3.JPG",
+    "Name": "NORRNÄS",
+    "Link": "http://www.ikea.com/aa/en/catalog/products/40177493/",
+    "Description": "chair",
+    "IsSpecialPrice": false,
+    "Price": 95.0,
+    "Size": "Tested for: 110 kg,\t\t\t\t\t\tWidth: 42 cm,\t\t\t\t\t\tDepth: 53 cm",
+    "Colors": [
+      3,
+      5
+    ],
+    "IsByableOnline": true,
+    "Category": 4
+  },
+  {
+    "Id": "00185305",
+    "PictureUrl": "http://www.ikea.com/PIAimages/0105949_PE253721_S3.JPG",
+    "Name": "NORRNÄS",
+    "Link": "http://www.ikea.com/aa/en/catalog/products/00185305/",
+    "Description": "chair",
+    "IsSpecialPrice": false,
+    "Price": 95.0,
+    "Size": "Tested for: 110 kg,\t\t\t\t\t\tWidth: 42 cm,\t\t\t\t\t\tDepth: 53 cm",
+    "Colors": [
+      3,
+      5
+    ],
+    "IsByableOnline": true,
+    "Category": 4
+  },
+  {
+    "Id": "50177497",
+    "PictureUrl": "http://www.ikea.com/PIAimages/0105947_PE253719_S3.JPG",
+    "Name": "NORRNÄS",
+    "Link": "http://www.ikea.com/aa/en/catalog/products/50177497/",
+    "Description": "chair",
+    "IsSpecialPrice": false,
+    "Price": 95.0,
+    "Size": "Tested for: 110 kg,\t\t\t\t\t\tWidth: 42 cm,\t\t\t\t\t\tDepth: 53 cm",
+    "Colors": [
+      3,
+      5
+    ],
+    "IsByableOnline": true,
+    "Category": 4
+  },
+  {
+    "Id": "40177501",
+    "PictureUrl": "http://www.ikea.com/PIAimages/0105946_PE253718_S3.JPG",
+    "Name": "NORRNÄS",
+    "Link": "http://www.ikea.com/aa/en/catalog/products/40177501/",
+    "Description": "chair",
+    "IsSpecialPrice": false,
+    "Price": 95.0,
+    "Size": "Tested for: 110 kg,\t\t\t\t\t\tWidth: 42 cm,\t\t\t\t\t\tDepth: 53 cm",
+    "Colors": [
+      3,
+      5
+    ],
+    "IsByableOnline": true,
+    "Category": 4
+  },
+  {
+    "Id": "40201332",
+    "PictureUrl": "http://www.ikea.com/PIAimages/0140020_PE299967_S3.JPG",
+    "Name": "PREBEN",
+    "Link": "http://www.ikea.com/aa/en/catalog/products/40201332/",
+    "Description": "chair",
+    "IsSpecialPrice": false,
+    "Price": 125.0,
+    "Size": "Tested for: 110 kg,\t\t\t\t\t\tWidth: 45 cm,\t\t\t\t\t\tDepth: 51 cm",
+    "Colors": [
+      3,
+      5
+    ],
+    "IsByableOnline": true,
+    "Category": 4
+  },
+  {
+    "Id": "80211089",
+    "PictureUrl": "http://www.ikea.com/PIAimages/0122106_PE278491_S3.JPG",
+    "Name": "STEFAN",
+    "Link": "http://www.ikea.com/aa/en/catalog/products/80211089/",
+    "Description": "chair",
+    "IsSpecialPrice": false,
+    "Price": 30.0,
+    "Size": "Tested for: 110 kg,\t\t\t\t\t\tWidth: 42 cm,\t\t\t\t\t\tDepth: 49 cm",
+    "Colors": [
+      0,
+      5
+    ],
+    "IsByableOnline": true,
+    "Category": 1
+  },
+  {
+    "Id": "80162239",
+    "PictureUrl": "http://www.ikea.com/PIAimages/74048_PE190789_S3.JPG",
+    "Name": "TOBIAS",
+    "Link": "http://www.ikea.com/aa/en/catalog/products/80162239/",
+    "Description": "chair",
+    "IsSpecialPrice": false,
+    "Price": 95.0,
+    "Size": "Tested for: 110 kg,\t\t\t\t\t\tWidth: 55 cm,\t\t\t\t\t\tDepth: 56 cm",
+    "Colors": [
+      5,
+      7
+    ],
+    "IsByableOnline": true,
+    "Category": 1
+  },
+  {
+    "Id": "S29011531",
+    "PictureUrl": "http://www.ikea.com/PIAimages/0259513_PE403158_S3.JPG",
+    "Name": "VILMAR",
+    "Link": "http://www.ikea.com/aa/en/catalog/products/S29011531/",
+    "Description": "chair",
+    "IsSpecialPrice": false,
+    "Price": 65.0,
+    "Size": "Tested for: 110 kg,\t\t\t\t\t\tWidth: 52 cm,\t\t\t\t\t\tDepth: 55 cm",
+    "Colors": [
+      5,
+      8
+    ],
+    "IsByableOnline": true,
+    "Category": 1
+  },
+  {
+    "Id": "S49889761",
+    "PictureUrl": "http://www.ikea.com/PIAimages/0125496_PE283076_S3.JPG",
+    "Name": "VILMAR",
+    "Link": "http://www.ikea.com/aa/en/catalog/products/S49889761/",
+    "Description": "chair",
+    "IsSpecialPrice": false,
+    "Price": 75.0,
+    "Size": "Tested for: 110 kg,\t\t\t\t\t\tWidth: 52 cm,\t\t\t\t\t\tDepth: 55 cm",
+    "Colors": [
+      0,
+      5
+    ],
+    "IsByableOnline": true,
+    "Category": 1
+  },
+  {
+    "Id": "S39889747",
+    "PictureUrl": "http://www.ikea.com/PIAimages/0125495_PE283075_S3.JPG",
+    "Name": "VILMAR",
+    "Link": "http://www.ikea.com/aa/en/catalog/products/S39889747/",
+    "Description": "chair",
+    "IsSpecialPrice": false,
+    "Price": 65.0,
+    "Size": "Tested for: 110 kg,\t\t\t\t\t\tWidth: 52 cm,\t\t\t\t\t\tDepth: 55 cm",
+    "Colors": [
+      5,
+      6
+    ],
+    "IsByableOnline": true,
+    "Category": 1
+  },
+  {
+    "Id": "S29889757",
+    "PictureUrl": "http://www.ikea.com/PIAimages/0214682_PE370791_S3.JPG",
+    "Name": "VILMAR",
+    "Link": "http://www.ikea.com/aa/en/catalog/products/S29889757/",
+    "Description": "chair",
+    "IsSpecialPrice": false,
+    "Price": 65.0,
+    "Size": "Tested for: 110 kg,\t\t\t\t\t\tWidth: 52 cm,\t\t\t\t\t\tDepth: 55 cm",
+    "Colors": [
+      5,
+      7
+    ],
+    "IsByableOnline": true,
+    "Category": 1
+  },
+  {
+    "Id": "S59889751",
+    "PictureUrl": "http://www.ikea.com/PIAimages/0125494_PE283074_S3.JPG",
+    "Name": "VILMAR",
+    "Link": "http://www.ikea.com/aa/en/catalog/products/S59889751/",
+    "Description": "chair",
+    "IsSpecialPrice": false,
+    "Price": 65.0,
+    "Size": "Tested for: 110 kg,\t\t\t\t\t\tWidth: 52 cm,\t\t\t\t\t\tDepth: 55 cm",
+    "Colors": [],
+    "IsByableOnline": true,
+    "Category": 1
+  },
+  {
+    "Id": "S69889755",
+    "PictureUrl": "http://www.ikea.com/PIAimages/0125493_PE283073_S3.JPG",
+    "Name": "VILMAR",
+    "Link": "http://www.ikea.com/aa/en/catalog/products/S69889755/",
+    "Description": "chair",
+    "IsSpecialPrice": false,
+    "Price": 65.0,
+    "Size": "Tested for: 110 kg,\t\t\t\t\t\tWidth: 52 cm,\t\t\t\t\t\tDepth: 55 cm",
+    "Colors": [
+      0,
+      5
+    ],
+    "IsByableOnline": true,
+    "Category": 1
+  },
+  {
+    "Id": "20239034",
+    "PictureUrl": "http://www.ikea.com/PIAimages/0154292_PE312641_S3.JPG",
+    "Name": "ÄLMSTA",
+    "Link": "http://www.ikea.com/aa/en/catalog/products/20239034/",
+    "Description": "chair",
+    "IsSpecialPrice": false,
+    "Price": 95.0,
+    "Size": "Tested for: 110 kg,\t\t\t\t\t\tWidth: 60 cm,\t\t\t\t\t\tDepth: 60 cm",
+    "Colors": [
+      0,
+      5
+    ],
+    "IsByableOnline": true,
+    "Category": 1
+  },
+  {
+    "Id": "50334732",
+    "PictureUrl": "http://www.ikea.com/PIAimages/0438861_PE591869_S3.JPG",
+    "Name": "BERNHARD",
+    "Link": "http://www.ikea.com/aa/en/catalog/products/50334732/",
+    "Description": "chair",
+    "IsSpecialPrice": false,
+    "Price": 175.0,
+    "Size": "Tested for: 110 kg,\t\t\t\t\t\tWidth: 49 cm,\t\t\t\t\t\tDepth: 50 cm",
+    "Colors": [
+      5,
+      8
+    ],
+    "IsByableOnline": true,
+    "Category": 4
+  },
+  {
+    "Id": "00334739",
+    "PictureUrl": "http://www.ikea.com/PIAimages/0438855_PE591866_S3.JPG",
+    "Name": "BERNHARD",
+    "Link": "http://www.ikea.com/aa/en/catalog/products/00334739/",
+    "Description": "chair",
+    "IsSpecialPrice": false,
+    "Price": 175.0,
+    "Size": "Tested for: 110 kg,\t\t\t\t\t\tWidth: 49 cm,\t\t\t\t\t\tDepth: 50 cm",
+    "Colors": [
+      4,
+      5
+    ],
+    "IsByableOnline": true,
+    "Category": 4
+  },
+  {
+    "Id": "70339903",
+    "PictureUrl": "http://www.ikea.com/PIAimages/0482607_PE620294_S3.JPG",
+    "Name": "BRORINGE",
+    "Link": "http://www.ikea.com/aa/en/catalog/products/70339903/",
+    "Description": "underframe",
+    "IsSpecialPrice": false,
+    "Price": 20.0,
+    "Size": "Tested for: 110 kg,\t\t\t\t\t\tWidth: 52 cm,\t\t\t\t\t\tDepth: 50 cm",
+    "Colors": [
+      5,
+      7
+    ],
+    "IsByableOnline": false,
+    "Category": 2
+  },
+  {
+    "Id": "10339901",
+    "PictureUrl": "http://www.ikea.com/PIAimages/0482606_PE620293_S3.JPG",
+    "Name": "BRORINGE",
+    "Link": "http://www.ikea.com/aa/en/catalog/products/10339901/",
+    "Description": "underframe",
+    "IsSpecialPrice": false,
+    "Price": 20.0,
+    "Size": "Tested for: 110 kg,\t\t\t\t\t\tWidth: 52 cm,\t\t\t\t\t\tDepth: 50 cm",
+    "Colors": [
+      0,
+      5
+    ],
+    "IsByableOnline": false,
+    "Category": 2
+  },
+  {
+    "Id": "90288629",
+    "PictureUrl": "http://www.ikea.com/PIAimages/0375994_PE553899_S3.JPG",
+    "Name": "BRORINGE",
+    "Link": "http://www.ikea.com/aa/en/catalog/products/90288629/",
+    "Description": "underframe",
+    "IsSpecialPrice": false,
+    "Price": 30.0,
+    "Size": "Tested for: 110 kg,\t\t\t\t\t\tWidth: 52 cm,\t\t\t\t\t\tDepth: 50 cm",
+    "Colors": [],
+    "IsByableOnline": true,
+    "Category": 2
+  },
+  {
+    "Id": "70339899",
+    "PictureUrl": "http://www.ikea.com/PIAimages/0482609_PE620295_S3.JPG",
+    "Name": "DIETMAR",
+    "Link": "http://www.ikea.com/aa/en/catalog/products/70339899/",
+    "Description": "underframe for chair with armrests",
+    "IsSpecialPrice": false,
+    "Price": 50.0,
+    "Size": "Tested for: 110 kg,\t\t\t\t\t\tWidth: 53 cm,\t\t\t\t\t\tDepth: 50 cm",
+    "Colors": [
+      0,
+      5
+    ],
+    "IsByableOnline": false,
+    "Category": 2
+  },
+  {
+    "Id": "50288631",
+    "PictureUrl": "http://www.ikea.com/PIAimages/0375996_PE553902_S3.JPG",
+    "Name": "DIETMAR",
+    "Link": "http://www.ikea.com/aa/en/catalog/products/50288631/",
+    "Description": "underframe for chair with armrests",
+    "IsSpecialPrice": false,
+    "Price": 50.0,
+    "Size": "Tested for: 110 kg,\t\t\t\t\t\tWidth: 53 cm,\t\t\t\t\t\tDepth: 50 cm",
+    "Colors": [],
+    "IsByableOnline": true,
+    "Category": 2
+  },
+  {
+    "Id": "70287975",
+    "PictureUrl": "http://www.ikea.com/PIAimages/0375998_PE553898_S3.JPG",
+    "Name": "ERNFRID",
+    "Link": "http://www.ikea.com/aa/en/catalog/products/70287975/",
+    "Description": "underframe",
+    "IsSpecialPrice": false,
+    "Price": 60.0,
+    "Size": "Tested for: 110 kg,\t\t\t\t\t\tWidth: 48 cm,\t\t\t\t\t\tDepth: 51 cm",
+    "Colors": [
+      5
+    ],
+    "IsByableOnline": true,
+    "Category": 2
+  },
+  {
+    "Id": "10309678",
+    "PictureUrl": "http://www.ikea.com/PIAimages/0105965_PE253735_S3.JPG",
+    "Name": "HENRIKSDAL",
+    "Link": "http://www.ikea.com/aa/en/catalog/products/10309678/",
+    "Description": "chair",
+    "IsSpecialPrice": false,
+    "Price": 195.0,
+    "Size": "Tested for: 110 kg,\t\t\t\t\t\tWidth: 51 cm,\t\t\t\t\t\tDepth: 58 cm",
+    "Colors": [
+      0,
+      5
+    ],
+    "IsByableOnline": true,
+    "Category": 4
+  },
+  {
+    "Id": "40217823",
+    "PictureUrl": "http://www.ikea.com/PIAimages/0355482_PE547815_S3.JPG",
+    "Name": "INGOLF",
+    "Link": "http://www.ikea.com/aa/en/catalog/products/40217823/",
+    "Description": "chair",
+    "IsSpecialPrice": false,
+    "Price": 75.0,
+    "Size": "Tested for: 100 kg,\t\t\t\t\t\tWidth: 43 cm,\t\t\t\t\t\tDepth: 52 cm",
+    "Colors": [
+      0,
+      5
+    ],
+    "IsByableOnline": true,
+    "Category": 1
+  },
+  {
+    "Id": "S09127815",
+    "PictureUrl": "http://www.ikea.com/PIAimages/0376675_PE553888_S3.JPG",
+    "Name": "LEIFARNE",
+    "Link": "http://www.ikea.com/aa/en/catalog/products/S09127815/",
+    "Description": "chair",
+    "IsSpecialPrice": false,
+    "Price": 65.0,
+    "Size": "Tested for: 110 kg,\t\t\t\t\t\tWidth: 52 cm,\t\t\t\t\t\tDepth: 50 cm",
+    "Colors": [
+      5,
+      7
+    ],
+    "IsByableOnline": true,
+    "Category": 1
+  },
+  {
+    "Id": "S59127813",
+    "PictureUrl": "http://www.ikea.com/PIAimages/0376673_PE553886_S3.JPG",
+    "Name": "LEIFARNE",
+    "Link": "http://www.ikea.com/aa/en/catalog/products/S59127813/",
+    "Description": "chair",
+    "IsSpecialPrice": false,
+    "Price": 65.0,
+    "Size": "Tested for: 110 kg,\t\t\t\t\t\tWidth: 52 cm,\t\t\t\t\t\tDepth: 50 cm",
+    "Colors": [
+      1,
+      5
+    ],
+    "IsByableOnline": true,
+    "Category": 1
+  },
+  {
+    "Id": "S89127816",
+    "PictureUrl": "http://www.ikea.com/PIAimages/0376676_PE553889_S3.JPG",
+    "Name": "LEIFARNE",
+    "Link": "http://www.ikea.com/aa/en/catalog/products/S89127816/",
+    "Description": "chair",
+    "IsSpecialPrice": false,
+    "Price": 95.0,
+    "Size": "Tested for: 110 kg,\t\t\t\t\t\tWidth: 52 cm,\t\t\t\t\t\tDepth: 50 cm",
+    "Colors": [
+      5,
+      7
+    ],
+    "IsByableOnline": true,
+    "Category": 1
+  },
+  {
+    "Id": "S39127814",
+    "PictureUrl": "http://www.ikea.com/PIAimages/0376674_PE553887_S3.JPG",
+    "Name": "LEIFARNE",
+    "Link": "http://www.ikea.com/aa/en/catalog/products/S39127814/",
+    "Description": "chair",
+    "IsSpecialPrice": false,
+    "Price": 95.0,
+    "Size": "Tested for: 110 kg,\t\t\t\t\t\tWidth: 52 cm,\t\t\t\t\t\tDepth: 50 cm",
+    "Colors": [
+      1,
+      5
+    ],
+    "IsByableOnline": true,
+    "Category": 1
+  },
+  {
+    "Id": "S69127817",
+    "PictureUrl": "http://www.ikea.com/PIAimages/0376677_PE553890_S3.JPG",
+    "Name": "LEIFARNE",
+    "Link": "http://www.ikea.com/aa/en/catalog/products/S69127817/",
+    "Description": "chair with armrests",
+    "IsSpecialPrice": false,
+    "Price": 85.0,
+    "Size": "Tested for: 110 kg,\t\t\t\t\t\tWidth: 53 cm,\t\t\t\t\t\tDepth: 50 cm",
+    "Colors": [
+      1,
+      5
+    ],
+    "IsByableOnline": true,
+    "Category": 1
+  },
+  {
+    "Id": "S49127818",
+    "PictureUrl": "http://www.ikea.com/PIAimages/0376678_PE553891_S3.JPG",
+    "Name": "LEIFARNE",
+    "Link": "http://www.ikea.com/aa/en/catalog/products/S49127818/",
+    "Description": "chair with armrests",
+    "IsSpecialPrice": false,
+    "Price": 85.0,
+    "Size": "Tested for: 110 kg,\t\t\t\t\t\tWidth: 53 cm,\t\t\t\t\t\tDepth: 50 cm",
+    "Colors": [
+      5,
+      7
+    ],
+    "IsByableOnline": true,
+    "Category": 1
+  },
+  {
+    "Id": "10288633",
+    "PictureUrl": "http://www.ikea.com/PIAimages/0376000_PE553897_S3.JPG",
+    "Name": "LEIFARNE",
+    "Link": "http://www.ikea.com/aa/en/catalog/products/10288633/",
+    "Description": "seat shell",
+    "IsSpecialPrice": false,
+    "Price": 35.0,
+    "Size": "Tested for: 110 kg,\t\t\t\t\t\tHeight: 42 cm,\t\t\t\t\t\tSeat width: 45 cm",
+    "Colors": [
+      5,
+      7
+    ],
+    "IsByableOnline": true,
+    "Category": 2
+  },
+  {
+    "Id": "90291919",
+    "PictureUrl": "http://www.ikea.com/PIAimages/0376001_PE553896_S3.JPG",
+    "Name": "LEIFARNE",
+    "Link": "http://www.ikea.com/aa/en/catalog/products/90291919/",
+    "Description": "seat shell",
+    "IsSpecialPrice": false,
+    "Price": 35.0,
+    "Size": "Tested for: 110 kg,\t\t\t\t\t\tHeight: 42 cm,\t\t\t\t\t\tSeat width: 45 cm",
+    "Colors": [
+      1,
+      5
+    ],
+    "IsByableOnline": true,
+    "Category": 2
+  },
+  {
+    "Id": "S99184383",
+    "PictureUrl": "http://www.ikea.com/PIAimages/0517256_PE640643_S3.JPG",
+    "Name": "MARTIN",
+    "Link": "http://www.ikea.com/aa/en/catalog/products/S99184383/",
+    "Description": "chair",
+    "IsSpecialPrice": false,
+    "Price": 35.0,
+    "Size": "Tested for: 100 kg,\t\t\t\t\t\tWidth: 49 cm,\t\t\t\t\t\tDepth: 52 cm",
+    "Colors": [
+      0,
+      5
+    ],
+    "IsByableOnline": false,
+    "Category": 1
+  },
+  {
+    "Id": "50162207",
+    "PictureUrl": "http://www.ikea.com/PIAimages/0368620_PE549629_S3.JPG",
+    "Name": "NILS",
+    "Link": "http://www.ikea.com/aa/en/catalog/products/50162207/",
+    "Description": "chair frame with armrests",
+    "IsSpecialPrice": false,
+    "Price": 105.0,
+    "Size": "Tested for: 110 kg,\t\t\t\t\t\tWidth: 60 cm,\t\t\t\t\t\tDepth: 57 cm",
+    "Colors": [
+      0,
+      5
+    ],
+    "IsByableOnline": true,
+    "Category": 4
+  },
+  {
+    "Id": "S39031005",
+    "PictureUrl": "http://www.ikea.com/PIAimages/0449221_PE598746_S3.JPG",
+    "Name": "NILS",
+    "Link": "http://www.ikea.com/aa/en/catalog/products/S39031005/",
+    "Description": "chair with armrests",
+    "IsSpecialPrice": false,
+    "Price": 135.0,
+    "Size": "Tested for: 110 kg,\t\t\t\t\t\tWidth: 60 cm,\t\t\t\t\t\tDepth: 57 cm",
+    "Colors": [
+      3,
+      5
+    ],
+    "IsByableOnline": true,
+    "Category": 4
+  },
+  {
+    "Id": "40351312",
+    "PictureUrl": "http://www.ikea.com/PIAimages/0507289_PE635042_S3.JPG",
+    "Name": "NORDMYRA",
+    "Link": "http://www.ikea.com/aa/en/catalog/products/40351312/",
+    "Description": "chair",
+    "IsSpecialPrice": false,
+    "Price": 50.0,
+    "Size": "Tested for: 110 kg,\t\t\t\t\t\tWidth: 45 cm,\t\t\t\t\t\tDepth: 48 cm",
+    "Colors": [
+      5,
+      7
+    ],
+    "IsByableOnline": true,
+    "Category": 1
+  },
+  {
+    "Id": "60273097",
+    "PictureUrl": "http://www.ikea.com/PIAimages/0418691_PE575727_S3.JPG",
+    "Name": "NORRARYD",
+    "Link": "http://www.ikea.com/aa/en/catalog/products/60273097/",
+    "Description": "chair",
+    "IsSpecialPrice": false,
+    "Price": 95.0,
+    "Size": "Tested for: 110 kg,\t\t\t\t\t\tWidth: 47 cm,\t\t\t\t\t\tDepth: 51 cm",
+    "Colors": [
+      5,
+      7
+    ],
+    "IsByableOnline": true,
+    "Category": 1
+  },
+  {
+    "Id": "00273095",
+    "PictureUrl": "http://www.ikea.com/PIAimages/0418689_PE575725_S3.JPG",
+    "Name": "NORRARYD",
+    "Link": "http://www.ikea.com/aa/en/catalog/products/00273095/",
+    "Description": "chair",
+    "IsSpecialPrice": false,
+    "Price": 95.0,
+    "Size": "Tested for: 110 kg,\t\t\t\t\t\tWidth: 47 cm,\t\t\t\t\t\tDepth: 51 cm",
+    "Colors": [
+      5,
+      6
+    ],
+    "IsByableOnline": true,
+    "Category": 1
+  },
+  {
+    "Id": "60301528",
+    "PictureUrl": "http://www.ikea.com/PIAimages/0440364_PE592358_S3.JPG",
+    "Name": "NORRÅKER",
+    "Link": "http://www.ikea.com/aa/en/catalog/products/60301528/",
+    "Description": "chair",
+    "IsSpecialPrice": false,
+    "Price": 95.0,
+    "Size": "Tested for: 110 kg,\t\t\t\t\t\tWidth: 41 cm,\t\t\t\t\t\tDepth: 50 cm",
+    "Colors": [
+      0,
+      5
+    ],
+    "IsByableOnline": true,
+    "Category": 1
+  },
+  {
+    "Id": "20275343",
+    "PictureUrl": "http://www.ikea.com/PIAimages/0372971_PE552171_S3.JPG",
+    "Name": "NORRÅKER",
+    "Link": "http://www.ikea.com/aa/en/catalog/products/20275343/",
+    "Description": "chair",
+    "IsSpecialPrice": false,
+    "Price": 95.0,
+    "Size": "Tested for: 110 kg,\t\t\t\t\t\tWidth: 41 cm,\t\t\t\t\t\tDepth: 50 cm",
+    "Colors": [
+      5,
+      7
+    ],
+    "IsByableOnline": true,
+    "Category": 1
+  },
+  {
+    "Id": "40311830",
+    "PictureUrl": "http://www.ikea.com/PIAimages/0445471_PE595804_S3.JPG",
+    "Name": "SALTHOLMEN",
+    "Link": "http://www.ikea.com/aa/en/catalog/products/40311830/",
+    "Description": "chair, outdoor",
+    "IsSpecialPrice": false,
+    "Price": 29.95,
+    "Size": "Width: 42 cm,\t\t\t\t\t\tDepth: 46 cm,\t\t\t\t\t\tHeight: 83 cm",
+    "Colors": [
+      5,
+      7
+    ],
+    "IsByableOnline": true,
+    "Category": 1
+  },
+  {
+    "Id": "S29127819",
+    "PictureUrl": "http://www.ikea.com/PIAimages/0376679_PE553892_S3.JPG",
+    "Name": "SVENBERTIL",
+    "Link": "http://www.ikea.com/aa/en/catalog/products/S29127819/",
+    "Description": "chair",
+    "IsSpecialPrice": false,
+    "Price": 65.0,
+    "Size": "Tested for: 110 kg,\t\t\t\t\t\tWidth: 52 cm,\t\t\t\t\t\tDepth: 50 cm",
+    "Colors": [],
+    "IsByableOnline": true,
+    "Category": 1
+  },
+  {
+    "Id": "S09127820",
+    "PictureUrl": "http://www.ikea.com/PIAimages/0376680_PE553893_S3.JPG",
+    "Name": "SVENBERTIL",
+    "Link": "http://www.ikea.com/aa/en/catalog/products/S09127820/",
+    "Description": "chair",
+    "IsSpecialPrice": false,
+    "Price": 95.0,
+    "Size": "Tested for: 110 kg,\t\t\t\t\t\tWidth: 48 cm,\t\t\t\t\t\tDepth: 51 cm",
+    "Colors": [],
+    "IsByableOnline": true,
+    "Category": 1
+  },
+  {
+    "Id": "S89127821",
+    "PictureUrl": "http://www.ikea.com/PIAimages/0376681_PE553894_S3.JPG",
+    "Name": "SVENBERTIL",
+    "Link": "http://www.ikea.com/aa/en/catalog/products/S89127821/",
+    "Description": "chair with armrests",
+    "IsSpecialPrice": false,
+    "Price": 85.0,
+    "Size": "Tested for: 110 kg,\t\t\t\t\t\tWidth: 53 cm,\t\t\t\t\t\tDepth: 50 cm",
+    "Colors": [],
+    "IsByableOnline": true,
+    "Category": 1
+  },
+  {
+    "Id": "80288639",
+    "PictureUrl": "http://www.ikea.com/PIAimages/0482613_PE620296_S3.JPG",
+    "Name": "SVENBERTIL",
+    "Link": "http://www.ikea.com/aa/en/catalog/products/80288639/",
+    "Description": "seat shell",
+    "IsSpecialPrice": false,
+    "Price": 35.0,
+    "Size": "Tested for: 110 kg,\t\t\t\t\t\tSeat width: 45 cm,\t\t\t\t\t\tSeat depth: 47 cm",
+    "Colors": [
+      0,
+      5
+    ],
+    "IsByableOnline": false,
+    "Category": 2
+  },
+  {
+    "Id": "50339895",
+    "PictureUrl": "http://www.ikea.com/PIAimages/0482614_PE620297_S3.JPG",
+    "Name": "SVENBERTIL",
+    "Link": "http://www.ikea.com/aa/en/catalog/products/50339895/",
+    "Description": "seat shell",
+    "IsSpecialPrice": false,
+    "Price": 35.0,
+    "Size": "Tested for: 110 kg,\t\t\t\t\t\tSeat width: 45 cm,\t\t\t\t\t\tSeat depth: 47 cm",
+    "Colors": [
+      5,
+      7
+    ],
+    "IsByableOnline": false,
+    "Category": 2
+  },
+  {
+    "Id": "30291917",
+    "PictureUrl": "http://www.ikea.com/PIAimages/0376003_PE553895_S3.JPG",
+    "Name": "SVENBERTIL",
+    "Link": "http://www.ikea.com/aa/en/catalog/products/30291917/",
+    "Description": "seat shell",
+    "IsSpecialPrice": false,
+    "Price": 35.0,
+    "Size": "Tested for: 110 kg,\t\t\t\t\t\tSeat width: 45 cm,\t\t\t\t\t\tSeat depth: 47 cm",
+    "Colors": [],
+    "IsByableOnline": true,
+    "Category": 2
+  },
+  {
+    "Id": "70350938",
+    "PictureUrl": "http://www.ikea.com/PIAimages/0517051_PE640574_S3.JPG",
+    "Name": "TEODORES",
+    "Link": "http://www.ikea.com/aa/en/catalog/products/70350938/",
+    "Description": "chair",
+    "IsSpecialPrice": false,
+    "Price": 30.0,
+    "Size": "Tested for: 110 kg,\t\t\t\t\t\tWidth: 46 cm,\t\t\t\t\t\tDepth: 54 cm",
+    "Colors": [
+      5,
+      7
+    ],
+    "IsByableOnline": false,
+    "Category": 1
+  },
+  {
+    "Id": "90349675",
+    "PictureUrl": "http://www.ikea.com/PIAimages/0482632_PE620304_S3.JPG",
+    "Name": "TOBIAS",
+    "Link": "http://www.ikea.com/aa/en/catalog/products/90349675/",
+    "Description": "chair",
+    "IsSpecialPrice": false,
+    "Price": 95.0,
+    "Size": "Tested for: 100 kg,\t\t\t\t\t\tWidth: 55 cm,\t\t\t\t\t\tDepth: 56 cm",
+    "Colors": [
+      3,
+      5
+    ],
+    "IsByableOnline": false,
+    "Category": 1
+  },
+  {
+    "Id": "50334727",
+    "PictureUrl": "http://www.ikea.com/PIAimages/0480407_PE618920_S3.JPG",
+    "Name": "TOBIAS",
+    "Link": "http://www.ikea.com/aa/en/catalog/products/50334727/",
+    "Description": "chair",
+    "IsSpecialPrice": false,
+    "Price": 95.0,
+    "Size": "Tested for: 110 kg,\t\t\t\t\t\tWidth: 55 cm,\t\t\t\t\t\tDepth: 56 cm",
+    "Colors": [
+      1,
+      5
+    ],
+    "IsByableOnline": false,
+    "Category": 1
+  },
+  {
+    "Id": "30259502",
+    "PictureUrl": "http://www.ikea.com/PIAimages/0335234_PE553368_S3.JPG",
+    "Name": "TUNHOLMEN",
+    "Link": "http://www.ikea.com/aa/en/catalog/products/30259502/",
+    "Description": "chair, outdoor",
+    "IsSpecialPrice": false,
+    "Price": 75.0,
+    "Size": "Width: 55 cm,\t\t\t\t\t\tDepth: 55 cm,\t\t\t\t\t\tHeight: 78 cm",
+    "Colors": [],
+    "IsByableOnline": true,
+    "Category": 1
+  },
+  {
+    "Id": "80347200",
+    "PictureUrl": "http://www.ikea.com/PIAimages/0271857_PE413659_S3.JPG",
+    "Name": "VOLFGANG",
+    "Link": "http://www.ikea.com/aa/en/catalog/products/80347200/",
+    "Description": "chair",
+    "IsSpecialPrice": false,
+    "Price": 125.0,
+    "Size": "Tested for: 110 kg,\t\t\t\t\t\tWidth: 50 cm,\t\t\t\t\t\tDepth: 45 cm",
+    "Colors": [
+      3,
+      5
+    ],
+    "IsByableOnline": true,
+    "Category": 4
+  },
+  {
+    "Id": "30327902",
+    "PictureUrl": "http://www.ikea.com/PIAimages/0271848_PE413639_S3.JPG",
+    "Name": "VOLFGANG",
+    "Link": "http://www.ikea.com/aa/en/catalog/products/30327902/",
+    "Description": "chair",
+    "IsSpecialPrice": false,
+    "Price": 125.0,
+    "Size": "Width: 50 cm,\t\t\t\t\t\tDepth: 45 cm,\t\t\t\t\t\tHeight: 90 cm",
+    "Colors": [
+      0,
+      5
+    ],
+    "IsByableOnline": true,
+    "Category": 4
+  },
+  {
+    "Id": "50298456",
+    "PictureUrl": "http://www.ikea.com/PIAimages/0271855_PE413657_S3.JPG",
+    "Name": "VOLFGANG",
+    "Link": "http://www.ikea.com/aa/en/catalog/products/50298456/",
+    "Description": "chair",
+    "IsSpecialPrice": false,
+    "Price": 125.0,
+    "Size": "Tested for: 110 kg,\t\t\t\t\t\tWidth: 50 cm,\t\t\t\t\t\tDepth: 45 cm",
+    "Colors": [
+      3,
+      5
+    ],
+    "IsByableOnline": true,
+    "Category": 4
+  },
+  {
+    "Id": "70298455",
+    "PictureUrl": "http://www.ikea.com/PIAimages/0271856_PE413658_S3.JPG",
+    "Name": "VOLFGANG",
+    "Link": "http://www.ikea.com/aa/en/catalog/products/70298455/",
+    "Description": "chair",
+    "IsSpecialPrice": false,
+    "Price": 125.0,
+    "Size": "Tested for: 110 kg,\t\t\t\t\t\tWidth: 50 cm,\t\t\t\t\t\tDepth: 45 cm",
+    "Colors": [
+      5,
+      7
+    ],
+    "IsByableOnline": true,
+    "Category": 4
+  },
+  {
+    "Id": "90320342",
+    "PictureUrl": "http://www.ikea.com/PIAimages/0410020_PE577748_S3.JPG",
+    "Name": "KULLABERG",
+    "Link": "http://www.ikea.com/aa/en/catalog/products/90320342/",
+    "Description": "swivel chair",
+    "IsSpecialPrice": false,
+    "Price": 79.95,
+    "Size": "Tested for: 110 kg,\t\t\t\t\t\tWidth: 58 cm,\t\t\t\t\t\tDepth: 58 cm",
+    "Colors": [
+      0,
+      5
+    ],
+    "IsByableOnline": true,
+    "Category": 1
+  },
+  {
+    "Id": "70325519",
+    "PictureUrl": "http://www.ikea.com/PIAimages/0410010_PE577747_S3.JPG",
+    "Name": "KULLABERG",
+    "Link": "http://www.ikea.com/aa/en/catalog/products/70325519/",
+    "Description": "swivel chair",
+    "IsSpecialPrice": false,
+    "Price": 79.95,
+    "Size": "Tested for: 110 kg,\t\t\t\t\t\tWidth: 58 cm,\t\t\t\t\t\tDepth: 58 cm",
+    "Colors": [
+      0,
+      5
+    ],
+    "IsByableOnline": true,
+    "Category": 1
+  }
+]

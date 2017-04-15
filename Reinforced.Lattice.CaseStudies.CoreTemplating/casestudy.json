@@ -22,6 +22,16 @@
       "View": "Index",
       "Data": "data.json",
       "AdditionalFiles": [ "TodoListTemplates.cshtml" ]
+    },
+    {
+      "Id": "IKEA",
+      "Title": "IKEA Dinning Chairs",
+      "Description": "Piece of IKEA online shop with dinnign chairs",
+      "Controller": "IkeaChairsController",
+      "Action": "Index",
+      "View": "Index",
+      "Data": "chairs.json",
+      "AdditionalFiles": [ "MainFilter.cshtml","Disclamer.cshtml" ]
     }
   ],
   "CodePieces": [
@@ -53,6 +63,43 @@
           "Language": "cshtml",
           "Comment": "Templates page for ToDo list",
           "Title": "Index.cshtml"
+        }
+      ]
+    },
+    {
+      "Id": "IKEA_Materials",
+      "Title": "Materials for IKEA Chairs demo",
+      "Description": "All materials for IKEA Chairs demo",
+      "Files": [
+        {
+          "Path": "/Views/IkeaChairs/Index.cshtml",
+          "Language": "cshtml",
+          "Comment": "Main page",
+          "Title": "Index.cshtml"
+        },
+        {
+          "Path": "/Models/IkeaChair.cs",
+          "Language": "csharp",
+          "Comment": "Data class, row, enumerations",
+          "Title": "IkeaChair.cs"
+        },
+        {
+          "Path": "/Models/IkeaChairsTable.cs",
+          "Language": "csharp",
+          "Comment": "Table configurator",
+          "Title": "IkeaChairsTable.cs"
+        },
+        {
+          "Path": "/Controllers/IkeaChairsController.cs",
+          "Language": "csharp",
+          "Comment": "Controller",
+          "Title": "IkeaChairsController.cs"
+        },
+        {
+          "Path": "/Views/IkeaChairs/MainFilter.cshtml",
+          "Language": "cshtml",
+          "Comment": "Filter partial",
+          "Title": "MainFilter.cshtml"
         }
       ]
     }

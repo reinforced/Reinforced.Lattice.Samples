@@ -1,0 +1,128 @@
+﻿@using Reinforced.Lattice.CaseStudies.CoreTemplating.Models
+@model Reinforced.Lattice.CaseStudies.CoreTemplating.Models.IkeaChairsFilterViewModel
+<div class="gridRow filterBlock">
+    <div class="productsFilter floatLeft">
+        <div id="productsFilterOptions" class="productsFilterOptions">
+            <div>
+                <div class="productsFilterButtons floatLeft">
+                    <div class="productsFilterChapters" id="productFilters">
+                        <a class="orangeBtn active" href="javascript:void(0)" data-cat="">All</a>
+                        <a class="orangeBtn" href="javascript:void(0)" data-cat="@((int)Category.UnderframesAndShells)">Dining chair underframes &amp; seat shells</a>
+                        <a class="orangeBtn" href="javascript:void(0)" data-cat="@((int)Category.DiningChairs)">Dining chairs</a>
+                        <a class="orangeBtn" href="javascript:void(0)" data-cat="@((int)Category.UpholsteredChairs)">Upholstered chairs</a>
+                        <a class="orangeBtn" href="javascript:void(0)" data-cat="@((int)Category.FoldableChairs)">Foldable chairs</a>
+                        <a class="orangeBtn" href="javascript:void(0)" data-cat="@((int)Category.ChairCovers)">Chair covers</a>
+                        <a id="buyableOnline" href="javascript:void(0)">Buyable online</a>
+                        @Html.TextBoxFor(c => c.Category, new { style = "display:none" })
+                        @Html.TextBoxFor(c => c.ByableOnline, new { style = "display:none" })
+                    </div>
+                </div>
+                <div>
+                    <div class="productsFilterColors floatLeft">
+                        <div id="filterImageTooltip">
+                            <div class="inactiveColor" data-color="@((int)ChairColor.Black)">
+                                <img src="http://www.ikea.com/ms/img/filter/black.png" class="_inactive" style="cursor: pointer" title="Black">
+                                <img src="http://www.ikea.com/ms/img/filter/active_black.png" class="_active" style="display: none;cursor: pointer" title="Black">
+                            </div>
+
+                            <div class="inactiveColor" data-color="@((int)ChairColor.Blue)">
+                                <img src="http://www.ikea.com/ms/img/filter/blue.png" class="_inactive" style="cursor: pointer" title="Blue">
+                                <img src="http://www.ikea.com/ms/img/filter/active_blue.png" class="_active" style="display: none;cursor: pointer" title="Blue">
+                            </div>
+
+                            <div class="inactiveColor" data-color="@((int)ChairColor.Brown)">
+                                <img src="http://www.ikea.com/ms/img/filter/brown.png" class="_inactive" style="cursor: pointer" title="Brown">
+                                <img src="http://www.ikea.com/ms/img/filter/active_brown.png" class="_active" style="display: none;cursor: pointer" title="Brown">
+                            </div>
+
+                            <div class="inactiveColor" data-color="@((int)ChairColor.Green)">
+                                <img src="http://www.ikea.com/ms/img/filter/green.png" class="_inactive" style="cursor: pointer" title="Green">
+                                <img src="http://www.ikea.com/ms/img/filter/active_green.png" class="_active" style="display: none;cursor: pointer" title="Green">
+                            </div>
+
+                            <div class="inactiveColor" data-color="@((int)ChairColor.Gray)">
+                                <img src="http://www.ikea.com/ms/img/filter/gray.png" class="_inactive" style="cursor: pointer" title="Grey">
+                                <img src="http://www.ikea.com/ms/img/filter/active_gray.png" class="_active" style="display: none;cursor: pointer" title="Grey">
+                            </div>
+
+                            <div class="inactiveColor" data-color="@((int)ChairColor.Red)">
+                                <img src="http://www.ikea.com/ms/img/filter/red.png" class="_inactive" style="cursor: pointer" title="Red">
+                                <img src="http://www.ikea.com/ms/img/filter/active_red.png" class="_active" style="display: none;cursor: pointer" title="Red">
+                            </div>
+
+                            <div class="inactiveColor" data-color="@((int)ChairColor.White)">
+                                <img src="http://www.ikea.com/ms/img/filter/white.png" class="_inactive" style="cursor: pointer" title="White">
+                                <img src="http://www.ikea.com/ms/img/filter/active_white.png" class="_active" style="display: none;cursor: pointer" title="White">
+                            </div>
+
+                            <div class="inactiveColor" data-color="@((int)ChairColor.Yellow)">
+                                <img src="http://www.ikea.com/ms/img/filter/yellow.png" class="_inactive" style="cursor: pointer" title="Yellow">
+                                <img src="http://www.ikea.com/ms/img/filter/active_yellow.png" class="_active" style="display: none;cursor: pointer" title="Yellow">
+                            </div>
+
+                            <div class="inactiveColor" data-color="@((int)ChairColor.Other)">
+                                <img src="http://www.ikea.com/ms/img/filter/othercolors.png" class="_inactive" style="cursor: pointer" title="Other colours">
+                                <img src="http://www.ikea.com/ms/img/filter/active_othercolors.png" class="_active" style="display: none;cursor: pointer" title="Other colours">
+                            </div>
+                            @Html.TextBoxFor(c => c.Color, new { style = "display:none" })
+                        </div>
+                    </div>
+                    <div class="priceFilter">
+                        <div id="text">Price Range ($)</div>
+                        @Html.TextBoxFor(c => c.PriceFrom, new { @class = "priceMin" })
+                        <div id="hypen">-</div>
+                        @Html.TextBoxFor(c => c.PriceTo, new { @class = "priceMax" })
+                        <input id="filterButton" type="submit" class="orangeBtn" value="Filter">
+                    </div>
+                </div>
+            </div>
+            <div class="clearAll"></div>
+        </div>
+    </div>
+</div>
+
+<script type="text/javascript">
+    $(document).ready(function () {
+        $("#productFilters .orangeBtn").click(function () {
+            $("#productFilters .orangeBtn").removeClass('active');
+            $(this).addClass('active');
+            $('#Category').val($(this).attr('data-cat'));
+            Reinforced.Lattice.Master.fireDomEvent('change', $('#Category')[0]);
+        });
+        $("#buyableOnline").click(function () {
+            if ($(this).hasClass('active')) {
+                $(this).removeClass('active');
+                $('#ByableOnline').val('');
+                Reinforced.Lattice.Master.fireDomEvent('change', $('#ByableOnline')[0]);
+            } else {
+                $(this).addClass('active');
+                $('#ByableOnline').val('true');
+                Reinforced.Lattice.Master.fireDomEvent('change', $('#ByableOnline')[0]);
+            }
+        });
+
+        $("#filterImageTooltip .inactiveColor").click(function () {
+            var isActive = $(this).hasClass('selectedactiveColor');
+
+            $("#filterImageTooltip .selectedactiveColor img._active").hide();
+            $("#filterImageTooltip .selectedactiveColor img._inactive").show();
+
+            $("#filterImageTooltip .selectedactiveColor")
+                .removeClass('selectedactiveColor')
+                .addClass('inactiveColor');
+            if (!isActive) {
+                $(this).removeClass('inactiveColor').addClass('selectedactiveColor');
+                $(this).find('img._inactive').hide();
+                $(this).find('img._active').show();
+
+                $('#Color').val($(this).attr('data-color'));
+            } else {
+                $('#Color').val('');
+            }
+            Reinforced.Lattice.Master.fireDomEvent('change', $('#Color')[0]);
+        });
+        $('#filterButton').click(function () {
+            window.$$table.reload();
+        });
+    });
+</script>

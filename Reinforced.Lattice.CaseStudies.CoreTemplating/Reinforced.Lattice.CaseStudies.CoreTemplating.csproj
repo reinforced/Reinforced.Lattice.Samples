@@ -183,6 +183,7 @@
     <Compile Include="App_Start\FilterConfig.cs" />
     <Compile Include="App_Start\RouteConfig.cs" />
     <Compile Include="Controllers\HomeController.cs" />
+    <Compile Include="Controllers\IkeaChairsController.cs" />
     <Compile Include="Controllers\TodoListController.cs" />
     <Compile Include="Data\DataService.cs" />
     <Compile Include="Global.asax.cs">
@@ -192,6 +193,9 @@
     <Compile Include="Models\Contract.cs" />
     <Compile Include="Models\HomeIndexViewModel.cs" />
     <Compile Include="Models\ContractRow.cs" />
+    <Compile Include="Models\IkeaChair.cs" />
+    <Compile Include="Models\IkeaChairsTable.cs" />
+    <Compile Include="Models\IkeaChairsViewModel.cs" />
     <Compile Include="Models\ToDoListData.cs" />
     <Compile Include="Models\TodoListEntry.cs" />
     <Compile Include="Models\TodoListTable.cs" />
@@ -209,6 +213,7 @@
     <Content Include="Scripts\bootstrap.min.js" />
     <Content Include="App_Data\data.json" />
     <Content Include="casestudy.json" />
+    <Content Include="App_Data\chairs.json" />
     <None Include="Scripts\jquery-1.10.2.intellisense.js" />
     <Content Include="Scripts\jquery-1.10.2.js" />
     <Content Include="Scripts\jquery-1.10.2.min.js" />
@@ -230,8 +235,11 @@
     <Content Include="Views\Home\Index.cshtml" />
     <Content Include="Views\TodoList\Index.cshtml" />
     <Content Include="Views\TodoList\TodoListTemplates.cshtml" />
+    <Content Include="Views\IkeaChairs\Index.cshtml" />
+    <Content Include="Views\IkeaChairs\MainFilter.cshtml" />
     <Content Include="Views\Shared\Lattice_Templates_Bootstrap.cshtml" />
     <Content Include="Scripts\Reinforced.Lattice\reinforced.lattice.js.map" />
+    <Content Include="Views\IkeaChairs\Disclamer.cshtml" />
   </ItemGroup>
   <ItemGroup>
     <Content Include="fonts\glyphicons-halflings-regular.woff" />

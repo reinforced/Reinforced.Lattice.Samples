@@ -5,15 +5,25 @@ var Reinforced;
 (function (Reinforced) {
     var Lattice;
     (function (Lattice) {
+        /** Message type enum */
         var MessageType;
         (function (MessageType) {
+            /**
+            * UserMessage is shown using specified custom functions for
+            *             messages showing
+            */
             MessageType[MessageType["UserMessage"] = 0] = "UserMessage";
+            /** Banner message is displayed among whole table instead of data */
             MessageType[MessageType["Banner"] = 1] = "Banner";
         })(MessageType = Lattice.MessageType || (Lattice.MessageType = {}));
+        /** Ordering */
         var Ordering;
         (function (Ordering) {
+            /** Ascending */
             Ordering[Ordering["Ascending"] = 0] = "Ascending";
+            /** Descending */
             Ordering[Ordering["Descending"] = 1] = "Descending";
+            /** Ordering is not applied */
             Ordering[Ordering["Neutral"] = 2] = "Neutral";
         })(Ordering = Lattice.Ordering || (Lattice.Ordering = {}));
         var SelectAllBehavior;
@@ -61,14 +71,23 @@ var Reinforced;
         (function (Plugins) {
             var Hierarchy;
             (function (Hierarchy) {
+                /** Controls policy of nodes collapsing and expanding */
                 var NodeExpandBehavior;
                 (function (NodeExpandBehavior) {
+                    /** This option will not fetch subtree nodes when locally loaded data available */
                     NodeExpandBehavior[NodeExpandBehavior["LoadFromCacheWhenPossible"] = 0] = "LoadFromCacheWhenPossible";
+                    /**
+                    * This option will make hierarchy plugin always fetch subtree from
+                    *             server-side even if local data available
+                    */
                     NodeExpandBehavior[NodeExpandBehavior["AlwaysLoadRemotely"] = 1] = "AlwaysLoadRemotely";
                 })(NodeExpandBehavior = Hierarchy.NodeExpandBehavior || (Hierarchy.NodeExpandBehavior = {}));
+                /** This option controls client filtering policy related to collapsed nodes */
                 var TreeCollapsedNodeFilterBehavior;
                 (function (TreeCollapsedNodeFilterBehavior) {
+                    /** In this case, even collapsed nodes will be included to filter results */
                     TreeCollapsedNodeFilterBehavior[TreeCollapsedNodeFilterBehavior["IncludeCollapsed"] = 0] = "IncludeCollapsed";
+                    /** In this case, even collapsed nodes will be excluded from filter results */
                     TreeCollapsedNodeFilterBehavior[TreeCollapsedNodeFilterBehavior["ExcludeCollapsed"] = 1] = "ExcludeCollapsed";
                 })(TreeCollapsedNodeFilterBehavior = Hierarchy.TreeCollapsedNodeFilterBehavior || (Hierarchy.TreeCollapsedNodeFilterBehavior = {}));
             })(Hierarchy = Plugins.Hierarchy || (Plugins.Hierarchy = {}));
@@ -233,6 +252,9 @@ var Reinforced;
                         return rw.TemplateIdOverride;
                     }
                     return this.CoreTemplateIds.RowWrapper;
+                };
+                TemplatesExecutor.prototype.obtainLineTemplate = function () {
+                    return this.CoreTemplateIds.Line;
                 };
                 TemplatesExecutor.prototype.obtainCellTemplate = function (cell) {
                     if (cell.TemplateIdOverride) {
@@ -1167,6 +1189,18 @@ var Reinforced;
                 return this.getRowTrackByIndex(row.Index);
             };
             /**
+             * Returns string track ID for line
+             */
+            TrackHelper.getLineTrack = function (line) {
+                return this.getLineTrackByIndex(line.Number);
+            };
+            /**
+            * Returns string track ID for line
+            */
+            TrackHelper.getLineTrackByIndex = function (lineNumber) {
+                return "ln-" + lineNumber;
+            };
+            /**
              * Returns string track ID for row
              */
             TrackHelper.getRowTrackByObject = function (dataObject) {
@@ -1303,6 +1337,9 @@ var Reinforced;
                             break;
                         case Templating.RenderedObject.Partition:
                             trk = Lattice.TrackHelper.getPartitionRowTrack();
+                            break;
+                        case Templating.RenderedObject.Line:
+                            trk = Lattice.TrackHelper.getLineTrack(element);
                             break;
                         case Templating.RenderedObject.Custom:
                             trk = null;
@@ -1581,10 +1618,14 @@ var Reinforced;
                  */
                 RenderedObject[RenderedObject["Partition"] = 5] = "Partition";
                 /**
+                 * Template region for line of rows
+                 */
+                RenderedObject[RenderedObject["Line"] = 6] = "Line";
+                /**
                  * Custom rendering object.
                  * Needed for rendering of random templates bound to random objects
                  */
-                RenderedObject[RenderedObject["Custom"] = 6] = "Custom";
+                RenderedObject[RenderedObject["Custom"] = 7] = "Custom";
             })(RenderedObject = Templating.RenderedObject || (Templating.RenderedObject = {}));
         })(Templating = Lattice.Templating || (Lattice.Templating = {}));
     })(Lattice = Reinforced.Lattice || (Reinforced.Lattice = {}));
@@ -1647,6 +1688,12 @@ var Reinforced;
                             case Templating.RenderedObject.Cell:
                                 Driver.cellContent(p.Context.Object, p);
                                 break;
+                            case Templating.RenderedObject.Line:
+                                var line = p.Context.Object;
+                                for (var i = 0; i < line.Rows.length; i++) {
+                                    Driver.row(p, line.Rows[i]);
+                                }
+                                break;
                             default:
                                 throw new Error('Unknown rendering context type');
                         }
@@ -1654,6 +1701,9 @@ var Reinforced;
                 };
                 Driver.row = function (p, row) {
                     p.nestElement(row, p.Executor.obtainRowTemplate(row), Templating.RenderedObject.Row);
+                };
+                Driver.line = function (p, ln) {
+                    p.nestElement(ln, p.Executor.obtainLineTemplate(), Templating.RenderedObject.Line);
                 };
                 Driver.headerContent = function (head, p) {
                     var content = head.Column.Configuration.Title || head.Column.RawName;
@@ -2071,6 +2121,11 @@ var Reinforced;
                  */
                 Controller.prototype.drawAdjustmentResult = function (adjustmentResult) {
                     this._masterTable.Events.AdjustmentRender.invokeBefore(this, adjustmentResult);
+                    if (adjustmentResult.NeedRedrawAll) {
+                        this.reload();
+                        this._masterTable.Events.AdjustmentRender.invokeAfter(this, adjustmentResult);
+                        return;
+                    }
                     if (adjustmentResult.NeedRefilter) {
                         this._masterTable.DataHolder.filterStoredDataWithPreviousQuery();
                     }
@@ -2152,13 +2207,20 @@ var Reinforced;
                         return null;
                     if (!columns)
                         columns = this._masterTable.InstanceManager.getUiColumns();
+                    var isLast = this._masterTable.DataHolder.DisplayedData.length == 0
+                        ? true
+                        : (this._masterTable.DataHolder.DisplayedData[this._masterTable.DataHolder.DisplayedData.length - 1] ==
+                            dataObject);
                     var rw = {
                         DataObject: dataObject,
                         Index: dataObject['__i'],
                         MasterTable: this._masterTable,
                         IsSelected: this._masterTable.Selection.isSelected(dataObject),
                         CanBeSelected: this._masterTable.Selection.canSelect(dataObject),
-                        Cells: null
+                        Cells: null,
+                        Command: null,
+                        DisplayIndex: this._masterTable.DataHolder.DisplayedData.indexOf(dataObject),
+                        IsLast: isLast
                     };
                     //if (dataObject.IsMessageObject) {
                     //    dataObject.UiColumnsCount = columns.length;
@@ -2187,6 +2249,8 @@ var Reinforced;
                         var row = this.produceRow(obj, columns);
                         if (!row)
                             continue;
+                        row.DisplayIndex = i;
+                        row.IsLast = i === (data.length - 1);
                         result.push(row);
                     }
                     return result;
@@ -2863,7 +2927,8 @@ var Reinforced;
                         NeedRefilter: needRefilter,
                         AddedData: added,
                         TouchedData: touchedData,
-                        TouchedColumns: touchedColumns
+                        TouchedColumns: touchedColumns,
+                        NeedRedrawAll: adjustments.RedrawAll
                     };
                     this._masterTable.Events.Adjustment.invokeAfter(this, adresult);
                     return adresult;
@@ -3690,10 +3755,10 @@ var Reinforced;
                         this.triggerCommandWithConfirmation(commandName, subject, null, callback);
                     }
                 };
-                CommandsService.prototype.redrawSubjectRow = function (subject) {
+                CommandsService.prototype.redrawSubjectRow = function (subject, command) {
                     if (subject != null && subject != undefined) {
                         var row = this._masterTable.Controller.produceRow(subject);
-                        row.IsCommandSubject = true;
+                        row.Command = command;
                         this._masterTable.Renderer.Modifier.redrawRow(row);
                     }
                 };
@@ -3724,7 +3789,7 @@ var Reinforced;
                         dismiss: null,
                         Details: null
                     };
-                    this.redrawSubjectRow(subject);
+                    this.redrawSubjectRow(subject, params);
                     var cmd = this._commandsCache[commandName];
                     if (cmd == null || cmd == undefined) {
                         this._masterTable.Loader.command(commandName, function (r) {
@@ -3793,6 +3858,9 @@ var Reinforced;
              */
             var ConfirmationWindowViewModel = (function () {
                 function ConfirmationWindowViewModel(masterTable, commandDescription, subject, originalCallback) {
+                    this.Command = null;
+                    this.DisplayIndex = -1;
+                    this.IsLast = false;
                     //#region Public fields
                     /**
                      * Confirmation form root HTML element
@@ -5876,9 +5944,33 @@ var Reinforced;
                  */
                 Renderer.prototype.body = function (rows) {
                     var process = this.Executor.beginProcess();
-                    for (var i = 0; i < rows.length; i++) {
-                        var rw = rows[i];
-                        Reinforced.Lattice.Templating.Driver.row(process, rw);
+                    if (this._masterTable.Configuration.RowsInLine != null) {
+                        var line = [];
+                        var lineNum = 0;
+                        for (var k = 0; k < rows.length; k++) {
+                            line.push(rows[k]);
+                            if (line.length === this._masterTable.Configuration.RowsInLine) {
+                                Reinforced.Lattice.Templating.Driver.line(process, {
+                                    Number: lineNum,
+                                    Rows: line
+                                });
+                                line = [];
+                                lineNum++;
+                            }
+                        }
+                        if (line.length > 0) {
+                            lineNum++;
+                            Reinforced.Lattice.Templating.Driver.line(process, {
+                                Number: lineNum,
+                                Rows: line
+                            });
+                        }
+                    }
+                    else {
+                        for (var i = 0; i < rows.length; i++) {
+                            var rw = rows[i];
+                            Reinforced.Lattice.Templating.Driver.row(process, rw);
+                        }
                     }
                     var result = this.Executor.endProcess(process);
                     this.Delegator.handleElementDestroy(this.BodyElement);
@@ -7633,7 +7725,10 @@ var Reinforced;
                             Cells: {},
                             renderContent: null,
                             renderElement: null,
-                            IsSpecial: true
+                            IsSpecial: true,
+                            Command: null,
+                            DisplayIndex: -1,
+                            IsLast: false
                         };
                         for (var i = 0; i < cols.length; i++) {
                             var col = cols[i];
@@ -9243,7 +9338,7 @@ var Reinforced;
                                             var val = formData[mappingConf.FieldKeys[0]];
                                             if (!val || val.length === 0)
                                                 break;
-                                            query.Filterings[fm] = val;
+                                            query.Filterings[fm] = val == null ? null : val.toString();
                                             break;
                                         case 1:
                                             var v1 = '', v2 = '';
@@ -9486,6 +9581,9 @@ var Reinforced;
             (function (Partition) {
                 var PartitionIndicatorRow = (function () {
                     function PartitionIndicatorRow(masterTable, dataLoader, conf) {
+                        this.Command = null;
+                        this.DisplayIndex = -1;
+                        this.IsLast = false;
                         this.IsSpecial = true;
                         this.Index = 0;
                         this.Cells = {};
@@ -10261,6 +10359,8 @@ var Reinforced;
                     //#region IRow members
                     _this.Cells = {};
                     _this.IsSpecial = false;
+                    _this.Command = null;
+                    _this.DisplayIndex = 0;
                     _this.ValidationMessages = [];
                     _this.EditorConfigurations = {};
                     return _this;
@@ -10632,7 +10732,10 @@ var Reinforced;
                         TemplateIdOverride: "ltmsg-" + tableMessage.Class,
                         MasterTable: null,
                         Index: 0,
-                        Cells: {}
+                        Cells: {},
+                        Command: null,
+                        DisplayIndex: 0,
+                        IsLast: true
                     };
                     tableMessage.UiColumnsCount = this._instances.getUiColumns().length;
                     tableMessage.IsMessageObject = true;
@@ -10661,7 +10764,10 @@ var Reinforced;
                             TemplateIdOverride: "ltmsg-" + message.Class,
                             MasterTable: null,
                             Index: 0,
-                            Cells: {}
+                            Cells: {},
+                            Command: null,
+                            DisplayIndex: 0,
+                            IsLast: true
                         };
                         rows.push(msgRow);
                     }
@@ -10823,6 +10929,12 @@ var Reinforced;
                             if (this._isEditing)
                                 return;
                             this.DataObject = this.MasterTable.DataHolder.StoredCache[loadIndex];
+                            this.DisplayIndex = this.MasterTable.DataHolder.DisplayedData.indexOf(this.DataObject);
+                            var isLast = this.MasterTable.DataHolder.DisplayedData.length == 0
+                                ? true
+                                : (this.MasterTable.DataHolder.DisplayedData[this.MasterTable.DataHolder.DisplayedData.length - 1] ==
+                                    this.DataObject);
+                            this.IsLast = isLast;
                             this.CurrentDataObjectModified = {};
                             for (var cd in this.DataObject) {
                                 if (this.DataObject.hasOwnProperty(cd)) {
@@ -10978,6 +11090,12 @@ var Reinforced;
                             if (rowIndex >= 0) {
                                 this._isAddingNewRow = false;
                                 this.DataObject = this.MasterTable.DataHolder.StoredCache[rowIndex];
+                                this.DisplayIndex = this.MasterTable.DataHolder.DisplayedData.indexOf(this.DataObject);
+                                var isLast = this.MasterTable.DataHolder.DisplayedData.length == 0
+                                    ? true
+                                    : (this.MasterTable.DataHolder.DisplayedData[this.MasterTable.DataHolder.DisplayedData.length - 1] ==
+                                        this.DataObject);
+                                this.IsLast = isLast;
                                 this.CurrentDataObjectModified = {};
                                 for (var cd in this.DataObject) {
                                     if (this.DataObject.hasOwnProperty(cd)) {
