@@ -5,25 +5,15 @@ var Reinforced;
 (function (Reinforced) {
     var Lattice;
     (function (Lattice) {
-        /** Message type enum */
         var MessageType;
         (function (MessageType) {
-            /**
-            * UserMessage is shown using specified custom functions for
-            *             messages showing
-            */
             MessageType[MessageType["UserMessage"] = 0] = "UserMessage";
-            /** Banner message is displayed among whole table instead of data */
             MessageType[MessageType["Banner"] = 1] = "Banner";
         })(MessageType = Lattice.MessageType || (Lattice.MessageType = {}));
-        /** Ordering */
         var Ordering;
         (function (Ordering) {
-            /** Ascending */
             Ordering[Ordering["Ascending"] = 0] = "Ascending";
-            /** Descending */
             Ordering[Ordering["Descending"] = 1] = "Descending";
-            /** Ordering is not applied */
             Ordering[Ordering["Neutral"] = 2] = "Neutral";
         })(Ordering = Lattice.Ordering || (Lattice.Ordering = {}));
         var SelectAllBehavior;
@@ -71,23 +61,14 @@ var Reinforced;
         (function (Plugins) {
             var Hierarchy;
             (function (Hierarchy) {
-                /** Controls policy of nodes collapsing and expanding */
                 var NodeExpandBehavior;
                 (function (NodeExpandBehavior) {
-                    /** This option will not fetch subtree nodes when locally loaded data available */
                     NodeExpandBehavior[NodeExpandBehavior["LoadFromCacheWhenPossible"] = 0] = "LoadFromCacheWhenPossible";
-                    /**
-                    * This option will make hierarchy plugin always fetch subtree from
-                    *             server-side even if local data available
-                    */
                     NodeExpandBehavior[NodeExpandBehavior["AlwaysLoadRemotely"] = 1] = "AlwaysLoadRemotely";
                 })(NodeExpandBehavior = Hierarchy.NodeExpandBehavior || (Hierarchy.NodeExpandBehavior = {}));
-                /** This option controls client filtering policy related to collapsed nodes */
                 var TreeCollapsedNodeFilterBehavior;
                 (function (TreeCollapsedNodeFilterBehavior) {
-                    /** In this case, even collapsed nodes will be included to filter results */
                     TreeCollapsedNodeFilterBehavior[TreeCollapsedNodeFilterBehavior["IncludeCollapsed"] = 0] = "IncludeCollapsed";
-                    /** In this case, even collapsed nodes will be excluded from filter results */
                     TreeCollapsedNodeFilterBehavior[TreeCollapsedNodeFilterBehavior["ExcludeCollapsed"] = 1] = "ExcludeCollapsed";
                 })(TreeCollapsedNodeFilterBehavior = Hierarchy.TreeCollapsedNodeFilterBehavior || (Hierarchy.TreeCollapsedNodeFilterBehavior = {}));
             })(Hierarchy = Plugins.Hierarchy || (Plugins.Hierarchy = {}));
@@ -1049,6 +1030,221 @@ var Reinforced;
         }());
         ComponentsContainer._components = {};
         Lattice.ComponentsContainer = ComponentsContainer;
+    })(Lattice = Reinforced.Lattice || (Reinforced.Lattice = {}));
+})(Reinforced || (Reinforced = {}));
+///<reference path="../CoreInterfaces.ts"/>
+var Reinforced;
+(function (Reinforced) {
+    var Lattice;
+    (function (Lattice) {
+        var Plugins;
+        (function (Plugins) {
+            /**
+             * Base class for plugins.
+             * It contains necessary infrastructure for convinence of plugins creation
+             */
+            var PluginBase = (function () {
+                function PluginBase() {
+                    /**
+                     * Function that is called after plugin is drawn
+                     *
+                     * @param e Event arguments
+                     */
+                    this.afterDrawn = null;
+                }
+                PluginBase.prototype.init = function (masterTable) {
+                    this.MasterTable = masterTable;
+                    this.Configuration = this.RawConfig.Configuration;
+                    if (masterTable.Events != null)
+                        this.subscribe(masterTable.Events);
+                };
+                /**
+                 * Events subscription method.
+                 * In derived class here should be subscription to various events
+                 *
+                 * @param e Events manager
+                 */
+                PluginBase.prototype.subscribe = function (e) {
+                    if (this.afterDrawn != null) {
+                        this.MasterTable.Events.LayoutRendered.subscribeAfter(this.afterDrawn.bind(this), this.RawConfig.PluginId);
+                    }
+                };
+                /**
+                 * Default render function using TemplateId from plugin configuration
+                 * @param e Templates provider
+                 * @returns content string
+                 */
+                PluginBase.prototype.defaultRender = function (p) {
+                    return p.nest(this, this.RawConfig.TemplateId);
+                };
+                return PluginBase;
+            }());
+            Plugins.PluginBase = PluginBase;
+        })(Plugins = Lattice.Plugins || (Lattice.Plugins = {}));
+    })(Lattice = Reinforced.Lattice || (Reinforced.Lattice = {}));
+})(Reinforced || (Reinforced = {}));
+var __extends = (this && this.__extends) || function (d, b) {
+    for (var p in b) if (b.hasOwnProperty(p)) d[p] = b[p];
+    function __() { this.constructor = d; }
+    d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
+};
+///<reference path="PluginBase.ts"/>
+var Reinforced;
+(function (Reinforced) {
+    var Lattice;
+    (function (Lattice) {
+        var Plugins;
+        (function (Plugins) {
+            var NativeScroll;
+            (function (NativeScroll) {
+                var NativeScrollPlugin = (function (_super) {
+                    __extends(NativeScrollPlugin, _super);
+                    function NativeScrollPlugin() {
+                        var _this = _super !== null && _super.apply(this, arguments) || this;
+                        _this._previousAmout = 0;
+                        _this._block = false;
+                        //#region Event throttling
+                        _this.time = Date.now();
+                        _this.prevPos = null;
+                        _this._onScrollBound = null;
+                        return _this;
+                    }
+                    NativeScrollPlugin.prototype.adjustScrollerHeight = function (skip) {
+                        if (skip == null)
+                            skip = this.MasterTable.Partition.Skip;
+                        this._previousAmout = this.MasterTable.Partition.amount();
+                        this.szBefore(this.beforeSize(skip));
+                        this.szAfter(this.afterSize(skip));
+                    };
+                    NativeScrollPlugin.prototype.totalSize = function () {
+                        var total = this.MasterTable.Partition.amount();
+                        return total * this.Configuration.ElementSize;
+                    };
+                    NativeScrollPlugin.prototype.afterSize = function (skip) {
+                        var total = this.MasterTable.Partition.amount();
+                        return (total - this.MasterTable.Partition.Take - skip) *
+                            this.Configuration.ElementSize;
+                    };
+                    NativeScrollPlugin.prototype.beforeSize = function (skip) {
+                        return skip * this.Configuration.ElementSize;
+                    };
+                    NativeScrollPlugin.prototype.szBefore = function (size) {
+                        return this.sz(this._before, size);
+                    };
+                    NativeScrollPlugin.prototype.szAfter = function (size) {
+                        return this.sz(this._after, size);
+                    };
+                    NativeScrollPlugin.prototype.sz = function (element, size) {
+                        if (size == null) {
+                            var x = element.getBoundingClientRect();
+                            if (this.Configuration.IsHorizontal)
+                                return x.width;
+                            return x.height;
+                        }
+                        else {
+                            if (this.Configuration.IsHorizontal)
+                                element.style.width = (Math.floor(size) + 'px');
+                            else
+                                element.style.height = (Math.floor(size) + 'px');
+                            return size;
+                        }
+                    };
+                    NativeScrollPlugin.prototype.hideScroll = function () {
+                        this._isHidden = true;
+                        if (this.Configuration.IsHorizontal) {
+                            this._scrollContainer.style.overflowX = 'hidden';
+                        }
+                        else {
+                            this._scrollContainer.style.overflowY = 'hidden';
+                        }
+                    };
+                    NativeScrollPlugin.prototype.showScroll = function () {
+                        if (!this._isHidden)
+                            return;
+                        if (this.Configuration.IsHorizontal) {
+                            this._scrollContainer.style.overflowX = 'auto';
+                        }
+                        else {
+                            this._scrollContainer.style.overflowY = 'auto';
+                        }
+                    };
+                    NativeScrollPlugin.prototype.init = function (masterTable) {
+                        _super.prototype.init.call(this, masterTable);
+                    };
+                    NativeScrollPlugin.prototype.onScroll = function (e) {
+                        if (this._block)
+                            return;
+                        var scroll = e.target.scrollTop;
+                        if (this.prevPos == null) {
+                            this.prevPos = scroll;
+                            return;
+                        }
+                        if (Math.abs(this.prevPos - scroll) < this.Configuration.ElementSize)
+                            return;
+                        if (this.Configuration.ScrollThrottle > 0 && (this.time + this.Configuration.ScrollThrottle - Date.now() >= 0))
+                            return;
+                        this.time = Date.now();
+                        e.preventDefault();
+                        e.stopPropagation();
+                        this._block = true;
+                        this.MasterTable.Partition.setSkip(scroll / this.Configuration.ElementSize);
+                        this.prevPos = scroll;
+                        this._block = false;
+                    };
+                    //#endregion
+                    NativeScrollPlugin.prototype.onPartitionChange = function (e) {
+                        if (!this.MasterTable.DataHolder.Ordered
+                            || (this.MasterTable.Partition.isClient() && this.MasterTable.DataHolder.Ordered.length <= e.MasterTable.Partition.Take)
+                            || this.MasterTable.DataHolder.DisplayedData.length === 0
+                            || e.EventArgs.Take === 0) {
+                            this.hideScroll();
+                            return;
+                        }
+                        else {
+                            this.showScroll();
+                        }
+                        this.adjustScrollerHeight();
+                    };
+                    NativeScrollPlugin.prototype.onClientDataProcessing = function (e) {
+                        if (e.EventArgs.OnlyPartitionPerformed)
+                            return;
+                        if (e.MasterTable.Partition.Take === 0
+                            || (((this.MasterTable.Partition.Type === Reinforced.Lattice.PartitionType.Client) || (this.MasterTable.Partition.Type === Reinforced.Lattice.PartitionType.Sequential))
+                                && e.EventArgs.Ordered.length <= e.MasterTable.Partition.Take)
+                            || e.EventArgs.Displaying.length === 0) {
+                            this.hideScroll();
+                            return;
+                        }
+                        else {
+                            this.showScroll();
+                        }
+                        this.adjustScrollerHeight();
+                    };
+                    NativeScrollPlugin.prototype.subscribe = function (e) {
+                        e.LayoutRendered.subscribeAfter(this.onLayoutRendered.bind(this), 'nscroll');
+                        e.PartitionChanged.subscribeAfter(this.onPartitionChange.bind(this), 'nscroll');
+                        e.ClientDataProcessing.subscribeAfter(this.onClientDataProcessing.bind(this), 'nscroll');
+                    };
+                    NativeScrollPlugin.prototype.onLayoutRendered = function (e) {
+                        var bdyParent = this.MasterTable.Renderer.BodyElement.parentElement;
+                        this._before = document.createElement('div');
+                        this._before.style.visibility = 'hidden';
+                        this._before.style.opacity = '0';
+                        bdyParent.insertBefore(this._before, this.MasterTable.Renderer.BodyElement);
+                        this._after = document.createElement('div');
+                        this._after.style.visibility = 'hidden';
+                        this._after.style.opacity = '0';
+                        bdyParent.appendChild(this._after);
+                        this._scrollContainer = bdyParent;
+                        this._onScrollBound = this.onScroll.bind(this);
+                        Reinforced.Lattice.Services.EventsDelegatorService.addHandler(this._scrollContainer, 'scroll', this._onScrollBound);
+                    };
+                    return NativeScrollPlugin;
+                }(Reinforced.Lattice.Plugins.PluginBase));
+                NativeScroll.NativeScrollPlugin = NativeScrollPlugin;
+                Lattice.ComponentsContainer.registerComponent('NativeScroll', NativeScrollPlugin);
+            })(NativeScroll = Plugins.NativeScroll || (Plugins.NativeScroll = {}));
+        })(Plugins = Lattice.Plugins || (Lattice.Plugins = {}));
     })(Lattice = Reinforced.Lattice || (Reinforced.Lattice = {}));
 })(Reinforced || (Reinforced = {}));
 var Reinforced;
@@ -5278,6 +5474,48 @@ var Reinforced;
                  * @param row
                  * @returns {}
                  */
+                DOMModifier.prototype.appendLine = function (line, beforeLineAtIndex) {
+                    var p = this._tpl.beginProcess();
+                    Reinforced.Lattice.Templating.Driver.line(p, line);
+                    var result = this._tpl.endProcess(p);
+                    var newLineElement = this.createElement(result.Html);
+                    if (beforeLineAtIndex != null && beforeLineAtIndex != undefined) {
+                        var referenceNode = this._locator.getLineElementByIndex(beforeLineAtIndex);
+                        referenceNode.parentNode.insertBefore(newLineElement, referenceNode);
+                    }
+                    else {
+                        this._bodyElement.appendChild(newLineElement);
+                    }
+                    this._backBinder.backBind(newLineElement, result.BackbindInfo);
+                    return newLineElement;
+                };
+                /**
+                 * Redraws specified row refreshing all its graphical state
+                 *
+                 * @param row
+                 * @returns {}
+                 */
+                DOMModifier.prototype.prependLine = function (line) {
+                    var p = this._tpl.beginProcess();
+                    Reinforced.Lattice.Templating.Driver.line(p, line);
+                    var result = this._tpl.endProcess(p);
+                    var newLineElement = this.createElement(result.Html);
+                    if (this._bodyElement.childElementCount === 0) {
+                        this._bodyElement.appendChild(newLineElement);
+                    }
+                    else {
+                        var referenceNode = this._bodyElement.firstElementChild;
+                        referenceNode.parentNode.insertBefore(newLineElement, referenceNode);
+                    }
+                    this._backBinder.backBind(newLineElement, result.BackbindInfo);
+                    return newLineElement;
+                };
+                /**
+                 * Redraws specified row refreshing all its graphical state
+                 *
+                 * @param row
+                 * @returns {}
+                 */
                 DOMModifier.prototype.prependRow = function (row) {
                     var p = this._tpl.beginProcess();
                     Reinforced.Lattice.Templating.Driver.row(p, row);
@@ -5319,6 +5557,18 @@ var Reinforced;
                     if (!rowElement)
                         return;
                     this.destroyElement(rowElement);
+                };
+                /**
+                 * Removes line row by its index
+                 *
+                 * @param lineDisplayIndex
+                 * @returns {}
+                 */
+                DOMModifier.prototype.destroyLineByIndex = function (lineDisplayIndex) {
+                    var lineElement = this._locator.getLineElementByIndex(lineDisplayIndex);
+                    if (!lineElement)
+                        return;
+                    this.destroyElement(lineElement);
                 };
                 DOMModifier.prototype.destroyRowByNumber = function (rowNumber) {
                     var rows = this._locator.getRowElements();
@@ -5758,10 +6008,19 @@ var Reinforced;
                  * Retrieves row element (including wrapper)
                  *
                  * @param row Row
-                 * @returns HTML element
+                 * @returns NodeList of rows
                  */
                 DOMLocator.prototype.getRowElements = function () {
                     return this._bodyElement.querySelectorAll("[data-track^=\"r-\"]");
+                };
+                /**
+                 * Retrieves all lines elements
+                 *
+                 * @param row Row
+                 * @returns NodeList of lines
+                 */
+                DOMLocator.prototype.getLineElements = function () {
+                    return this._bodyElement.querySelectorAll("[data-track^=\"ln-\"]");
                 };
                 /**
                 * Retrieves row element (including wrapper) by specified row index
@@ -5771,6 +6030,16 @@ var Reinforced;
                 */
                 DOMLocator.prototype.getRowElementByIndex = function (rowDisplayingIndex) {
                     var track = Lattice.TrackHelper.getRowTrackByIndex(rowDisplayingIndex);
+                    return this._bodyElement.querySelector("[data-track=\"" + track + "\"]");
+                };
+                /**
+                * Retrieves line element (including all nested rows) by specified line index
+                *
+                * @param row Row
+                * @returns HTML element
+                */
+                DOMLocator.prototype.getLineElementByIndex = function (lineDisplayingIndex) {
+                    var track = Lattice.TrackHelper.getLineTrackByIndex(lineDisplayingIndex);
                     return this._bodyElement.querySelector("[data-track=\"" + track + "\"]");
                 };
                 /**
@@ -5944,12 +6213,12 @@ var Reinforced;
                  */
                 Renderer.prototype.body = function (rows) {
                     var process = this.Executor.beginProcess();
-                    if (this._masterTable.Configuration.RowsInLine != null) {
+                    if (this._masterTable.Configuration.Lines != null && this._masterTable.Configuration.Lines.UseTemplate) {
                         var line = [];
                         var lineNum = 0;
                         for (var k = 0; k < rows.length; k++) {
                             line.push(rows[k]);
-                            if (line.length === this._masterTable.Configuration.RowsInLine) {
+                            if (line.length === this._masterTable.Configuration.Lines.RowsInLine) {
                                 Reinforced.Lattice.Templating.Driver.line(process, {
                                     Number: lineNum,
                                     Rows: line
@@ -6374,62 +6643,6 @@ var Reinforced;
         Lattice.Master = Master;
     })(Lattice = Reinforced.Lattice || (Reinforced.Lattice = {}));
 })(Reinforced || (Reinforced = {}));
-///<reference path="../CoreInterfaces.ts"/>
-var Reinforced;
-(function (Reinforced) {
-    var Lattice;
-    (function (Lattice) {
-        var Plugins;
-        (function (Plugins) {
-            /**
-             * Base class for plugins.
-             * It contains necessary infrastructure for convinence of plugins creation
-             */
-            var PluginBase = (function () {
-                function PluginBase() {
-                    /**
-                     * Function that is called after plugin is drawn
-                     *
-                     * @param e Event arguments
-                     */
-                    this.afterDrawn = null;
-                }
-                PluginBase.prototype.init = function (masterTable) {
-                    this.MasterTable = masterTable;
-                    this.Configuration = this.RawConfig.Configuration;
-                    if (masterTable.Events != null)
-                        this.subscribe(masterTable.Events);
-                };
-                /**
-                 * Events subscription method.
-                 * In derived class here should be subscription to various events
-                 *
-                 * @param e Events manager
-                 */
-                PluginBase.prototype.subscribe = function (e) {
-                    if (this.afterDrawn != null) {
-                        this.MasterTable.Events.LayoutRendered.subscribeAfter(this.afterDrawn.bind(this), this.RawConfig.PluginId);
-                    }
-                };
-                /**
-                 * Default render function using TemplateId from plugin configuration
-                 * @param e Templates provider
-                 * @returns content string
-                 */
-                PluginBase.prototype.defaultRender = function (p) {
-                    return p.nest(this, this.RawConfig.TemplateId);
-                };
-                return PluginBase;
-            }());
-            Plugins.PluginBase = PluginBase;
-        })(Plugins = Lattice.Plugins || (Lattice.Plugins = {}));
-    })(Lattice = Reinforced.Lattice || (Reinforced.Lattice = {}));
-})(Reinforced || (Reinforced = {}));
-var __extends = (this && this.__extends) || function (d, b) {
-    for (var p in b) if (b.hasOwnProperty(p)) d[p] = b[p];
-    function __() { this.constructor = d; }
-    d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
-};
 ///<reference path="../Plugins/PluginBase.ts"/>
 var Reinforced;
 (function (Reinforced) {
@@ -8022,15 +8235,19 @@ var Reinforced;
                             this.MasterTable.Renderer.Modifier.appendRow(rows[j], beforeIdx);
                         }
                     };
-                    HierarchyPlugin.prototype.firePartitionChange = function (tk, sk) {
+                    HierarchyPlugin.prototype.firePartitionChange = function (tk, sk, fsk) {
                         tk = tk == null ? this.MasterTable.Partition.Take : tk;
                         sk = sk == null ? this.MasterTable.Partition.Skip : sk;
+                        fsk = fsk == null ? this.MasterTable.Partition.FloatingSkip : fsk;
                         var prevTk = this.MasterTable.Partition.Take;
                         var prevSk = this.MasterTable.Partition.Skip;
+                        var prefFsk = this.MasterTable.Partition.FloatingSkip;
                         this.MasterTable.Partition.Take = tk;
                         this.MasterTable.Partition.Skip = sk;
+                        this.MasterTable.Partition.Skip = fsk;
                         this.MasterTable.Events.PartitionChanged.invokeAfter(this, {
-                            Take: tk, PreviousTake: prevTk, Skip: sk, PreviousSkip: prevSk
+                            Take: tk, PreviousTake: prevTk, Skip: sk, PreviousSkip: prevSk,
+                            PreviousFloatingSkip: prefFsk, FloatingSkip: fsk
                         });
                     };
                     HierarchyPlugin.prototype.removeNLastRows = function (n) {
@@ -8132,7 +8349,7 @@ var Reinforced;
                                     this.MasterTable.Renderer.Modifier.appendRow(rows[l]);
                                 }
                             }
-                            this.firePartitionChange(null, nskip);
+                            this.firePartitionChange(null, nskip, nskip);
                         }
                     };
                     //#endregion
@@ -8676,7 +8893,7 @@ var Reinforced;
                             this._scollbar.style.top = newCoords.top + 'px';
                         this.calculateAvailableSpace();
                         this.adjustScrollerHeight();
-                        this.adjustScrollerPosition(this.MasterTable.Partition.Skip);
+                        this.adjustScrollerPosition(this.MasterTable.Partition.FloatingSkip);
                     };
                     ScrollbarPlugin.prototype.adjustScrollerPosition = function (skip) {
                         if (!this.Scroller)
@@ -8708,7 +8925,7 @@ var Reinforced;
                             this._availableSpace -= (sz - osz);
                             this._availableSpaceRawCorrection = (sz - osz);
                             this._availableSpaceRaw = false;
-                            this.adjustScrollerPosition(this.MasterTable.Partition.Skip);
+                            this.adjustScrollerPosition(this.MasterTable.Partition.FloatingSkip);
                         }
                         if (this.Configuration.IsHorizontal)
                             this.Scroller.style.width = sz + 'px';
@@ -8938,19 +9155,19 @@ var Reinforced;
                         var result = false;
                         var mappings = this.Configuration.Keys;
                         if (mappings.SingleDown.indexOf(keyCode) > -1) {
-                            this.deferScroll(this.MasterTable.Partition.Skip + this.Configuration.Forces.SingleForce);
+                            this.deferScroll(this.MasterTable.Partition.FloatingSkip + this.Configuration.Forces.SingleForce);
                             result = true;
                         }
                         if (mappings.SingleUp.indexOf(keyCode) > -1) {
-                            this.deferScroll(this.MasterTable.Partition.Skip - this.Configuration.Forces.SingleForce);
+                            this.deferScroll(this.MasterTable.Partition.FloatingSkip - this.Configuration.Forces.SingleForce);
                             result = true;
                         }
                         if (mappings.PageDown.indexOf(keyCode) > -1) {
-                            this.deferScroll(this.MasterTable.Partition.Skip + (this.Configuration.UseTakeAsPageForce ? this.MasterTable.Partition.Take : this.Configuration.Forces.PageForce));
+                            this.deferScroll(this.MasterTable.Partition.FloatingSkip + (this.Configuration.UseTakeAsPageForce ? this.MasterTable.Partition.Take : this.Configuration.Forces.PageForce));
                             result = true;
                         }
                         if (mappings.PageUp.indexOf(keyCode) > -1) {
-                            this.deferScroll(this.MasterTable.Partition.Skip - (this.Configuration.UseTakeAsPageForce ? this.MasterTable.Partition.Take : this.Configuration.Forces.PageForce));
+                            this.deferScroll(this.MasterTable.Partition.FloatingSkip - (this.Configuration.UseTakeAsPageForce ? this.MasterTable.Partition.Take : this.Configuration.Forces.PageForce));
                             result = true;
                         }
                         if (mappings.Home.indexOf(keyCode) > -1) {
@@ -8973,7 +9190,7 @@ var Reinforced;
                         var pos = this.Configuration.IsHorizontal ? e.clientX : e.clientY;
                         var rowsPerPixel = this.MasterTable.Partition.amount() / this._availableSpace;
                         var diff = (pos - (cs + (this._scrollerSize / 2))) * rowsPerPixel;
-                        this.MasterTable.Partition.setSkip(this.MasterTable.Partition.Skip + Math.floor(diff));
+                        this.MasterTable.Partition.setSkip(this.MasterTable.Partition.FloatingSkip + diff);
                         e.stopPropagation();
                     };
                     ScrollbarPlugin.prototype.activeAreaMouseDown = function (e) {
@@ -8982,7 +9199,7 @@ var Reinforced;
                     };
                     ScrollbarPlugin.prototype.scrollerStart = function (e) {
                         this._mouseStartPos = this.Configuration.IsHorizontal ? e.clientX : e.clientY;
-                        this._startSkip = this.MasterTable.Partition.Skip;
+                        this._startSkip = this.MasterTable.Partition.FloatingSkip;
                         this._skipOnUp = -1;
                         Reinforced.Lattice.Services.EventsDelegatorService.addHandler(document.body, 'mousemove', this._boundScrollerMove);
                         Reinforced.Lattice.Services.EventsDelegatorService.addHandler(document.body, 'mouseup', this._boundScrollerEnd);
@@ -8996,7 +9213,7 @@ var Reinforced;
                         var amt = this.MasterTable.Partition.amount();
                         var rowsPerPixel = amt / this._availableSpace;
                         var diff = (cPos - this._mouseStartPos) * rowsPerPixel;
-                        var skp = this._startSkip + Math.floor(diff);
+                        var skp = this._startSkip + diff;
                         if (skp < 0)
                             skp = 0;
                         if (skp > amt - this.MasterTable.Partition.Take)
@@ -9041,8 +9258,8 @@ var Reinforced;
                         if (e.deltaMode === e.DOM_DELTA_PAGE) {
                             range = e.deltaY * (this.Configuration.UseTakeAsPageForce ? this.MasterTable.Partition.Take : this.Configuration.Forces.PageForce);
                         }
-                        if (range !== 0 && (this.MasterTable.Partition.Skip + range >= 0)) {
-                            this.MasterTable.Partition.setSkip(this.MasterTable.Partition.Skip + range);
+                        if (range !== 0 && (this.MasterTable.Partition.FloatingSkip + range >= 0)) {
+                            this.MasterTable.Partition.setSkip(this.MasterTable.Partition.FloatingSkip + range);
                             e.preventDefault();
                             e.stopPropagation();
                         }
@@ -9053,9 +9270,9 @@ var Reinforced;
                         e.stopPropagation();
                     };
                     ScrollbarPlugin.prototype.upArrow = function () {
-                        if (this.MasterTable.Partition.Skip == 0)
+                        if (this.MasterTable.Partition.FloatingSkip === 0)
                             return;
-                        this.MasterTable.Partition.setSkip(this.MasterTable.Partition.Skip - this.Configuration.Forces.SingleForce); //todo force
+                        this.MasterTable.Partition.setSkip(this.MasterTable.Partition.FloatingSkip - this.Configuration.Forces.SingleForce); //todo force
                     };
                     ScrollbarPlugin.prototype.upArrowEnd = function (e) {
                         if (!this._upArrowActive)
@@ -9072,11 +9289,11 @@ var Reinforced;
                     ScrollbarPlugin.prototype.downArrow = function () {
                         // to make user able to scroll until loader
                         if (this.MasterTable.Partition.Type !== Reinforced.Lattice.PartitionType.Sequential) {
-                            if (this.MasterTable.Partition.Skip + this.MasterTable.Partition.Take >=
+                            if (this.MasterTable.Partition.FloatingSkip + this.MasterTable.Partition.Take >=
                                 this.MasterTable.Partition.amount())
                                 return;
                         }
-                        this.MasterTable.Partition.setSkip(this.MasterTable.Partition.Skip + this.Configuration.Forces.SingleForce); //todo force
+                        this.MasterTable.Partition.setSkip(this.MasterTable.Partition.FloatingSkip + this.Configuration.Forces.SingleForce); //todo force
                     };
                     ScrollbarPlugin.prototype.downArrowEnd = function (e) {
                         if (!this._downArrowActive)
@@ -9140,7 +9357,7 @@ var Reinforced;
                         if (this.MasterTable.Partition.amount() !== this._previousAmout) {
                             this.adjustScrollerHeight();
                         }
-                        this.adjustScrollerPosition(e.EventArgs.Skip);
+                        this.adjustScrollerPosition(e.EventArgs.FloatingSkip);
                     };
                     ScrollbarPlugin.prototype.onClientDataProcessing = function (e) {
                         if (e.EventArgs.OnlyPartitionPerformed)
@@ -9156,7 +9373,7 @@ var Reinforced;
                             this.showScroll(true);
                         }
                         this.adjustScrollerHeight();
-                        this.adjustScrollerPosition(this.MasterTable.Partition.Skip);
+                        this.adjustScrollerPosition(this.MasterTable.Partition.FloatingSkip);
                     };
                     ScrollbarPlugin.prototype.subscribe = function (e) {
                         e.LayoutRendered.subscribeAfter(this.onLayoutRendered.bind(this), 'scrollbar');
@@ -9338,7 +9555,7 @@ var Reinforced;
                                             var val = formData[mappingConf.FieldKeys[0]];
                                             if (!val || val.length === 0)
                                                 break;
-                                            query.Filterings[fm] = val == null ? null : val.toString();
+                                            query.Filterings[fm] = val == null ? '' : val.toString();
                                             break;
                                         case 1:
                                             var v1 = '', v2 = '';
@@ -9649,11 +9866,20 @@ var Reinforced;
                             preserveTake = true;
                         if (skip < 0)
                             skip = 0;
+                        var floatingSkip = skip;
+                        skip = Math.floor(skip);
+                        var prevSkip = this.Skip;
+                        if (this._masterTable.Configuration.Lines != null) {
+                            skip = Math.floor(skip / this._masterTable.Configuration.Lines.RowsInLine) *
+                                this._masterTable.Configuration.Lines.RowsInLine;
+                        }
                         var take = this.Take;
                         if (take > 0) {
                             if (skip + take > this.amount()) {
-                                if (preserveTake)
+                                if (preserveTake) {
                                     skip = this.amount() - take;
+                                    floatingSkip = skip;
+                                }
                                 else
                                     take = this.amount() - skip;
                             }
@@ -9661,48 +9887,97 @@ var Reinforced;
                         else {
                             take = this.amount() - skip;
                         }
-                        var prevSkip = this.Skip;
-                        if (prevSkip === skip)
+                        if (prevSkip === skip) {
+                            this.beforeSkipTake(null, floatingSkip);
+                            this.adjustSkipTake(null, floatingSkip);
                             return;
-                        var ea = {
-                            PreviousSkip: prevSkip,
-                            Skip: skip,
-                            PreviousTake: this.Take,
-                            Take: this.Take
-                        };
-                        this._masterTable.Events.PartitionChanged.invokeBefore(this, ea);
+                        }
+                        this.beforeSkipTake(skip, floatingSkip, take);
                         if (skip >= prevSkip + take || skip <= prevSkip - take) {
                             this.cutDisplayed(skip, take);
                             this._masterTable.Controller.redrawVisibleData();
                         }
                         else {
-                            var prevIdx = this.displayedIndexes();
-                            this.cutDisplayed(skip, take);
-                            var diff = Math.abs(prevSkip - skip);
-                            var down = skip > prevSkip;
-                            var rows = this._masterTable.Controller.produceRows();
-                            this.destroySpecialRows(rows);
-                            for (var i = 0; i < diff; i++) {
-                                var toDestroy = down ? prevIdx[i] : prevIdx[prevIdx.length - 1 - i];
-                                this._masterTable.Renderer.Modifier.destroyRowByIndex(toDestroy);
-                            }
-                            if (down) {
-                                var li = this.lastNonSpecialIndex(rows) - diff + 1;
-                                for (var j = 0; j < diff; j++) {
-                                    this._masterTable.Renderer.Modifier.appendRow(rows[li + j]);
-                                }
+                            if (this._masterTable.Configuration.Lines != null && this._masterTable.Configuration.Lines.UseTemplate) {
+                                this.scrollLines(skip, take, prevSkip);
                             }
                             else {
-                                var fi = this.firstNonSpecialIndex(rows) + diff - 1;
-                                for (var k = 0; k < diff; k++) {
-                                    this._masterTable.Renderer.Modifier.prependRow(rows[fi - k]);
-                                }
+                                this.scrollRows(skip, take, prevSkip);
                             }
-                            this.restoreSpecialRows(rows);
                             this._masterTable.Events.DataRendered.invokeAfter(this, null);
                         }
-                        this.Skip = skip;
-                        this._masterTable.Events.PartitionChanged.invokeAfter(this, ea);
+                        this.adjustSkipTake(skip, floatingSkip, take);
+                    };
+                    ClientPartitionService.prototype.scrollLines = function (skip, take, prevSkip) {
+                        var prevIdx = this.displayedIndexes();
+                        var lineSize = this._masterTable.Configuration.Lines.RowsInLine;
+                        var prevLines = prevIdx.length / lineSize;
+                        this.cutDisplayed(skip, take);
+                        var diff = Math.abs(prevSkip - skip);
+                        var linesDiff = diff / lineSize;
+                        var down = skip > prevSkip;
+                        var rows = this._masterTable.Controller.produceRows();
+                        this.destroySpecialRows(rows);
+                        for (var i = 0; i < linesDiff; i++) {
+                            if (down) {
+                                this._masterTable.Renderer.Modifier.destroyLineByIndex(i);
+                            }
+                            else {
+                                this._masterTable.Renderer.Modifier.destroyLineByIndex(prevLines - i - 1);
+                            }
+                        }
+                        if (down) {
+                            var li = this.lastNonSpecialIndex(rows) - diff + 1;
+                            for (var j = 0; j < linesDiff; j++) {
+                                var splStart = li + j * lineSize;
+                                var line = {
+                                    Number: 0,
+                                    Rows: rows.slice(splStart, splStart + lineSize)
+                                };
+                                this._masterTable.Renderer.Modifier.appendLine(line);
+                            }
+                        }
+                        else {
+                            var fi = this.firstNonSpecialIndex(rows);
+                            for (var k = linesDiff - 1; k >= 0; k--) {
+                                var splStart2 = fi + k * lineSize;
+                                var revline = {
+                                    Number: 0,
+                                    Rows: rows.slice(splStart2, splStart2 + lineSize)
+                                };
+                                this._masterTable.Renderer.Modifier.prependLine(revline);
+                            }
+                        }
+                        var limes = this._masterTable.Renderer.Locator.getLineElements();
+                        for (var l = 0; l < limes.length; l++) {
+                            limes.item(l).setAttribute('data-track', Lattice.TrackHelper.getLineTrackByIndex(l));
+                        }
+                        this.restoreSpecialRows(rows);
+                    };
+                    ClientPartitionService.prototype.scrollRows = function (skip, take, prevSkip) {
+                        var prevIdx = this.displayedIndexes();
+                        this.cutDisplayed(skip, take);
+                        var diff = Math.abs(prevSkip - skip);
+                        var down = skip > prevSkip;
+                        var rows = this._masterTable.Controller.produceRows();
+                        this.destroySpecialRows(rows);
+                        for (var i = 0; i < diff; i++) {
+                            var toDestroy = down ? prevIdx[i] : prevIdx[prevIdx.length - 1 - i];
+                            this._masterTable.Renderer.Modifier.destroyRowByIndex(toDestroy);
+                        }
+                        if (down) {
+                            var li = this.lastNonSpecialIndex(rows) - diff + 1;
+                            for (var j = 0; j < diff; j++) {
+                                this._masterTable.Renderer.Modifier.appendRow(rows[li + j]);
+                            }
+                        }
+                        else {
+                            var fi = this.firstNonSpecialIndex(rows) + diff - 1;
+                            for (var k = 0; k < diff; k++) {
+                                this._masterTable.Renderer.Modifier.prependRow(rows[fi - k]);
+                            }
+                        }
+                        this.restoreSpecialRows(rows);
                     };
                     ClientPartitionService.prototype.firstNonSpecialIndex = function (rows) {
                         for (var i = 0; i < rows.length; i++) {
@@ -9730,25 +10005,16 @@ var Reinforced;
                         return currentIndexes;
                     };
                     ClientPartitionService.prototype.setTake = function (take) {
-                        var ea = {
-                            PreviousSkip: this.Skip,
-                            Skip: this.Skip,
-                            PreviousTake: this.Take,
-                            Take: take
-                        };
-                        this._masterTable.Events.PartitionChanged.invokeBefore(this, ea);
+                        this.beforeSkipTake(null, null, take);
                         if (!this._masterTable.DataHolder.RecentClientQuery) {
                             this.Take = take;
                             this._masterTable.Controller.reload();
-                            this._masterTable.Events.PartitionChanged.invokeAfter(this, ea);
+                            this.adjustSkipTake();
                             return;
                         }
                         if (take === 0) {
-                            this.Skip = 0;
-                            this.Take = 0;
-                            ea.Skip = 0;
-                            this.cutDisplayed(this.Skip, take);
-                            this._masterTable.Events.PartitionChanged.invokeAfter(this, ea);
+                            this.cutDisplayed(0, 0);
+                            this.adjustSkipTake(0, 0, 0);
                             this._masterTable.Controller.redrawVisibleData();
                             return;
                         }
@@ -9775,7 +10041,6 @@ var Reinforced;
                             rows = this._masterTable.Controller.produceRows();
                             if (take > rows.length - specialCount) {
                                 take = rows.length - specialCount;
-                                ea.Take = take;
                             }
                             var woSpecial = [];
                             for (var l = 0; l < rows.length; l++) {
@@ -9792,7 +10057,7 @@ var Reinforced;
                             this._masterTable.Events.DataRendered.invokeAfter(this, null);
                         }
                         this.Take = take;
-                        this._masterTable.Events.PartitionChanged.invokeAfter(this, ea);
+                        this.adjustSkipTake(null, null, take);
                     };
                     ClientPartitionService.prototype.restoreSpecialRows = function (rows) {
                         for (var i = 0; i < rows.length; i++) {
@@ -9845,18 +10110,52 @@ var Reinforced;
                             Skip: this.Skip
                         };
                     };
-                    ClientPartitionService.prototype.partitionAfterQuery = function (initialSet, query, serverCount) {
-                        if (initialSet.length !== 0 && this.Skip + this.Take > initialSet.length) {
-                            var prevSkip = this.Skip;
-                            this.Skip = initialSet.length - this.Take;
-                            if (this.Skip < 0)
-                                this.Skip = 0;
-                            this._masterTable.Events.PartitionChanged.invokeAfter(this, {
-                                PreviousSkip: prevSkip,
-                                Skip: 0,
-                                PreviousTake: this.Take,
+                    ClientPartitionService.prototype.beforeSkipTake = function (skip, floatingSkip, take) {
+                        this._masterTable.Events.PartitionChanged.invokeBefore(this, {
+                            PreviousSkip: this.Skip,
+                            Skip: skip || this.Skip,
+                            PreviousFloatingSkip: this.FloatingSkip,
+                            FloatingSkip: floatingSkip || this.FloatingSkip,
+                            PreviousTake: this.Take,
+                            Take: take || this.Take
+                        });
+                    };
+                    ClientPartitionService.prototype.adjustSkipTake = function (skip, floatingSkip, take) {
+                        var changed = (skip != null && this.Skip !== skip)
+                            || (floatingSkip != null && this.FloatingSkip !== floatingSkip)
+                            || (take != null && this.Take !== take);
+                        if (!changed)
+                            return;
+                        var prevSkip = this.Skip;
+                        var prevFloatSkip = this.FloatingSkip;
+                        var prevTake = this.Take;
+                        if (skip != null)
+                            this.Skip = skip;
+                        if (floatingSkip != null)
+                            this.FloatingSkip = floatingSkip;
+                        if (take != null)
+                            this.Take = take;
+                        this._masterTable.Events.PartitionChanged.invokeAfter(this, {
+                            PreviousSkip: prevSkip,
+                            Skip: skip,
+                            PreviousTake: prevTake,
+                            Take: this.Take,
+                            PreviousFloatingSkip: prevFloatSkip,
+                            FloatingSkip: floatingSkip
+                        });
+                        if (this._masterTable.Configuration.Partition.BalancerFunction != null) {
+                            this._masterTable.Configuration.Partition.BalancerFunction({
+                                Skip: floatingSkip,
                                 Take: this.Take
                             });
+                        }
+                    };
+                    ClientPartitionService.prototype.partitionAfterQuery = function (initialSet, query, serverCount) {
+                        if (initialSet.length !== 0 && this.Skip + this.Take > initialSet.length) {
+                            var skp = initialSet.length - this.Take;
+                            if (skp < 0)
+                                skp = 0;
+                            this.adjustSkipTake(skp, skp);
                         }
                         var result = this.skipTakeSet(initialSet, query);
                         return result;
@@ -9893,6 +10192,19 @@ var Reinforced;
                     ClientPartitionService.prototype.amount = function () {
                         return (!this._masterTable.DataHolder.Ordered) ? 0 : this._masterTable.DataHolder.Ordered.length;
                     };
+                    ClientPartitionService.prototype.lines = function () {
+                        var r = this.amount();
+                        if (this._masterTable.Configuration.Lines != null) {
+                            var c = r / this._masterTable.Configuration.Lines.RowsInLine;
+                            if (c > Math.floor(c)) {
+                                return Math.floor(c) + 1;
+                            }
+                            else {
+                                return Math.floor(c);
+                            }
+                        }
+                        return r;
+                    };
                     ClientPartitionService.prototype.isAmountFinite = function () {
                         return true;
                     };
@@ -9901,12 +10213,15 @@ var Reinforced;
                     };
                     ClientPartitionService.prototype.initial = function (skip, take) {
                         this.Skip = skip;
+                        this.FloatingSkip = skip;
                         this.Take = take;
                         this._masterTable.Events.PartitionChanged.invokeAfter(this, {
                             PreviousSkip: 0,
                             Skip: skip,
                             PreviousTake: 0,
-                            Take: take
+                            Take: take,
+                            PreviousFloatingSkip: 0,
+                            FloatingSkip: skip
                         });
                     };
                     ClientPartitionService.prototype.isClient = function () { return true; };
@@ -9963,7 +10278,7 @@ var Reinforced;
                         if (preserveTake == null)
                             preserveTake = true;
                         var iSkip = skip - this._serverSkip;
-                        var prevTake = this.Take;
+                        var take = this.Take;
                         if (((iSkip + this.Take + this._conf.LoadAhead) > this._masterTable.DataHolder.Ordered.length) || (iSkip < 0)) {
                             if ((iSkip > this._masterTable.DataHolder.Ordered.length) || (iSkip < 0)) {
                                 if (skip + this.Take > this._serverTotalCount) {
@@ -9971,17 +10286,10 @@ var Reinforced;
                                         skip = this._serverTotalCount - this.Take;
                                     }
                                     else {
-                                        this.Take = this._serverTotalCount - skip;
+                                        take = this._serverTotalCount - skip;
                                     }
                                 }
-                                var prevSkip = this.Skip;
-                                this.Skip = skip;
-                                this._masterTable.Events.PartitionChanged.invokeAfter(this, {
-                                    PreviousSkip: prevSkip,
-                                    Skip: this.Skip,
-                                    PreviousTake: prevTake,
-                                    Take: this.Take
-                                });
+                                this.adjustSkipTake(skip, skip, take);
                                 this._serverSkip = skip;
                                 this._masterTable.Controller.reload(true);
                                 return;
@@ -10041,19 +10349,12 @@ var Reinforced;
                         };
                         return isServerQuery;
                     };
-                    ServerPartitionService.prototype.resetSkip = function () {
+                    ServerPartitionService.prototype.resetSkip = function (take) {
                         this._serverSkip = 0;
-                        if (this.Skip === 0)
+                        if (this.Skip === 0 && this.Take === take)
                             return;
-                        var prevSkip = this.Skip;
-                        this._dataLoader.skipTake(0, this.Take);
-                        this.Skip = 0;
-                        this._masterTable.Events.PartitionChanged.invokeAfter(this, {
-                            PreviousSkip: prevSkip,
-                            Skip: this.Skip,
-                            PreviousTake: this.Take,
-                            Take: this.Take
-                        });
+                        this._dataLoader.skipTake(0, take);
+                        this.adjustSkipTake(0, 0, take);
                     };
                     ServerPartitionService.prototype.switchToSequential = function () {
                         this._masterTable.Partition = this._seq;
@@ -10062,8 +10363,7 @@ var Reinforced;
                     };
                     ServerPartitionService.prototype.switchBack = function (serverQuery, clientQuery, isServerQuery) {
                         this._masterTable.Partition = this;
-                        this.Take = this._seq.Take;
-                        this.resetSkip();
+                        this.resetSkip(this._seq.Take);
                         this.partitionBeforeQuery(serverQuery, clientQuery, isServerQuery);
                     };
                     ServerPartitionService.prototype.partitionAfterQuery = function (initialSet, query, serverCount) {
@@ -10155,24 +10455,17 @@ var Reinforced;
                     SequentialPartitionService.prototype.amount = function () {
                         return _super.prototype.amount.call(this);
                     };
-                    SequentialPartitionService.prototype.resetSkip = function () {
-                        if (this.Skip === 0)
+                    SequentialPartitionService.prototype.resetSkip = function (take) {
+                        if (this.Skip === 0 && take === this.Take)
                             return;
-                        var prevSkip = this.Skip;
-                        this.DataLoader.skipTake(0, this.Take);
-                        this.Skip = 0;
-                        this._masterTable.Events.PartitionChanged.invokeAfter(this, {
-                            PreviousSkip: prevSkip,
-                            Skip: this.Skip,
-                            PreviousTake: this.Take,
-                            Take: this.Take
-                        });
+                        this.DataLoader.skipTake(0, take);
+                        this.adjustSkipTake(0, 0, take);
                     };
                     SequentialPartitionService.prototype.partitionBeforeQuery = function (serverQuery, clientQuery, isServerQuery) {
                         // Check if it is pager's request. If true - nothing to do here. All necessary things are already done in queryModifier
                         if ((serverQuery) && serverQuery.IsBackgroundDataFetch)
                             return isServerQuery;
-                        this.resetSkip();
+                        this.resetSkip(this.Take);
                         if (this.Owner != null) {
                             var hasClientFilters = this.any(clientQuery.Filterings);
                             if (!hasClientFilters) {

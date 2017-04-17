@@ -36,7 +36,18 @@ namespace Reinforced.Lattice.CaseStudies.CoreTemplating.Controllers
             var conf = new Configurator<IkeaChair, IkeaChairRow>().IkeaChairs();
             var handler = conf.CreateMvcHandler(ControllerContext);
            
-            return handler.Handle(DataService.GetAllData().AsQueryable());
+            return handler.Handle(GetChairs().AsQueryable());
+        }
+
+        private IEnumerable<IkeaChair> GetChairs()
+        {
+            while (true)
+            {
+                foreach (var ikeaChair in DataService.GetAllData())
+                {
+                    yield return ikeaChair;
+                }
+            }
         }
 
         public DataService<IkeaChair> DataService { get; private set; }

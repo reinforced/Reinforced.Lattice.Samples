@@ -237,9 +237,9 @@
     <Content Include="Views\TodoList\TodoListTemplates.cshtml" />
     <Content Include="Views\IkeaChairs\Index.cshtml" />
     <Content Include="Views\IkeaChairs\MainFilter.cshtml" />
+    <Content Include="Views\IkeaChairs\Disclamer.cshtml" />
     <Content Include="Views\Shared\Lattice_Templates_Bootstrap.cshtml" />
     <Content Include="Scripts\Reinforced.Lattice\reinforced.lattice.js.map" />
-    <Content Include="Views\IkeaChairs\Disclamer.cshtml" />
   </ItemGroup>
   <ItemGroup>
     <Content Include="fonts\glyphicons-halflings-regular.woff" />

@@ -10,7 +10,7 @@ namespace Reinforced.Lattice.CaseStudies.CoreTemplating.Models
     {
         public static Configurator<IkeaChair, IkeaChairRow> IkeaChairs(this Configurator<IkeaChair, IkeaChairRow> conf)
         {
-            conf.PrimaryKey(c => c.Id);
+            //conf.PrimaryKey(c => c.Id);
             conf.ProjectDataWith(c => c.Select(x => new IkeaChairRow()
             {
                 Price = x.Price,

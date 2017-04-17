@@ -15,6 +15,7 @@
 @using Reinforced.Lattice.Mvc
 @using Reinforced.Lattice.Plugins
 @using Reinforced.Lattice.Plugins.Formwatch
+@using Reinforced.Lattice.Plugins.NativeScroll
 @using Reinforced.Lattice.Plugins.Ordering
 @using Reinforced.Lattice.Plugins.Paging
 @using Reinforced.Lattice.Plugins.Toolbar
@@ -46,6 +47,9 @@
         x.FilterColumn(conf, c => c.Price).FilterRange(c => c.PriceFrom, c => c.PriceTo).ClientServer(server: false);
         x.FilterColumn(conf, c => c.IsByableOnline).FilterValue(c => c.ByableOnline).ClientServer(server: false);
     });
+
+    conf.Partition(x => x.Sequential(loadPagesAhead: 50).InitialSkipTake(take: 12));
+    conf.NativeScrollbar(63.5);
 }
 <div id="allContent" style="width:1131px">
     <div id="mainPadding">
@@ -66,7 +70,9 @@
     {
         using (var tpl = t.Layout("ikeaLayout"))
         {
-            <div class="productLists adproductLists" id="productLists" @tpl.Body()></div>
+            <div id="bodyContainer" style="max-height: 630px; overflow-y: auto;">
+                <div class="productLists adproductLists" id="productLists" @tpl.Body()></div>
+            </div>
         }
 
         using (var tpl = t.Line())
